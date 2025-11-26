@@ -48,10 +48,10 @@ The system allows families to borrow useful items for their children free of cha
 
 ## 🛠️ Technology & Methodology
 - **Backend:** (to be defined, e.g., .NET Core, Node.js, or Python Flask)
-- **Frontend:** HTML, CSS, JavaScript (with possible frameworks like React)
+- **Frontend:** HTML, CSS, JavaScript
 - **Database:** PostgreSQL (managed via pgAdmin)
 - **Project Management:** Agile methodology with Azure DevOps
-- **Cloud/Hosting:** Azure (optional)
+- **Cloud/Hosting:** Azure 
 
 ---
 
