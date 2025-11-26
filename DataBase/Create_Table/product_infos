@@ -1,8 +1,0 @@
-CREATE TABLE product (
-    id SERIAL PRIMARY KEY,
-    product_name VARCHAR(100) NOT NULL,
-    category VARCHAR(50) NOT NULL,
-    publish_date DATE DEFAULT CURRENT_DATE,
-    status VARCHAR(20) CHECK (status IN ('available', 'borrowed', 'unavailable')) DEFAULT 'available',
-    owner_id INT REFERENCES personnal_infos(id) ON DELETE SET NULL
-);
