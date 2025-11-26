@@ -1,0 +1,21 @@
+trigger:
+- main   # or master, depending on your branch name
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- script: echo "Synchronizing GitHub with Azure DevOps!"
+  displayName: 'Test pipeline run'
+
+# Example: install and test Node.js project
+- task: NodeTool@0
+  inputs:
+    versionSpec: '18.x'
+  displayName: 'Install Node.js'
+
+- script: npm install
+  displayName: 'Install dependencies'
+
+- script: npm test
+  displayName: 'Run tests'
