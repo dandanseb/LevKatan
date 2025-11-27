@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>לב קטן - התחברות והרשמה</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #FFB6C1 0%, #FFC0CB 50%, #FFE4E1 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(255, 182, 193, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(173, 216, 230, 0.3) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .container {
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 480px;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #FF69B4 0%, #FFB6C1 100%);
+            padding: 40px 20px 30px;
+            text-align: center;
+            color: white;
+            position: relative;
+        }
+
+        .logo {
+            font-size: 48px;
+            margin-bottom: 10px;
+            animation: heartbeat 2s ease-in-out infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.1); }
+            50% { transform: scale(1); }
+        }
+
+        .site-name {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .tagline {
+            font-size: 16px;
+            opacity: 0.95;
+            font-weight: 300;
+        }
+
+        .tabs {
+            display: flex;
+            background: #FFF5F7;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 18px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            font-size: 16px;
+        }
+
+        .tab:hover {
+            background: #FFE4E9;
+        }
+
+        .tab.active {
+            color: #FF69B4;
+            background: white;
+            border-bottom-color: #FF69B4;
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 26px;
+        }
+
+        .subtitle {
+            color: #888;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #FFE4E9;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            outline: none;
+            background: #FAFAFA;
+        }
+
+        input:focus {
+            border-color: #FF69B4;
+            box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.1);
+            background: white;
+        }
+
+        input::placeholder {
+            color: #BBB;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #FF69B4 0%, #FFB6C1 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(255, 105, 180, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 105, 180, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .success-message {
+            display: none;
+            background: #D4F4DD;
+            color: #1E7E34;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 2px solid #A8E6B7;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .success-message.show {
+            display: block;
+            animation: slideDown 0.4s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .info-box {
+            background: #FFF9E6;
+            border: 2px solid #FFE4B3;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 25px;
+            color: #856404;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .info-box::before {
+            content: '💝';
+            display: block;
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .footer-note {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">💝</div>
+            <div class="site-name">לב קטן</div>
+            <div class="tagline">גמ"ח להשאלת מוצרי תינוקות וילדים</div>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('login')">התחברות</div>
+            <div class="tab" onclick="switchTab('register')">הרשמה</div>
+        </div>
+
+        <div class="form-container">
+            <!-- Login Form -->
+            <div id="loginForm" class="form-section active">
+                <h2>ברוכים השבים</h2>
+                <p class="subtitle">הזינו את פרטי ההתחברות שלכם</p>
+                
+                <div id="loginSuccess" class="success-message">
+                    ✓ התחברתם בהצלחה! שמחים לראותכם שוב
+                </div>
+
+                <form onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label for="loginEmail">דוא"ל</label>
+                        <input 
+                            type="email" 
+                            id="loginEmail" 
+                            placeholder="your.email@example.com"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="loginPassword">סיסמה</label>
+                        <input 
+                            type="password" 
+                            id="loginPassword" 
+                            placeholder="הזינו את הסיסמה שלכם"
+                            required
+                            minlength="6"
+                        >
+                    </div>
+
+                    <button type="submit" class="submit-btn">התחברות</button>
+                </form>
+            </div>
+
+            <!-- Registration Form -->
+            <div id="registerForm" class="form-section">
+                <h2>הצטרפות לקהילה</h2>
+                <p class="subtitle">מלאו את הפרטים שלכם כדי להתחיל</p>
+                
+                <div class="info-box">
+                    הצטרפו אלינו ותוכלו להשאיל מוצרים איכותיים לתינוקות וילדים בחינם
+                </div>
+
+                <div id="registerSuccess" class="success-message">
+                    ✓ נרשמתם בהצלחה! ברוכים הבאים למשפחת לב קטן
+                </div>
+
+                <form onsubmit="handleRegister(event)">
+                    <div class="form-group">
+                        <label for="fullName">שם מלא</label>
+                        <input 
+                            type="text" 
+                            id="fullName" 
+                            placeholder="ישראל ישראלי"
+                            required
+                            minlength="2"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="username">שם משתמש</label>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            placeholder="israel123"
+                            required
+                            minlength="3"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">מספר טלפון</label>
+                        <input 
+                            type="tel" 
+                            id="phone" 
+                            placeholder="050-1234567"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="registerEmail">דוא"ל</label>
+                        <input 
+                            type="email" 
+                            id="registerEmail" 
+                            placeholder="your.email@example.com"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="registerPassword">סיסמה</label>
+                        <input 
+                            type="password" 
+                            id="registerPassword" 
+                            placeholder="צרו סיסמה חזקה"
+                            required
+                            minlength="6"
+                        >
+                    </div>
+
+                    <button type="submit" class="submit-btn">הרשמה</button>
+                    
+                    <p class="footer-note">בהרשמה אתם מסכימים לתנאי השימוש שלנו</p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tab) {
+            // Update tab styling
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update form visibility
+            const forms = document.querySelectorAll('.form-section');
+            forms.forEach(f => f.classList.remove('active'));
+
+            if (tab === 'login') {
+                document.getElementById('loginForm').classList.add('active');
+            } else {
+                document.getElementById('registerForm').classList.add('active');
+            }
+
+            // Hide any success messages
+            document.querySelectorAll('.success-message').forEach(msg => {
+                msg.classList.remove('show');
+            });
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            console.log('Login attempt:', { email, password });
+
+            // Show success message
+            const successMsg = document.getElementById('loginSuccess');
+            successMsg.classList.add('show');
+
+            // Reset form
+            event.target.reset();
+
+            // Hide success message after 3 seconds
+            setTimeout(() => {
+                successMsg.classList.remove('show');
+            }, 3000);
+        }
+
+        function handleRegister(event) {
+            event.preventDefault();
+            
+            const formData = {
+                fullName: document.getElementById('fullName').value,
+                username: document.getElementById('username').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('registerEmail').value,
+                password: document.getElementById('registerPassword').value
+            };
+
+            console.log('Registration data:', formData);
+
+            // Show success message
+            const successMsg = document.getElementById('registerSuccess');
+            successMsg.classList.add('show');
+
+            // Reset form
+            event.target.reset();
+
+            // Hide success message after 3 seconds
+            setTimeout(() => {
+                successMsg.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
