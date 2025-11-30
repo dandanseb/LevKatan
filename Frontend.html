@@ -378,13 +378,14 @@
     </div>
 
     <script>
+        // Use the port your C# app is running on (usually 5000-5200)
+        const API_URL = "http://localhost:5230/api"; 
+
         function switchTab(tab) {
-            // Update tab styling
             const tabs = document.querySelectorAll('.tab');
             tabs.forEach(t => t.classList.remove('active'));
             event.target.classList.add('active');
 
-            // Update form visibility
             const forms = document.querySelectorAll('.form-section');
             forms.forEach(f => f.classList.remove('active'));
 
@@ -393,35 +394,42 @@
             } else {
                 document.getElementById('registerForm').classList.add('active');
             }
-
-            // Hide any success messages
-            document.querySelectorAll('.success-message').forEach(msg => {
-                msg.classList.remove('show');
-            });
+            
+            document.querySelectorAll('.success-message').forEach(msg => msg.classList.remove('show'));
         }
 
-        function handleLogin(event) {
+        async function handleLogin(event) {
             event.preventDefault();
             
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
 
-            console.log('Login attempt:', { email, password });
+            try {
+                const response = await fetch(`${API_URL}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
 
-            // Show success message
-            const successMsg = document.getElementById('loginSuccess');
-            successMsg.classList.add('show');
-
-            // Reset form
-            event.target.reset();
-
-            // Hide success message after 3 seconds
-            setTimeout(() => {
-                successMsg.classList.remove('show');
-            }, 3000);
+                if (response.ok) {
+                    const data = await response.json();
+                    const successMsg = document.getElementById('loginSuccess');
+                    successMsg.innerText = `✓ שלום ${data.username}, התחברת בהצלחה!`;
+                    successMsg.classList.add('show');
+                    event.target.reset();
+                    
+                    // Logic to redirect user or store login state goes here
+                    setTimeout(() => successMsg.classList.remove('show'), 3000);
+                } else {
+                    alert("שגיאה בהתחברות: אימייל או סיסמה שגויים");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("שגיאה בתקשורת עם השרת");
+            }
         }
 
-        function handleRegister(event) {
+        async function handleRegister(event) {
             event.preventDefault();
             
             const formData = {
@@ -432,19 +440,29 @@
                 password: document.getElementById('registerPassword').value
             };
 
-            console.log('Registration data:', formData);
+            try {
+                const response = await fetch(`${API_URL}/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
 
-            // Show success message
-            const successMsg = document.getElementById('registerSuccess');
-            successMsg.classList.add('show');
-
-            // Reset form
-            event.target.reset();
-
-            // Hide success message after 3 seconds
-            setTimeout(() => {
-                successMsg.classList.remove('show');
-            }, 3000);
+                if (response.ok) {
+                    const successMsg = document.getElementById('registerSuccess');
+                    successMsg.classList.add('show');
+                    event.target.reset();
+                    setTimeout(() => {
+                        successMsg.classList.remove('show');
+                        switchTab('login'); // Switch to login tab after success
+                    }, 3000);
+                } else {
+                    const errorData = await response.json();
+                    alert("שגיאה בהרשמה: " + (errorData.message || "נסה שוב מאוחר יותר"));
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("שגיאה בתקשורת עם השרת");
+            }
         }
     </script>
 </body>

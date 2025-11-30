@@ -1,0 +1,85 @@
+using Dapper;
+using Npgsql;
+using BCrypt.Net;
+using Microsoft.AspNetCore.Mvc;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// 1. Add CORS (Allows your HTML file to talk to this server)
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+    });
+});
+
+var app = builder.Build();
+app.UseCors();
+
+// 2. Database Connection String
+string connectionString = "Host=localhost;Port=5432;Database=LevKatan;Username=dan;Password=rebeccawife";
+
+// --- API ENDPOINTS ---
+
+// REGISTER LOGIC
+app.MapPost("/api/register", async ([FromBody] RegisterRequest request) =>
+{
+    using var connection = new NpgsqlConnection(connectionString);
+    
+    // Logic: Split "Full Name" into First/Last for your DB table
+    var names = request.FullName.Trim().Split(' ', 2);
+    var firstName = names[0];
+    var lastName = names.Length > 1 ? names[1] : ""; 
+
+    // Security: Hash the password (NEVER store plain text)
+    string passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
+
+    var sql = @"
+        INSERT INTO personnal_infos (first_name, last_name, email, username, phone_number, password, role)
+        VALUES (@FirstName, @LastName, @Email, @Username, @Phone, @Password, 'user')
+        RETURNING id;";
+
+    try 
+    {
+        var id = await connection.ExecuteScalarAsync<int>(sql, new { 
+            FirstName = firstName, 
+            LastName = lastName, 
+            Email = request.Email, 
+            Username = request.Username, 
+            Phone = request.Phone, 
+            Password = passwordHash
+        });
+        return Results.Ok(new { message = "Registered successfully", userId = id });
+    }
+    catch (PostgresException ex) when (ex.SqlState == "23505") // Unique constraint violation
+    {
+        return Results.Conflict(new { message = "Email or Username already exists." });
+    }
+});
+
+// LOGIN LOGIC
+app.MapPost("/api/login", async ([FromBody] LoginRequest request) =>
+{
+    using var connection = new NpgsqlConnection(connectionString);
+
+    var sql = "SELECT * FROM personnal_infos WHERE email = @Email";
+    var user = await connection.QuerySingleOrDefaultAsync<dynamic>(sql, new { Email = request.Email });
+
+    if (user == null) return Results.Unauthorized();
+
+    // Verify Password
+    if (!BCrypt.Net.BCrypt.Verify(request.Password, user.password))
+    {
+        return Results.Unauthorized();
+    }
+
+    // Success! (In a real app, you would return a JWT Token here)
+    return Results.Ok(new { message = "Login successful", username = user.username, role = user.role });
+});
+
+app.Run();
+
+// --- DATA MODELS ---
+public record RegisterRequest(string FullName, string Username, string Phone, string Email, string Password);
+public record LoginRequest(string Email, string Password);
