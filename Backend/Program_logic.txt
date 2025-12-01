@@ -1,3 +1,7 @@
+/*
+The core of the backend logic (written in C# with the .NET Minimal API) contains the logic for CORS, the PostgreSQL connection string, and the /api/register and /api/login endpoints. It uses BCrypt to hash passwords before inserting them into the personal_infos table.
+*/
+
 using Dapper;
 using Npgsql;
 using BCrypt.Net;
