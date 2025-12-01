@@ -64,7 +64,7 @@ The system allows families to borrow useful items for their children free of cha
 
 ## 📂 Database Design (Initial)
 - **Table: `user`**
-  - `id`, `first_name`, `last_name`, `email`, `username`, `phone_number`, `password`, `role`
+  - `id`, `full_name`, `email`, `username`, `phone_number`, `password`, `role`
 - **Table: `product`**
   - `id`, `product_name`, `category`, `publish_date`, `status`, `owner_id`
 
