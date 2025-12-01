@@ -13,10 +13,10 @@ namespace Backend
         public static NpgsqlConnection ConnectToDb()
         {
             // --- CONFIGURATION ---
-            string host = "127.0.0.1";
-            string port = "5432";           // If this fails, try changing to "5433"
+            string host = "172.29.112.1";   // Change if your DB is hosted elsewhere
+            string port = "5432";           // Default PostgreSQL port
             string dbName = "LevKatan";     // Your specific database name
-            string user = "postgres";       // Default superuser
+            string user = "dansebbah2@gmail.com";       // Default superuser
             
             // TODO: REPLACE THIS WITH YOUR REAL PGADMIN PASSWORD
             string password = "rebeccawife"; 
