@@ -1,11 +1,10 @@
 CREATE TABLE personnal_infos (
     id SERIAL PRIMARY KEY,
-    first_name VARCHAR(50) NOT NULL,
-    last_name VARCHAR(50) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
+    full_name VARCHAR(100) NOT NULL,
     username VARCHAR(50) UNIQUE NOT NULL,
     phone_number VARCHAR(20),
-    password TEXT NOT NULL,
+	email VARCHAR(100) UNIQUE NOT NULL,
+    passwd TEXT NOT NULL,
     role VARCHAR(20) CHECK (role IN ('admin', 'user','employee')) DEFAULT 'user'
 );
 
