@@ -1,3 +1,10 @@
+/*
+Backend project configuration file. 
+It specifies that the project uses .NET 9.0 and includes essential packages:
+Dapper (for data access),
+Npgsql (for connecting to PostgreSQL), and BCrypt.Net-Next (for password hashing).
+*/
+
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
