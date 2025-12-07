@@ -1,0 +1,196 @@
+import os
+import psycopg2
+import bcrypt
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+from dotenv import load_dotenv
+
+# --- Configuration de l'Application Flask ---
+app = Flask(__name__)
+CORS(app)  # Active CORS pour permettre la communication avec votre Frontend GitHub Pages
+
+# ----------------------------------------------------
+# 🔑 CONFIGURATION ET LECTURE DES SECRETS
+# ----------------------------------------------------
+
+# Charge les variables d'environnement à partir du fichier .env (pour le développement local).
+# Sur Azure App Service, cette ligne est ignorée, car Azure injecte directement les variables.
+
+load_dotenv()
+DIRECT_URL = os.getenv("DIRECT_URL")
+
+
+# ----------------------------------------------------
+# 🧪 FONCTION DE CONNEXION À LA DB (UTILISÉE PAR LES ROUTES)
+# ----------------------------------------------------
+
+def get_db_connection():
+    # Vérification critique des secrets avant de tenter la connexion
+    if not all(DIRECT_URL):
+        print(
+            "❌ ERREUR FATALE: Une ou plusieurs variables de connexion à la base de données sont manquantes.")
+        return None
+
+    try:
+        conn = psycopg2.connect(DIRECT_URL, sslmode='require')
+        return conn
+    except Exception as e:
+        # Affiche une erreur détaillée pour le diagnostic (mot de passe incorrect, pare-feu, etc.)
+        print("--------------------------------------------------")
+        print(f"❌ ÉCHEC DE LA CONNEXION À LA BASE DE DONNÉES : {e}")
+        print(
+            "Vérifiez 1) Votre mot de passe Supabase et 2) Les règles de pare-feu/réseau.")
+        print("--------------------------------------------------")
+        return None
+
+
+# ----------------------------------------------------
+#  FONCTION DE VÉRIFICATION ET DE DÉMARRAGE DU SERVEUR
+# ----------------------------------------------------
+
+def check_db_and_run():
+    # 1. Tente une connexion temporaire pour vérifier l'accès
+    test_conn = get_db_connection()
+
+    if test_conn is None:
+        print(
+            "\n🛑 DÉMARRAGE ANNULÉ : Connexion DB échouée. Serveur Flask non lancé.")
+        return
+
+    try:
+        # 2. Si la connexion réussit, exécute une simple requête de test SQL
+        cursor = test_conn.cursor()
+        cursor.execute("SELECT 1;")
+        cursor.close()
+        test_conn.close()  # Ferme la connexion de test
+
+        print("--------------------------------------------------")
+        print(
+            "✅ SUCCÈS : Connexion à Supabase validée ! Serveur Flask démarré.")
+        print("--------------------------------------------------")
+
+        # 3. Lance l'API Flask (en mode production pour Azure App Service)
+        # host='0.0.0.0' est nécessaire pour écouter toutes les interfaces sur Linux/Azure
+        # Le port 5230 est utilisé uniquement pour les tests locaux si vous le lancez directement
+        app.run(debug=True, port=5230, host='0.0.0.0')
+
+    except Exception as e:
+        print(f"\n🛑 ERREUR LORS DU TEST SQL OU DU DÉMARRAGE : {e}")
+        if test_conn:
+            test_conn.close()
+        return
+
+
+# ----------------------------------------------------
+# --- API ENDPOINTS ---
+# ----------------------------------------------------
+
+@app.route('/api/register', methods=['POST'])
+def register():
+    """
+    Endpoint d'inscription. Crée un nouvel utilisateur dans la table personnal_infos.
+    """
+    data = request.json
+    full_name = data.get('fullName')
+    username = data.get('username')
+    phone = data.get('phone')
+    email = data.get('email')
+    passwd = data.get('password')
+
+    if not all([full_name, username, phone, email, passwd]):
+        return jsonify({"message": "Données manquantes"}), 400
+
+    # Hacher le mot de passe
+    password_bytes = passwd.encode('utf-8')
+    hashed_password = bcrypt.hashpw(password_bytes, bcrypt.gensalt()).decode(
+        'utf-8')
+
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({
+                           "message": "Erreur serveur: Impossible de connecter à la DB"}), 500
+
+    cur = conn.cursor()
+
+    sql = """
+        INSERT INTO personnal_infos (full_name, email, username, phone_number, passwd, role)
+        VALUES (%s, %s, %s, %s, %s, 'user')
+        RETURNING id;
+    """
+
+    try:
+        cur.execute(sql, (full_name, email, username, phone, hashed_password))
+        user_id = cur.fetchone()[0]
+        conn.commit()
+        return jsonify(
+            {"message": "Registered successfully", "userId": user_id}), 200
+
+    except psycopg2.errors.UniqueViolation:
+        conn.rollback()
+        return jsonify(
+            {"message": "Email ou Nom d'utilisateur déjà utilisé."}), 409
+
+    except Exception as e:
+        conn.rollback()
+        print(f"Erreur d'enregistrement: {e}")
+        return jsonify({
+                           "message": "Erreur interne du serveur lors de l'enregistrement"}), 500
+
+    finally:
+        if cur: cur.close()
+        if conn: conn.close()
+
+
+@app.route('/api/login', methods=['POST'])
+def login():
+    """
+    Endpoint de connexion. Vérifie les identifiants de l'utilisateur.
+    """
+    data = request.json
+    email = data.get('email')
+    password = data.get('password')
+
+    if not all([email, password]):
+        return jsonify({"message": "Email ou mot de passe manquant"}), 400
+
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({
+                           "message": "Erreur serveur: Impossible de connecter à la DB"}), 500
+
+    cur = conn.cursor()
+    sql = "SELECT username, passwd, role FROM personnal_infos WHERE email = %s"
+
+    try:
+        cur.execute(sql, (email,))
+        user = cur.fetchone()
+
+        if user is None:
+            return jsonify({"message": "Non autorisé"}), 401
+
+        db_username, db_hashed_password, db_role = user
+
+        # Vérification du mot de passe
+        if bcrypt.checkpw(password.encode('utf-8'),
+                          db_hashed_password.encode('utf-8')):
+            return jsonify({
+                "message": "Login successful",
+                "username": db_username,
+                "role": db_role
+            }), 200
+        else:
+            return jsonify({"message": "Non autorisé"}), 401
+
+    except Exception as e:
+        print(f"Erreur de connexion: {e}")
+        return jsonify({"message": "Erreur interne du serveur"}), 500
+
+    finally:
+        if cur: cur.close()
+        if conn: conn.close()
+
+
+# ----------------------------------------------------
+
+if __name__ == '__main__':
+    check_db_and_run()
