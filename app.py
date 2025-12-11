@@ -25,13 +25,13 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 
 def get_db_connection():
     # Vérification critique des secrets avant de tenter la connexion
-    if not all(DIRECT_URL):
+    if not all(DATABASE_URL):
         print(
             "❌ ERREUR FATALE: Une ou plusieurs variables de connexion à la base de données sont manquantes.")
         return None
 
     try:
-        conn = psycopg2.connect(DIRECT_URL, sslmode='require')
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         return conn
     except Exception as e:
         # Affiche une erreur détaillée pour le diagnostic (mot de passe incorrect, pare-feu, etc.)
@@ -193,5 +193,6 @@ def login():
 
 if __name__ == '__main__':
     check_db_and_run()
+
 
 
