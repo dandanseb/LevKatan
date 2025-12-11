@@ -5,7 +5,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
 
-# --- Configuration de l'Application Flask ---
+# --- Configuration of Application Flask ---
 app = Flask(__name__)
 CORS(app)  # Active CORS pour permettre la communication avec votre Frontend GitHub Pages
 
@@ -194,3 +194,4 @@ def login():
 
 if __name__ == '__main__':
     check_db_and_run()
+
