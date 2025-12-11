@@ -17,8 +17,7 @@ CORS(app)  # Active CORS pour permettre la communication avec votre Frontend Git
 # Sur Azure App Service, cette ligne est ignorée, car Azure injecte directement les variables.
 
 load_dotenv()
-DIRECT_URL = os.getenv("DIRECT_URL")
-
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 # ----------------------------------------------------
 # 🧪 FONCTION DE CONNEXION À LA DB (UTILISÉE PAR LES ROUTES)
@@ -194,4 +193,5 @@ def login():
 
 if __name__ == '__main__':
     check_db_and_run()
+
 
