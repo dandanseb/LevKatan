@@ -29,7 +29,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-image: 
+            background-image:
                 radial-gradient(circle at 20% 80%, rgba(255, 182, 193, 0.3) 0%, transparent 50%),
                 radial-gradient(circle at 80% 20%, rgba(173, 216, 230, 0.3) 0%, transparent 50%);
             pointer-events: none;
@@ -271,7 +271,7 @@
             <div id="loginForm" class="form-section active">
                 <h2>ברוכים השבים</h2>
                 <p class="subtitle">הזינו את פרטי ההתחברות שלכם</p>
-                
+
                 <div id="loginSuccess" class="success-message">
                     ✓ התחברתם בהצלחה! שמחים לראותכם שוב
                 </div>
@@ -279,9 +279,9 @@
                 <form onsubmit="handleLogin(event)">
                     <div class="form-group">
                         <label for="loginEmail">דוא"ל</label>
-                        <input 
-                            type="email" 
-                            id="loginEmail" 
+                        <input
+                            type="email"
+                            id="loginEmail"
                             placeholder="your.email@example.com"
                             required
                         >
@@ -289,9 +289,9 @@
 
                     <div class="form-group">
                         <label for="loginPassword">סיסמה</label>
-                        <input 
-                            type="password" 
-                            id="loginPassword" 
+                        <input
+                            type="password"
+                            id="loginPassword"
                             placeholder="הזינו את הסיסמה שלכם"
                             required
                             minlength="6"
@@ -306,7 +306,7 @@
             <div id="registerForm" class="form-section">
                 <h2>הצטרפות לקהילה</h2>
                 <p class="subtitle">מלאו את הפרטים שלכם כדי להתחיל</p>
-                
+
                 <div class="info-box">
                     הצטרפו אלינו ותוכלו להשאיל מוצרים איכותיים לתינוקות וילדים בחינם
                 </div>
@@ -318,9 +318,9 @@
                 <form onsubmit="handleRegister(event)">
                     <div class="form-group">
                         <label for="fullName">שם מלא</label>
-                        <input 
-                            type="text" 
-                            id="fullName" 
+                        <input
+                            type="text"
+                            id="fullName"
                             placeholder="ישראל ישראלי"
                             required
                             minlength="2"
@@ -329,9 +329,9 @@
 
                     <div class="form-group">
                         <label for="username">שם משתמש</label>
-                        <input 
-                            type="text" 
-                            id="username" 
+                        <input
+                            type="text"
+                            id="username"
                             placeholder="israel123"
                             required
                             minlength="3"
@@ -340,9 +340,9 @@
 
                     <div class="form-group">
                         <label for="phone">מספר טלפון</label>
-                        <input 
-                            type="tel" 
-                            id="phone" 
+                        <input
+                            type="tel"
+                            id="phone"
                             placeholder="050-1234567"
                             required
                         >
@@ -350,9 +350,9 @@
 
                     <div class="form-group">
                         <label for="registerEmail">דוא"ל</label>
-                        <input 
-                            type="email" 
-                            id="registerEmail" 
+                        <input
+                            type="email"
+                            id="registerEmail"
                             placeholder="your.email@example.com"
                             required
                         >
@@ -360,9 +360,9 @@
 
                     <div class="form-group">
                         <label for="registerPassword">סיסמה</label>
-                        <input 
-                            type="password" 
-                            id="registerPassword" 
+                        <input
+                            type="password"
+                            id="registerPassword"
                             placeholder="צרו סיסמה חזקה"
                             required
                             minlength="6"
@@ -370,7 +370,7 @@
                     </div>
 
                     <button type="submit" class="submit-btn">הרשמה</button>
-                    
+
                     <p class="footer-note">בהרשמה אתם מסכימים לתנאי השימוש שלנו</p>
                 </form>
             </div>
@@ -379,8 +379,8 @@
 
     <script>
         //  (LOCAL)
-        // const API_URL = "http://127.0.0.1:5230/api";
-        const API_URL = "https://levkatan-api-dxh8azfdfua6e9gn.israelcentral-01.azurewebsites.net/api"; 
+        //const API_URL = "http://127.0.0.1:5230/api";
+        const API_URL = "https://levkatan-api-dxh8azfdfua6e9gn.israelcentral-01.azurewebsites.net/api";
 
         function switchTab(tab) {
             const tabs = document.querySelectorAll('.tab');
@@ -395,13 +395,13 @@
             } else {
                 document.getElementById('registerForm').classList.add('active');
             }
-            
+
             document.querySelectorAll('.success-message').forEach(msg => msg.classList.remove('show'));
         }
 
         async function handleLogin(event) {
             event.preventDefault();
-            
+
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
 
@@ -414,25 +414,48 @@
 
                 if (response.ok) {
                     const data = await response.json();
-                    const successMsg = document.getElementById('loginSuccess');
-                    successMsg.innerText = `✓ שלום ${data.username}, התחברת בהצלחה!`;
-                    successMsg.classList.add('show');
-                    event.target.reset();
-                    
-                    // Logic to redirect user or store login state goes here
-                    setTimeout(() => successMsg.classList.remove('show'), 3000);
-                } else {
-                    alert("שגיאה בהתחברות: אימייל או סיסמה שגויים");
-                }
-            } catch (error) {
-                console.error("Error:", error);
-                alert("שגיאה בתקשורת עם השרת");
+
+                    // 1. Stocker le rôle (et le jeton, si votre backend en renvoie un)
+            // Assurez-vous que votre Backend renvoie data.role
+            localStorage.setItem('userToken', data.token);
+            localStorage.setItem('userRole', data.role);
+
+            const successMsg = document.getElementById('loginSuccess');
+            successMsg.innerText = `✓ שלום ${data.username}, התחברת בהצלחה!`;
+            successMsg.classList.add('show');
+            event.target.reset();
+
+            // 2. Logique de Redirection par Rôle
+            switch (data.role) {
+                case 'admin':
+                    // Rediriger vers le CRM administrateur
+                    window.location.href = 'admin.html';
+                    break;
+                case 'employee':
+                    // Rediriger vers le tableau de bord des employés (à créer)
+                    window.location.href = 'employee_dashboard.html';
+                    break;
+                case 'user':
+                default:
+                    // Rediriger vers la page principale des utilisateurs (à créer)
+                    window.location.href = 'user_dashboard.html';
+                    break;
             }
+
+            // Nous n'avons plus besoin du setTimeout car nous redirigeons immédiatement.
+
+        } else {
+            alert("שגיאה בהתחברות: אימייל או סיסמה שגויים");
         }
+    } catch (error) {
+        console.error("Error:", error);
+        alert("שגיאה בתקשורת עם השרת");
+    }
+}
 
         async function handleRegister(event) {
             event.preventDefault();
-            
+
             const formData = {
                 fullName: document.getElementById('fullName').value,
                 username: document.getElementById('username').value,
