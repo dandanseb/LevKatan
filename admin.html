@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="fr" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lev Katan - Panneau Administrateur</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            text-align: right;
+            background-color: #f4f4f9;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 { color: #333; border-bottom: 2px solid #ccc; padding-bottom: 10px; }
+        .user-list {
+            margin-top: 20px;
+            border-collapse: collapse;
+            width: 100%;
+        }
+        .user-list th, .user-list td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: right;
+        }
+        .user-list th {
+            background-color: #f2f2f2;
+            color: #555;
+        }
+        .actions button {
+            margin-right: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+        }
+        .btn-update { background-color: #4CAF50; color: white; }
+        .btn-delete { background-color: #f44336; color: white; }
+        .btn-logout {
+            background-color: #007bff;
+            color: white;
+            float: left; /* Aligner à gauche dans la mise en page RTL */
+            margin-bottom: 20px;
+        }
+        /* NOUVEAUX STYLES CSS POUR LE CRM */
+        .crm-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ddd;
+        }
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            border-bottom: none;
+            background-color: #eee;
+            font-weight: bold;
+            color: #555;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .tab:hover {
+            background-color: #ddd;
+        }
+        .tab.active {
+            background-color: white;
+            color: #DA007D; /* Couleur Rose/Magenta similaire à votre charte */
+            border: 1px solid #ddd;
+            border-bottom: 2px solid #DA007D;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+            margin-bottom: -2px; /* Pour couvrir le bordure inférieure */
+        }
+        .crm-section {
+            padding: 20px 0;
+        }
+        h2 {
+            color: #DA007D; /* Rose pour les titres de section */
+            border-bottom: 1px dotted #ccc;
+            padding-bottom: 5px;
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="btn-logout" onclick="logout()">יציאה (Déconnexion)</button>
+
+        <h1>לוח בקרה למנהל</h1>
+
+        <div class="crm-tabs">
+            <div id="tab-personnel" class="tab active" onclick="showSection('personnel')">
+                ניהול צוות
+            </div>
+            <div id="tab-products" class="tab" onclick="showSection('products')">
+                ניהול מוצרים
+            </div>
+        </div>
+
+        <div id="section-personnel" class="crm-section active">
+            <h2>ניהול משתמשים </h2>
+            <p>Modification des rôles et suppression d'utilisateurs.</p>
+            <table class="user-list">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>שם משתמש (username)</th>
+                        <th>אימייל (Email)</th>
+                        <th>תפקיד (role)</th>
+                        <th>פעולות (Actions)</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                    </tbody>
+            </table>
+        </div>
+
+        <div id="section-products" class="crm-section" style="display:none;">
+            <h2>ניהול מוצרים </h2>
+            <p>Fonctionnalité de gestion des produits à venir...</p>
+        </div>
+
+    </div>
+    </body>
+
+    <script>
+        //const API_URL = "https://levkatan-api-dxh8azfdfua6e9gn.azurewebsites.net/api";
+
+        const API_URL = "http://127.0.0.1:5230/api";
+        const tableBody = document.getElementById('usersTableBody');
+        let usersData = [];
+
+        // --- Fonctions de base ---
+
+        function logout() {
+            // Supprimer le token/session de l'utilisateur
+            localStorage.removeItem('userToken');
+            localStorage.removeItem('userRole');
+            window.location.href = 'index.html'; // Retour à la page de connexion
+        }
+
+        async function fetchUsers() {
+            const token = localStorage.getItem('userToken');
+            if (!token) {
+                alert("Non autorisé. Veuillez vous reconnecter.");
+                logout();
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/admin/users`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` // Envoyer le jeton
+                    }
+                });
+
+                if (response.status === 401) {
+                    alert("Autorisation échouée. Seuls les administrateurs peuvent accéder à cette page.");
+                    logout();
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error('Erreur lors de la récupération des utilisateurs.');
+                }
+
+                usersData = await response.json();
+                renderUsers(usersData);
+
+            } catch (error) {
+                console.error("Erreur Fetch:", error);
+                alert("Erreur de communication avec le serveur.");
+            }
+        }
+
+        // --- Rendu et Logique d'affichage ---
+
+        function renderUsers(users) {
+            tableBody.innerHTML = '';
+            users.forEach(user => {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td>${user.id}</td>
+                    <td>${user.username}</td>
+                    <td>${user.email}</td>
+                    <td>${user.phone_number || '-'}</td>
+                    <td id="role-${user.id}">${user.role}</td>
+                    <td class="actions">
+                        <select id="roleSelect-${user.id}">
+                            <option value="user" ${user.role === 'user' ? 'selected' : ''}>משתמש (User)</option>
+                            <option value="employee" ${user.role === 'employee' ? 'selected' : ''}>עובד (Employee)</option>
+                            <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>מנהל (Admin)</option>
+                        </select>
+                        <button class="btn-update" onclick="updateUserRole(${user.id})">עדכון (Mettre à jour)</button>
+                        <button class="btn-delete" onclick="deleteUser(${user.id})">מחק (Supprimer)</button>
+                    </td>
+                `;
+            });
+        }
+
+        // --- Logique de modification de rôle ---
+
+        async function updateUserRole(userId) {
+            const newRole = document.getElementById(`roleSelect-${userId}`).value;
+            if (!confirm(`Êtes-vous sûr de vouloir changer le rôle de l'utilisateur ${userId} à ${newRole} ?`)) {
+                return;
+            }
+
+            const token = localStorage.getItem('userToken');
+            try {
+                const response = await fetch(`${API_URL}/admin/users/${userId}/role`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ role: newRole })
+                });
+
+                if (!response.ok) {
+                    throw new Error("Échec de la mise à jour du rôle.");
+                }
+
+                alert(`Rôle de l'utilisateur ${userId} mis à jour à ${newRole}.`);
+                // Mise à jour locale du rôle affiché
+                document.getElementById(`role-${userId}`).textContent = newRole;
+
+            } catch (error) {
+                console.error("Erreur de mise à jour:", error);
+                alert("Erreur: Impossible de mettre à jour le rôle.");
+            }
+        }
+
+        // --- Logique de suppression d'utilisateur ---
+
+        async function deleteUser(userId) {
+            if (!confirm(`Êtes-vous sûr de vouloir SUPPRIMER l'utilisateur ID ${userId} ? Cette action est irréversible.`)) {
+                return;
+            }
+
+            const token = localStorage.getItem('userToken');
+            try {
+                const response = await fetch(`${API_URL}/admin/users/${userId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error("Échec de la suppression de l'utilisateur.");
+                }
+
+                alert(`Utilisateur ID ${userId} supprimé avec succès.`);
+                // Supprimer la ligne du tableau
+                const row = document.getElementById(`role-${userId}`).closest('tr');
+                if (row) row.remove();
+
+            } catch (error) {
+                console.error("Erreur de suppression:", error);
+                alert("Erreur: Impossible de supprimer l'utilisateur.");
+            }
+        }
+
+        // --- Vérification et Initialisation ---
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const role = localStorage.getItem('userRole');
+            // S'assurer que seul un admin accède à cette page
+            if (role !== 'admin') {
+                alert("Accès refusé. Vous n'êtes pas administrateur.");
+                window.location.href = 'index.html';
+                return;
+            }
+            fetchUsers(); // Charger la liste des utilisateurs
+        });
+
+    </script>
+</body>
+</html>
