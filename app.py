@@ -25,7 +25,8 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 # CRITIQUE: Utilisez une clé SECRÈTE forte. Pour la production, utilisez os.getenv!
 # Pour le test local, vous pouvez utiliser une chaîne temporaire.
 # Pour la production Azure, ajoutez une variable d'environnement AZURE_JWT_SECRET
-JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "votre_cle_secrete_hyper_forte_par_defaut")
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+#, "votre_cle_secrete_hyper_forte_par_defaut"
 JWT_ALGORITHM = "HS256"
 
 # ----------------------------------------------------
@@ -383,3 +384,4 @@ def delete_user(user_id):
 
 if __name__ == '__main__':
     check_db_and_run()
+
