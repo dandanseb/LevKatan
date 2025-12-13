@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>ניהול מערכת - אדמין</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #333; color: #fff; padding: 20px; }
+        .container { background: #444; padding: 30px; border-radius: 15px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        table { width: 100%; background: #555; border-radius: 8px; overflow: hidden; }
+        th, td { padding: 12px; text-align: right; border-bottom: 1px solid #666; }
+        select { padding: 5px; border-radius: 4px; }
+        .btn-delete { background: #FF4444; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 4px; }
+        a { color: #4DB6AC; text-decoration: none; margin-left: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>🔒 ניהול משתמשים (Admin)</h2>
+            <div>
+                <a href="employee_dashboard.html">→ מעבר לניהול בקשות (עובד)</a>
+                <a href="#" onclick="logout()">יציאה</a>
+            </div>
+        </div>
+
+        <table id="usersTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>שם מלא</th>
+                    <th>שם משתמש</th>
+                    <th>תפקיד</th>
+                    <th>פעולות</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+
+    <script>
+        const API_URL = "http://127.0.0.1:5230/api";
+        const token = localStorage.getItem('userToken');
+
+        // Security check
+        if(!token || localStorage.getItem('userRole') !== 'admin') {
+            window.location.href = 'index.html';
+        }
+
+        async function loadUsers() {
+            const res = await fetch(`${API_URL}/admin/users`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const users = await res.json();
+            
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = users.map(u => `
+                <tr>
+                    <td>${u.id}</td>
+                    <td>${u.full_name}</td>
+                    <td>${u.username}</td>
+                    <td>
+                        <select onchange="changeRole(${u.id}, this.value)">
+                            <option value="user" ${u.role === 'user' ? 'selected' : ''}>User</option>
+                            <option value="employee" ${u.role === 'employee' ? 'selected' : ''}>Employee</option>
+                            <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Admin</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button class="btn-delete" onclick="deleteUser(${u.id})">מחק משתמש</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function changeRole(id, newRole) {
+            await fetch(`${API_URL}/admin/users/${id}/role`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ role: newRole })
+            });
+            alert("תפקיד עודכן בהצלחה");
+        }
+
+        async function deleteUser(id) {
+            if(!confirm("האם אתה בטוח שברצונך למחוק משתמש זה?")) return;
+            await fetch(`${API_URL}/admin/users/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            loadUsers();
+        }
+
+        function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+
+        loadUsers();
+    </script>
+</body>
+</html>

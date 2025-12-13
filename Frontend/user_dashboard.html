@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>לב קטן - קטלוג מוצרים</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #FFF5F7; margin: 0; padding: 20px; }
+        .navbar { background: white; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .btn { padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; color: white; background: #FF69B4; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .card h3 { color: #333; margin-top: 0; }
+        .status { font-size: 0.9em; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h2>👶 לב קטן - קטלוג</h2>
+        <div>
+            <button class="btn" onclick="showSection('catalog')">מוצרים</button>
+            <button class="btn" style="background: #999;" onclick="showSection('history')">הבקשות שלי</button>
+            <button class="btn" style="background: #333;" onclick="logout()">יציאה</button>
+        </div>
+    </div>
+
+    <div id="catalog" class="grid"></div>
+
+    <div id="history" style="display:none;">
+        <h3>ההיסטוריה שלי</h3>
+        <div id="historyList" class="grid"></div>
+    </div>
+
+    <script>
+        const API_URL = "http://127.0.0.1:5230/api"; // CHANGE THIS to your Azure URL if needed
+        const token = localStorage.getItem('userToken');
+
+        if(!token) window.location.href = 'index.html';
+
+        async function loadProducts() {
+            const res = await fetch(`${API_URL}/products`);
+            const products = await res.json();
+            const container = document.getElementById('catalog');
+            container.innerHTML = products.map(p => `
+                <div class="card">
+                    <h3>${p.name}</h3>
+                    <p>קטגוריה: ${p.category}</p>
+                    <button class="btn" onclick="borrow(${p.id})">בקש להשאיל ✋</button>
+                </div>
+            `).join('');
+        }
+
+        async function loadHistory() {
+            const res = await fetch(`${API_URL}/my-requests`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const reqs = await res.json();
+            document.getElementById('historyList').innerHTML = reqs.map(r => `
+                <div class="card">
+                    <h3>${r.product}</h3>
+                    <p>סטטוס: <strong>${r.status}</strong></p>
+                    <p>תאריך: ${r.date}</p>
+                </div>
+            `).join('');
+        }
+
+        async function borrow(id) {
+            if(!confirm("האם להגיש בקשה להשאלת מוצר זה?")) return;
+            const res = await fetch(`${API_URL}/borrow`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ product_id: id })
+            });
+            const data = await res.json();
+            alert(data.message);
+            loadProducts(); // Refresh
+        }
+
+        function showSection(id) {
+            document.getElementById('catalog').style.display = id === 'catalog' ? 'grid' : 'none';
+            document.getElementById('history').style.display = id === 'history' ? 'block' : 'none';
+            if(id === 'history') loadHistory();
+        }
+
+        function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+        
+        loadProducts();
+    </script>
+</body>
+</html>

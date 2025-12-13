@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>ניהול עובדים - לב קטן</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #E0F7FA; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .header { display: flex; justify-content: space-between; margin-bottom: 30px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: right; border-bottom: 1px solid #ddd; }
+        .btn-approve { background: #4CAF50; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
+        .btn-reject { background: #F44336; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
+        .nav-link { color: #00838F; text-decoration: underline; cursor: pointer; margin-left: 15px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>🛠️ לוח בקרה לעובד</h2>
+            <div>
+                <span class="nav-link" onclick="window.location.href='user_dashboard.html'">מעבר לאתר רגיל (השאלה)</span>
+                <span class="nav-link" onclick="logout()">יציאה</span>
+            </div>
+        </div>
+
+        <h3>בקשות השאלה ממתינות לאישור</h3>
+        <table id="requestsTable">
+            <thead>
+                <tr>
+                    <th>שם המשתמש</th>
+                    <th>המוצר</th>
+                    <th>תאריך בקשה</th>
+                    <th>פעולות</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+
+    <script>
+        const API_URL = "http://127.0.0.1:5230/api"; 
+        const token = localStorage.getItem('userToken');
+        
+        if(!token || localStorage.getItem('userRole') === 'user') window.location.href = 'index.html';
+
+        async function loadRequests() {
+            const res = await fetch(`${API_URL}/employee/requests`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if(res.status === 403) { alert("אין לך גישה!"); window.location.href = 'index.html'; return; }
+            
+            const reqs = await res.json();
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = reqs.map(r => `
+                <tr>
+                    <td>${r.username}</td>
+                    <td>${r.product}</td>
+                    <td>${r.date}</td>
+                    <td>
+                        <button class="btn-approve" onclick="updateStatus(${r.id}, 'approved')">אשר</button>
+                        <button class="btn-reject" onclick="updateStatus(${r.id}, 'rejected')">דחה</button>
+                    </td>
+                </tr>
+            `).join('');
+            if(reqs.length === 0) tbody.innerHTML = "<tr><td colspan='4'>אין בקשות ממתינות</td></tr>";
+        }
+
+        async function updateStatus(id, status) {
+            await fetch(`${API_URL}/employee/requests/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ status })
+            });
+            loadRequests();
+        }
+
+        function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+        
+        loadRequests();
+    </script>
+</body>
+</html>

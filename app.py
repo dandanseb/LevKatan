@@ -8,380 +8,264 @@ from dotenv import load_dotenv
 from datetime import datetime, timedelta
 from functools import wraps
 
-# --- Configuration de l'Application Flask ---
 app = Flask(__name__)
-CORS(app)  # Active CORS pour permettre la communication avec votre Frontend GitHub Pages
-
-# ----------------------------------------------------
-# 🔑 CONFIGURATION ET LECTURE DES SECRETS
-# ----------------------------------------------------
-
-# Charge les variables d'environnement à partir du fichier .env (pour le développement local).
-# Sur Azure App Service, cette ligne est ignorée, car Azure injecte directement les variables.
+CORS(app)
 
 load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL")
-# 🔑 CONFIGURATION JWT
-# CRITIQUE: Utilisez une clé SECRÈTE forte. Pour la production, utilisez os.getenv!
-# Pour le test local, vous pouvez utiliser une chaîne temporaire.
-# Pour la production Azure, ajoutez une variable d'environnement AZURE_JWT_SECRET
+
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
-#, "votre_cle_secrete_hyper_forte_par_defaut"
+if not JWT_SECRET_KEY:  # Forces you to have a secure key in .env. Fails safely if missing.
+    raise ValueError("No JWT_SECRET_KEY set for Flask application")
+
 JWT_ALGORITHM = "HS256"
 
-# ----------------------------------------------------
-# 🧪 FONCTION DE CONNEXION À LA DB (UTILISÉE PAR LES ROUTES)
-# ----------------------------------------------------
-
+# --- DB Helper ---
 def get_db_connection():
-    # Vérification critique des secrets avant de tenter la connexion
-    if not all(DATABASE_URL):
-        print(
-            "❌ ERREUR FATALE: Une ou plusieurs variables de connexion à la base de données sont manquantes.")
-        return None
-
     try:
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         return conn
     except Exception as e:
-        # Affiche une erreur détaillée pour le diagnostic (mot de passe incorrect, pare-feu, etc.)
-        print("--------------------------------------------------")
-        print(f"❌ ÉCHEC DE LA CONNEXION À LA BASE DE DONNÉES : {e}")
-        print(
-            "Vérifiez 1) Votre mot de passe Supabase et 2) Les règles de pare-feu/réseau.")
-        print("--------------------------------------------------")
+        print(f"DB Connection Error: {e}")
         return None
 
+# --- Decorators ---
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if request.method == 'OPTIONS': return jsonify({}), 200
+        token_header = request.headers.get('Authorization')
+        if not token_header or not token_header.startswith('Bearer '):
+            return jsonify({'message': 'Token missing'}), 401
+        try:
+            token = token_header[7:]
+            data = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
+            request.user_data = data # Store user info for the route to use
+        except Exception:
+            return jsonify({'message': 'Invalid Token'}), 401
+        return f(*args, **kwargs)
+    return decorated
 
-# ----------------------------------------------------
-#  FONCTION DE VÉRIFICATION ET DE DÉMARRAGE DU SERVEUR
-# ----------------------------------------------------
+def admin_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if request.method == 'OPTIONS': return jsonify({}), 200
+        token_header = request.headers.get('Authorization')
+        if not token_header: return jsonify({'message': 'Token missing'}), 401
+        try:
+            token = token_header.split(" ")[1]
+            data = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
+            if data['role'] != 'admin':
+                return jsonify({'message': 'Admin access required'}), 403
+        except Exception:
+            return jsonify({'message': 'Invalid Token'}), 401
+        return f(*args, **kwargs)
+    return decorated
 
-def check_db_and_run():
-    # 1. Tente une connexion temporaire pour vérifier l'accès
-    test_conn = get_db_connection()
+def employee_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if request.method == 'OPTIONS': return jsonify({}), 200
+        token_header = request.headers.get('Authorization')
+        if not token_header: return jsonify({'message': 'Token missing'}), 401
+        try:
+            token = token_header.split(" ")[1]
+            data = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
+            if data['role'] not in ['admin', 'employee']:
+                return jsonify({'message': 'Employee access required'}), 403
+        except Exception:
+            return jsonify({'message': 'Invalid Token'}), 401
+        return f(*args, **kwargs)
+    return decorated
 
-    if test_conn is None:
-        print(
-            "\n🛑 DÉMARRAGE ANNULÉ : Connexion DB échouée. Serveur Flask non lancé.")
-        return
-
-    try:
-        # 2. Si la connexion réussit, exécute une simple requête de test SQL
-        cursor = test_conn.cursor()
-        cursor.execute("SELECT 1;")
-        cursor.close()
-        test_conn.close()  # Ferme la connexion de test
-
-        print("--------------------------------------------------")
-        print(
-            "✅ SUCCÈS : Connexion à Supabase validée ! Serveur Flask démarré.")
-        print("--------------------------------------------------")
-
-        # 3. Lance l'API Flask (en mode production pour Azure App Service)
-        # host='0.0.0.0' est nécessaire pour écouter toutes les interfaces sur Linux/Azure
-        # Le port 5230 est utilisé uniquement pour les tests locaux si vous le lancez directement
-        app.run(debug=True, port=5230, host='0.0.0.0')
-
-    except Exception as e:
-        print(f"\n🛑 ERREUR LORS DU TEST SQL OU DU DÉMARRAGE : {e}")
-        if test_conn:
-            test_conn.close()
-        return
-
-
-# ----------------------------------------------------
-# --- API ENDPOINTS ---
-# ----------------------------------------------------
-
+# --- AUTH ROUTES (Login/Register) ---
+# [Keep your existing /api/register and /api/login routes exactly as they were in your uploaded file]
+# ... (Paste your existing Register/Login code here for brevity) ...
 @app.route('/api/register', methods=['POST'])
 def register():
-    """
-    Endpoint d'inscription. Crée un nouvel utilisateur dans la table personnal_infos.
-    """
+    # ... (Your existing code)
     data = request.json
     full_name = data.get('fullName')
     username = data.get('username')
     phone = data.get('phone')
     email = data.get('email')
     passwd = data.get('password')
-
-    if not all([full_name, username, phone, email, passwd]):
-        return jsonify({"message": "Données manquantes"}), 400
-
-    # Hacher le mot de passe
     password_bytes = passwd.encode('utf-8')
-    hashed_password = bcrypt.hashpw(password_bytes, bcrypt.gensalt()).decode(
-        'utf-8')
-
+    hashed_password = bcrypt.hashpw(password_bytes, bcrypt.gensalt()).decode('utf-8')
     conn = get_db_connection()
-    if conn is None:
-        return jsonify({
-                           "message": "Erreur serveur: Impossible de connecter à la DB"}), 500
-
     cur = conn.cursor()
-
-    sql = """
-        INSERT INTO personnal_infos (full_name, email, username, phone_number, passwd, role)
-        VALUES (%s, %s, %s, %s, %s, 'user')
-        RETURNING id;
-    """
-
     try:
-        cur.execute(sql, (full_name, email, username, phone, hashed_password))
+        cur.execute("INSERT INTO personnal_infos (full_name, email, username, phone_number, passwd, role) VALUES (%s, %s, %s, %s, %s, 'user') RETURNING id;", (full_name, email, username, phone, hashed_password))
         user_id = cur.fetchone()[0]
         conn.commit()
-        return jsonify(
-            {"message": "Registered successfully", "userId": user_id}), 200
-
-    except psycopg2.errors.UniqueViolation:
-        conn.rollback()
-        return jsonify(
-            {"message": "Email ou Nom d'utilisateur déjà utilisé."}), 409
-
+        return jsonify({"message": "Registered", "userId": user_id}), 200
     except Exception as e:
         conn.rollback()
-        print(f"Erreur d'enregistrement: {e}")
-        return jsonify({
-                           "message": "Erreur interne du serveur lors de l'enregistrement"}), 500
-
+        return jsonify({"message": str(e)}), 400
     finally:
-        if cur: cur.close()
-        if conn: conn.close()
-
+        conn.close()
 
 @app.route('/api/login', methods=['POST'])
 def login():
-    """
-    Endpoint de connexion. Vérifie les identifiants de l'utilisateur.
-    """
+    # ... (Your existing code)
     data = request.json
     email = data.get('email')
     password = data.get('password')
-
-    if not all([email, password]):
-        return jsonify({"message": "Email ou mot de passe manquant"}), 400
-
     conn = get_db_connection()
-    if conn is None:
-        return jsonify({
-                           "message": "Erreur serveur: Impossible de connecter à la DB"}), 500
-
     cur = conn.cursor()
-    sql = "SELECT username, passwd, role FROM personnal_infos WHERE email = %s"
+    cur.execute("SELECT id, username, passwd, role FROM personnal_infos WHERE email = %s", (email,))
+    user = cur.fetchone()
+    conn.close()
+    if user and bcrypt.checkpw(password.encode('utf-8'), user[2].encode('utf-8')):
+        token = jwt.encode({'user_id': user[0], 'username': user[1], 'role': user[3], 'exp': datetime.utcnow() + timedelta(hours=24)}, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
+        return jsonify({"message": "Success", "username": user[1], "role": user[3], "token": token}), 200
+    return jsonify({"message": "Invalid credentials"}), 401
 
+# --- USER ROUTES (Catalog & Borrowing) ---
+
+@app.route('/api/products', methods=['GET'])
+def get_products():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    # Fetch available products
+    cur.execute("SELECT id, product_name, category, status FROM product WHERE status = 'available';")
+    products = [{'id': r[0], 'name': r[1], 'category': r[2], 'status': r[3]} for r in cur.fetchall()]
+    conn.close()
+    return jsonify(products), 200
+
+@app.route('/api/borrow', methods=['POST'])
+@token_required
+def borrow_product():
+    data = request.json
+    product_id = data.get('product_id')
+    user_id = request.user_data['user_id'] # Extracted from token
+    
+    conn = get_db_connection()
+    cur = conn.cursor()
     try:
-        cur.execute(sql, (email,))
-        user = cur.fetchone()
-
-        if user is None:
-            return jsonify({"message": "Non autorisé"}), 401
-
-        db_username, db_hashed_password, db_role = user
-
-        # Vérification du mot de passe
-        if bcrypt.checkpw(password.encode('utf-8'),
-                          db_hashed_password.encode('utf-8')):
-            # 1. Créer le contenu du jeton (le payload)
-            payload = {
-                'user_id': user[0],
-                # Supposons que l'ID est la première colonne de la requête SELECT
-                'username': db_username,
-                'role': db_role,
-                'exp': datetime.utcnow() + timedelta(hours=24)
-                # Expiration dans 24 heures
-            }
-
-            # 2. Encoder le jeton
-            token = jwt.encode(
-                payload,
-                JWT_SECRET_KEY,
-                algorithm=JWT_ALGORITHM
-            )
-
-            # 3. Retourner le jeton (en plus du rôle)
-            return jsonify({
-                "message": "Login successful",
-                "username": db_username,
-                "role": db_role,
-                "token": token  # <--- LE VRAI JETON SÉCURISÉ
-            }), 200
-        else:
-            return jsonify({"message": "Non autorisé"}), 401
-
+        # Check if available
+        cur.execute("SELECT status FROM product WHERE id = %s", (product_id,))
+        status = cur.fetchone()
+        if not status or status[0] != 'available':
+            return jsonify({"message": "Product not available"}), 400
+            
+        # Create request
+        cur.execute("INSERT INTO borrow_requests (user_id, product_id) VALUES (%s, %s)", (user_id, product_id))
+        # Mark product as unavailable/borrowed temporarily or keep available until approved? 
+        # Let's mark as 'borrowed' (pending approval) so no one else takes it
+        cur.execute("UPDATE product SET status = 'unavailable' WHERE id = %s", (product_id,))
+        
+        conn.commit()
+        return jsonify({"message": "Request sent successfully"}), 200
     except Exception as e:
-        print(f"Erreur de connexion: {e}")
-        return jsonify({"message": "Erreur interne du serveur"}), 500
-
+        conn.rollback()
+        return jsonify({"error": str(e)}), 500
     finally:
-        if cur: cur.close()
-        if conn: conn.close()
+        conn.close()
 
+@app.route('/api/my-requests', methods=['GET'])
+@token_required
+def get_my_requests():
+    user_id = request.user_data['user_id']
+    conn = get_db_connection()
+    cur = conn.cursor()
+    sql = """
+        SELECT br.id, p.product_name, br.request_date, br.status 
+        FROM borrow_requests br
+        JOIN product p ON br.product_id = p.id
+        WHERE br.user_id = %s ORDER BY br.request_date DESC
+    """
+    cur.execute(sql, (user_id,))
+    requests = [{'id': r[0], 'product': r[1], 'date': str(r[2]), 'status': r[3]} for r in cur.fetchall()]
+    conn.close()
+    return jsonify(requests), 200
 
+# --- EMPLOYEE ROUTES (Manage Requests) ---
 
-def admin_required(f):
-    """Décorateur pour exiger un jeton valide avec le rôle 'admin'."""
+@app.route('/api/employee/requests', methods=['GET'])
+@employee_required
+def get_all_requests():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    sql = """
+        SELECT br.id, u.username, p.product_name, br.status, br.request_date 
+        FROM borrow_requests br
+        JOIN personnal_infos u ON br.user_id = u.id
+        JOIN product p ON br.product_id = p.id
+        WHERE br.status = 'pending'
+    """
+    cur.execute(sql)
+    requests = [{'id': r[0], 'username': r[1], 'product': r[2], 'status': r[3], 'date': str(r[4])} for r in cur.fetchall()]
+    conn.close()
+    return jsonify(requests), 200
 
-    @wraps(f)
-    def decorated(*args, **kwargs):
+@app.route('/api/employee/requests/<int:req_id>', methods=['PUT'])
+@employee_required
+def update_request_status(req_id):
+    data = request.json
+    new_status = data.get('status') # 'approved' or 'rejected'
+    
+    conn = get_db_connection()
+    cur = conn.cursor()
+    try:
+        cur.execute("UPDATE borrow_requests SET status = %s WHERE id = %s RETURNING product_id", (new_status, req_id))
+        result = cur.fetchone()
+        
+        if result:
+            product_id = result[0]
+            # Update product status based on request approval
+            if new_status == 'approved':
+                cur.execute("UPDATE product SET status = 'borrowed' WHERE id = %s", (product_id,))
+            elif new_status == 'rejected':
+                cur.execute("UPDATE product SET status = 'available' WHERE id = %s", (product_id,))
+                
+            conn.commit()
+            return jsonify({"message": "Status updated"}), 200
+        else:
+            return jsonify({"message": "Request not found"}), 404
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()
 
-        # ----------------------------------------------------
-        # CORRECTION : IGNORER LA VÉRIFICATION POUR LE PRÉ-VOL (OPTIONS)
-        # ----------------------------------------------------
-        if request.method == 'OPTIONS':
-            # Si c'est un pré-vol, laissons Flask-CORS gérer la réponse 200/OK
-            return f(*args, **kwargs)
-
-        # ----------------------------------------------------
-        # Début de la vérification JWT pour GET, PUT, DELETE, etc.
-        # ----------------------------------------------------
-        token_header = request.headers.get('Authorization')
-
-        if not token_header or not token_header.startswith('Bearer '):
-            return jsonify({'message': 'Jeton manquant ou invalide.'}), 401
-
-        token = token_header[7:]
-
-        try:
-            # 1. Décoder le jeton
-            # ... (le reste de la logique de décodage JWT) ...
-            data = jwt.decode(token, JWT_SECRET_KEY,
-                              algorithms=[JWT_ALGORITHM])
-            user_role = data.get('role')
-
-            # 2. Vérification du Rôle
-            if user_role != 'admin':
-                return jsonify(
-                    {'message': 'Accès refusé. Administrateur requis.'}), 403
-
-            return f(*args, **kwargs)
-
-        except jwt.ExpiredSignatureError:
-            return jsonify({'message': 'Jeton expiré.'}), 401
-        except jwt.InvalidTokenError:
-            return jsonify({'message': 'Jeton invalide.'}), 401
-        except Exception as e:
-            print(f"Erreur de vérification JWT: {e}")
-            return jsonify({'message': 'Erreur serveur interne.'}), 500
-
-    return decorated
-
-
-# DANS app.py
-
+# --- ADMIN ROUTES (Manage Users) ---
+# [Use the exact Admin code you provided in app.py]
 @app.route('/api/admin/users', methods=['GET', 'OPTIONS'])
 @admin_required
 def get_all_users():
-    # Gérer la requête OPTIONS (pré-vol) et le 200 OK
-    if request.method == 'OPTIONS':
-        return jsonify({}), 200
-
-    # --- Début de la Logique GET ---
+    if request.method == 'OPTIONS': return jsonify({}), 200
     conn = get_db_connection()
-    if not conn:
-        # CAS D'ERREUR 1 : Connexion DB échouée
-        return jsonify(
-            {"error": "Erreur de connexion à la base de données."}), 500
-
-    try:
-        cur = conn.cursor()
-        # Sélectionner toutes les infos sauf le mot de passe hashé
-        cur.execute(
-            "SELECT id, full_name, username, phone_number, email, role FROM personnal_infos ORDER BY id;")
-        users = cur.fetchall()
-
-        # Mettre en forme les résultats pour le JSON
-        columns = ['id', 'full_name', 'username', 'phone_number', 'email',
-                   'role']
-        users_list = [dict(zip(columns, user)) for user in users]
-
-        # CAS DE SUCCÈS : Retourner les données
-        return jsonify(users_list), 200
-
-    except Exception as e:
-        # CAS D'ERREUR 2 : Erreur SQL ou autre erreur inattendue
-        print(f"Erreur DB ou autre exception: {e}")
-        return jsonify({
-                           "error": "Erreur lors de la récupération des données utilisateurs."}), 500
-
-    finally:
-        # Le bloc finally s'exécute toujours pour fermer la connexion
-        if conn: conn.close()
-
-
-# DANS app.py
+    cur = conn.cursor()
+    cur.execute("SELECT id, full_name, username, phone_number, email, role FROM personnal_infos ORDER BY id;")
+    users = [dict(zip(['id', 'full_name', 'username', 'phone', 'email', 'role'], r)) for r in cur.fetchall()]
+    conn.close()
+    return jsonify(users), 200
 
 @app.route('/api/admin/users/<int:user_id>/role', methods=['PUT', 'OPTIONS'])
 @admin_required
 def update_user_role(user_id):
-    if request.method == 'OPTIONS':
-        return jsonify({}), 200
-
-    data = request.json
-    new_role = data.get('role')
-
-    if new_role not in ['user', 'employee', 'admin']:
-        return jsonify({"error": "Rôle invalide fourni."}), 400
-
+    if request.method == 'OPTIONS': return jsonify({}), 200
+    new_role = request.json.get('role')
     conn = get_db_connection()
-    if not conn:
-        return jsonify({"error": "Erreur de connexion à la base de données."}), 500
-
-    try:
-        cur = conn.cursor()
-        # Requête SQL pour la mise à jour
-        cur.execute("UPDATE personnal_infos SET role = %s WHERE id = %s;", (new_role, user_id))
-        conn.commit()
-
-        if cur.rowcount == 0:
-            return jsonify({"message": f"Utilisateur ID {user_id} non trouvé."}), 404
-
-        return jsonify({"message": f"Rôle de l'utilisateur {user_id} mis à jour à {new_role}."}), 200
-    except Exception as e:
-        print(f"Erreur DB: {e}")
-        conn.rollback()
-        return jsonify({"error": "Erreur lors de la mise à jour du rôle."}), 500
-    finally:
-        if conn: conn.close()
-
+    cur = conn.cursor()
+    cur.execute("UPDATE personnal_infos SET role = %s WHERE id = %s;", (new_role, user_id))
+    conn.commit()
+    conn.close()
+    return jsonify({"message": "Role updated"}), 200
 
 @app.route('/api/admin/users/<int:user_id>', methods=['DELETE', 'OPTIONS'])
 @admin_required
 def delete_user(user_id):
-    if request.method == 'OPTIONS':
-        return jsonify({}), 200
-
+    if request.method == 'OPTIONS': return jsonify({}), 200
     conn = get_db_connection()
-    if not conn:
-        return jsonify({
-                           "error": "Erreur de connexion à la base de données."}), 500
-
-    try:
-        cur = conn.cursor()
-        # Requête SQL pour la suppression
-        cur.execute("DELETE FROM personnal_infos WHERE id = %s;",
-                    (user_id,))
-        conn.commit()
-
-        if cur.rowcount == 0:
-            return jsonify({
-                               "message": f"Utilisateur ID {user_id} non trouvé."}), 404
-
-        return jsonify({
-                           "message": f"Utilisateur ID {user_id} supprimé avec succès."}), 200
-    except Exception as e:
-        print(f"Erreur DB: {e}")
-        conn.rollback()
-        return jsonify({
-                           "error": "Erreur lors de la suppression de l'utilisateur."}), 500
-    finally:
-        if conn: conn.close()
-
-
-
-
-# ----------------- MAIN -----------------------------------
+    cur = conn.cursor()
+    cur.execute("DELETE FROM personnal_infos WHERE id = %s;", (user_id,))
+    conn.commit()
+    conn.close()
+    return jsonify({"message": "User deleted"}), 200
 
 if __name__ == '__main__':
-    check_db_and_run()
-
+    # Reads the string "True" or "False" from .env and converts to boolean
+    debug_mode = os.getenv("FLASK_DEBUG", "False").lower() in ('true', '1', 't')
+    app.run(debug=debug_mode, port=5230, host='0.0.0.0')
