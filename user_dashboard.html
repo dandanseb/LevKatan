@@ -5,10 +5,31 @@
     <title>לב קטן - אזור אישי</title>
     <link rel="icon" href="logo.png" type="image/png">
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #FFF5F7; margin: 0; }
+        :root {
+            --bg-color: #FFF5F7;
+            --header-bg: white;
+            --text-color: #333;
+            --card-bg: white;
+            --nav-btn-bg: #f0f0f0;
+            --nav-btn-text: #555;
+            --nav-btn-hover: #e0e0e0;
+            --border-color: #eee;
+        }
+        body.dark-mode {
+            --bg-color: #121212;
+            --header-bg: #1E1E1E;
+            --text-color: #E0E0E0;
+            --card-bg: #2D2D2D;
+            --nav-btn-bg: #333;
+            --nav-btn-text: #ddd;
+            --nav-btn-hover: #444;
+            --border-color: #444;
+        }
+
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg-color); color: var(--text-color); margin: 0; transition: background 0.3s; }
         
         .top-bar {
-            background: white;
+            background: var(--header-bg);
             padding: 10px 20px;
             display: flex;
             justify-content: space-between;
@@ -19,49 +40,45 @@
         .brand-area { display: flex; align-items: center; gap: 10px; }
         .brand-logo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
         
-        /* NEW: Navigation Links Style */
-        .nav-links { display: flex; gap: 15px; }
+        .nav-links { display: flex; gap: 10px; align-items: center; }
+        
+        /* UNIFIED BUTTON STYLE */
         .nav-item { 
             text-decoration: none; 
-            color: #555; 
+            color: var(--nav-btn-text); 
             font-size: 14px; 
             font-weight: 600; 
-            padding: 5px 10px;
-            border-radius: 6px;
-            background: #f0f0f0;
+            padding: 8px 16px; 
+            border-radius: 20px;
+            background: var(--nav-btn-bg);
             transition: all 0.2s;
+            display: flex; align-items: center; gap: 5px;
         }
-        .nav-item:hover { background: #e0e0e0; color: #333; }
-        .nav-item.admin { background: #E3F2FD; color: #1976D2; }
-        .nav-item.employee { background: #E0F2F1; color: #00695C; }
+        .nav-item:hover { background: var(--nav-btn-hover); color: var(--text-color); }
+        
+        .theme-toggle { background: none; border: none; font-size: 20px; cursor: pointer; padding: 5px; border-radius: 50%; }
+        .theme-toggle:hover { background: rgba(128,128,128,0.2); }
 
         .user-area { display: flex; align-items: center; gap: 15px; }
-        .welcome-text { color: #555; font-weight: 600; }
+        .welcome-text { color: var(--text-color); font-weight: 600; opacity: 0.8; }
         
-        .logout-btn { 
-            background: #FF4444; 
-            color: white; 
-            border: none; 
-            padding: 6px 15px; 
-            border-radius: 20px; 
-            cursor: pointer; 
-            font-size: 14px; 
-            transition: all 0.2s; 
-            font-weight: bold;
-        }
+        .logout-btn { background: #FF4444; color: white; border: none; padding: 6px 15px; border-radius: 20px; cursor: pointer; font-size: 14px; font-weight: bold; transition: 0.2s; }
         .logout-btn:hover { background: #D32F2F; box-shadow: 0 2px 5px rgba(255,68,68,0.3); }
 
-        .tabs { display: flex; background: white; justify-content: center; box-shadow: 0 4px 6px -4px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        .tab { padding: 15px 40px; cursor: pointer; font-weight: 600; color: #666; border-bottom: 3px solid transparent; font-size: 16px; transition: all 0.3s; }
-        .tab:hover { background: #FFF0F5; color: #FF69B4; }
+        .tabs { display: flex; background: var(--header-bg); justify-content: center; box-shadow: 0 4px 6px -4px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .tab { padding: 15px 40px; cursor: pointer; font-weight: 600; color: #888; border-bottom: 3px solid transparent; font-size: 16px; transition: all 0.3s; }
+        .tab:hover { background: rgba(0,0,0,0.05); color: #FF69B4; }
         .tab.active { color: #FF69B4; border-bottom-color: #FF69B4; }
 
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #eee; transition: transform 0.2s; }
+        .card { background: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid var(--border-color); transition: transform 0.2s; }
         .card:hover { transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
-        .card h3 { color: #333; margin-top: 0; margin-bottom: 5px; }
+        .card h3 { color: var(--text-color); margin-top: 0; margin-bottom: 5px; }
+        
         .cat-tag { display: inline-block; background: #E3F2FD; color: #1976D2; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-bottom: 10px; }
+        body.dark-mode .cat-tag { background: #1976D2; color: white; }
+
         .btn-borrow { width: 100%; padding: 10px; background: #FF69B4; color: white; border: none; border-radius: 8px; cursor: pointer; margin-top: 10px; font-weight: bold; }
         .btn-borrow:hover { background: #E05297; }
         
@@ -74,10 +91,12 @@
     <div class="top-bar">
         <div class="brand-area">
             <img src="logo.png" alt="Logo" class="brand-logo">
-            <h2 style="margin:0; font-size: 20px; color:#333;">לב קטן</h2>
+            <h2 style="margin:0; font-size: 20px; color:var(--text-color);">לב קטן</h2>
         </div>
 
-        <div id="roleNav" class="nav-links"></div>
+        <div id="roleNav" class="nav-links">
+            <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
+        </div>
 
         <div class="user-area">
             <span class="welcome-text" id="userGreeting">שלום, אורח</span>
@@ -101,22 +120,33 @@
         const username = localStorage.getItem('username');
         const role = localStorage.getItem('userRole');
 
+        // --- Theme Logic ---
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+        }
+        if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
+        // -------------------
+
         if(!token) window.location.href = 'index.html';
         document.getElementById('userGreeting').innerText = `שלום, ${username || 'משתמש'}`;
 
-        // --- NEW LOGIC: Dynamic Navigation ---
         const navContainer = document.getElementById('roleNav');
-        
-        // Show Employee Dashboard link if Employee OR Admin
         if(role === 'employee' || role === 'admin') {
-            navContainer.innerHTML += `<a href="employee_dashboard.html" class="nav-item employee">🛠️ ממשק עובד</a>`;
+            // Added .nav-item class to match style
+            const btn = document.createElement('a');
+            btn.href = 'employee_dashboard.html';
+            btn.className = 'nav-item';
+            btn.innerHTML = '🛠️ ממשק עובד';
+            navContainer.prepend(btn);
         }
-
-        // Show Admin Dashboard link ONLY if Admin
         if(role === 'admin') {
-            navContainer.innerHTML += `<a href="admin_dashboard.html" class="nav-item admin">🔒 ניהול אדמין</a>`;
+            const btn = document.createElement('a');
+            btn.href = 'admin_dashboard.html';
+            btn.className = 'nav-item';
+            btn.innerHTML = '🔒 ניהול אדמין';
+            navContainer.prepend(btn);
         }
-        // -------------------------------------
 
         async function loadProducts() {
             const res = await fetch(`${API_URL}/products`);
