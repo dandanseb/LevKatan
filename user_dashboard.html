@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>לב קטן - אזור אישי</title>
-    <link rel="icon" href="lev katan.jpg" type="image/jpeg">
+    <link rel="icon" href="logo.png" type="image/png">
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #FFF5F7; margin: 0; }
         
-        /* NEW TOP BAR STYLE */
         .top-bar {
             background: white;
             padding: 10px 20px;
@@ -19,18 +18,44 @@
         }
         .brand-area { display: flex; align-items: center; gap: 10px; }
         .brand-logo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+        
+        /* NEW: Navigation Links Style */
+        .nav-links { display: flex; gap: 15px; }
+        .nav-item { 
+            text-decoration: none; 
+            color: #555; 
+            font-size: 14px; 
+            font-weight: 600; 
+            padding: 5px 10px;
+            border-radius: 6px;
+            background: #f0f0f0;
+            transition: all 0.2s;
+        }
+        .nav-item:hover { background: #e0e0e0; color: #333; }
+        .nav-item.admin { background: #E3F2FD; color: #1976D2; }
+        .nav-item.employee { background: #E0F2F1; color: #00695C; }
+
         .user-area { display: flex; align-items: center; gap: 15px; }
         .welcome-text { color: #555; font-weight: 600; }
-        .logout-btn { color: #FF4444; border: 1px solid #FF4444; background: white; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
-        .logout-btn:hover { background: #FF4444; color: white; }
+        
+        .logout-btn { 
+            background: #FF4444; 
+            color: white; 
+            border: none; 
+            padding: 6px 15px; 
+            border-radius: 20px; 
+            cursor: pointer; 
+            font-size: 14px; 
+            transition: all 0.2s; 
+            font-weight: bold;
+        }
+        .logout-btn:hover { background: #D32F2F; box-shadow: 0 2px 5px rgba(255,68,68,0.3); }
 
-        /* TABS STYLE (Copied from Login) */
         .tabs { display: flex; background: white; justify-content: center; box-shadow: 0 4px 6px -4px rgba(0,0,0,0.1); margin-bottom: 20px; }
         .tab { padding: 15px 40px; cursor: pointer; font-weight: 600; color: #666; border-bottom: 3px solid transparent; font-size: 16px; transition: all 0.3s; }
         .tab:hover { background: #FFF0F5; color: #FF69B4; }
         .tab.active { color: #FF69B4; border-bottom-color: #FF69B4; }
 
-        /* Content Area */
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
         .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #eee; transition: transform 0.2s; }
@@ -48,9 +73,12 @@
 <body>
     <div class="top-bar">
         <div class="brand-area">
-            <img src="lev katan.jpg" alt="Logo" class="brand-logo">
+            <img src="logo.png" alt="Logo" class="brand-logo">
             <h2 style="margin:0; font-size: 20px; color:#333;">לב קטן</h2>
         </div>
+
+        <div id="roleNav" class="nav-links"></div>
+
         <div class="user-area">
             <span class="welcome-text" id="userGreeting">שלום, אורח</span>
             <button class="logout-btn" onclick="logout()">יציאה</button>
@@ -64,7 +92,6 @@
 
     <div class="container">
         <div id="catalog" class="grid"></div>
-
         <div id="history" class="grid" style="display:none;"></div>
     </div>
 
@@ -72,9 +99,24 @@
         const API_URL = "https://levkatan-api-dxh8azfdfua6e9gn.israelcentral-01.azurewebsites.net/api";
         const token = localStorage.getItem('userToken');
         const username = localStorage.getItem('username');
+        const role = localStorage.getItem('userRole');
 
         if(!token) window.location.href = 'index.html';
         document.getElementById('userGreeting').innerText = `שלום, ${username || 'משתמש'}`;
+
+        // --- NEW LOGIC: Dynamic Navigation ---
+        const navContainer = document.getElementById('roleNav');
+        
+        // Show Employee Dashboard link if Employee OR Admin
+        if(role === 'employee' || role === 'admin') {
+            navContainer.innerHTML += `<a href="employee_dashboard.html" class="nav-item employee">🛠️ ממשק עובד</a>`;
+        }
+
+        // Show Admin Dashboard link ONLY if Admin
+        if(role === 'admin') {
+            navContainer.innerHTML += `<a href="admin_dashboard.html" class="nav-item admin">🔒 ניהול אדמין</a>`;
+        }
+        // -------------------------------------
 
         async function loadProducts() {
             const res = await fetch(`${API_URL}/products`);
@@ -122,18 +164,14 @@
             });
             const data = await res.json();
             alert(data.message);
-            loadProducts(); // Refresh catalog
+            loadProducts(); 
         }
 
         function switchTab(id) {
-            // UI Toggle
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             event.target.classList.add('active');
-            
-            // Content Toggle
             document.getElementById('catalog').style.display = id === 'catalog' ? 'grid' : 'none';
             document.getElementById('history').style.display = id === 'history' ? 'grid' : 'none';
-            
             if(id === 'history') loadHistory();
         }
 

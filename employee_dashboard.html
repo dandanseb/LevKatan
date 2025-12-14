@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>ניהול עובדים - לב קטן</title>
-    <link rel="icon" href="lev katan.jpg" type="image/jpeg">
+    <link rel="icon" href="logo.png" type="image/png">
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #E0F7FA; margin: 0; }
         
@@ -33,13 +33,16 @@
 <body>
     <div class="top-bar">
         <div class="brand-area">
-            <img src="lev katan.jpg" alt="Logo" class="brand-logo">
+            <img src="logo.png" alt="Logo" class="brand-logo">
             <h2 style="margin:0; font-size: 20px; color:#006064;">ממשק עובד</h2>
         </div>
         <div>
+            <span id="dynamicNav"></span>
+            
             <a href="user_dashboard.html" class="nav-link">← עבור לקטלוג (השאלה רגילה)</a>
             <span id="userGreeting" style="margin: 0 15px; font-weight:600; color:#555;"></span>
-            <button onclick="logout()" style="background:none; border:1px solid #ccc; padding:5px 10px; border-radius:4px; cursor:pointer;">יציאה</button>
+            
+            <button onclick="logout()" style="background:#FF4444; color:white; border:none; padding:6px 15px; border-radius:20px; font-weight:bold; cursor:pointer;">יציאה</button>
         </div>
     </div>
 
@@ -62,9 +65,16 @@
         const API_URL = "https://levkatan-api-dxh8azfdfua6e9gn.israelcentral-01.azurewebsites.net/api";
         const token = localStorage.getItem('userToken');
         const username = localStorage.getItem('username');
+        const role = localStorage.getItem('userRole');
 
         if(!token) window.location.href = 'index.html';
         document.getElementById('userGreeting').innerText = username;
+
+        // --- NEW LOGIC: Show Admin Link if Admin ---
+        if(role === 'admin') {
+            document.getElementById('dynamicNav').innerHTML = `<a href="admin_dashboard.html" class="nav-link" style="color:#D32F2F;">🔒 מעבר לניהול אדמין</a>`;
+        }
+        // -------------------------------------------
 
         async function loadRequests() {
             const res = await fetch(`${API_URL}/employee/requests`, {
