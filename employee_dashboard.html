@@ -3,28 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <title>ניהול עובדים - לב קטן</title>
+    <link rel="icon" href="lev katan.jpg" type="image/jpeg">
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #E0F7FA; padding: 20px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #E0F7FA; margin: 0; }
+        
+        .top-bar {
+            background: white; padding: 10px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 30px;
+        }
+        .brand-area { display: flex; align-items: center; gap: 10px; }
+        .brand-logo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+        
         .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .header { display: flex; justify-content: space-between; margin-bottom: 30px; }
-        table { width: 100%; border-collapse: collapse; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th, td { padding: 12px; text-align: right; border-bottom: 1px solid #ddd; }
-        .btn-approve { background: #4CAF50; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
-        .btn-reject { background: #F44336; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
-        .nav-link { color: #00838F; text-decoration: underline; cursor: pointer; margin-left: 15px; }
+        th { background-color: #f9f9f9; color: #006064; }
+        
+        .btn-approve { background: #4CAF50; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; transition:0.2s; }
+        .btn-approve:hover { background: #388E3C; }
+        
+        .btn-reject { background: #EF5350; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; transition:0.2s; margin-right: 5px; }
+        .btn-reject:hover { background: #D32F2F; }
+
+        .nav-link { color: #00838F; text-decoration: none; font-weight: bold; margin-left: 20px; font-size: 14px; }
+        .nav-link:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h2>🛠️ לוח בקרה לעובד</h2>
-            <div>
-                <span class="nav-link" onclick="window.location.href='user_dashboard.html'">מעבר לאתר רגיל (השאלה)</span>
-                <span class="nav-link" onclick="logout()">יציאה</span>
-            </div>
+    <div class="top-bar">
+        <div class="brand-area">
+            <img src="lev katan.jpg" alt="Logo" class="brand-logo">
+            <h2 style="margin:0; font-size: 20px; color:#006064;">ממשק עובד</h2>
         </div>
+        <div>
+            <a href="user_dashboard.html" class="nav-link">← עבור לקטלוג (השאלה רגילה)</a>
+            <span id="userGreeting" style="margin: 0 15px; font-weight:600; color:#555;"></span>
+            <button onclick="logout()" style="background:none; border:1px solid #ccc; padding:5px 10px; border-radius:4px; cursor:pointer;">יציאה</button>
+        </div>
+    </div>
 
-        <h3>בקשות השאלה ממתינות לאישור</h3>
+    <div class="container">
+        <h3>🎁 בקשות השאלה ממתינות לאישור</h3>
         <table id="requestsTable">
             <thead>
                 <tr>
@@ -39,10 +59,12 @@
     </div>
 
     <script>
-        const API_URL = "http://127.0.0.1:5230/api"; 
+        const API_URL = "https://levkatan-api-dxh8azfdfua6e9gn.israelcentral-01.azurewebsites.net/api";
         const token = localStorage.getItem('userToken');
-        
-        if(!token || localStorage.getItem('userRole') === 'user') window.location.href = 'index.html';
+        const username = localStorage.getItem('username');
+
+        if(!token) window.location.href = 'index.html';
+        document.getElementById('userGreeting').innerText = username;
 
         async function loadRequests() {
             const res = await fetch(`${API_URL}/employee/requests`, {
@@ -56,14 +78,14 @@
                 <tr>
                     <td>${r.username}</td>
                     <td>${r.product}</td>
-                    <td>${r.date}</td>
+                    <td>${r.date.split(' ')[0]}</td>
                     <td>
-                        <button class="btn-approve" onclick="updateStatus(${r.id}, 'approved')">אשר</button>
-                        <button class="btn-reject" onclick="updateStatus(${r.id}, 'rejected')">דחה</button>
+                        <button class="btn-approve" onclick="updateStatus(${r.id}, 'approved')">אשר ✅</button>
+                        <button class="btn-reject" onclick="updateStatus(${r.id}, 'rejected')">דחה ❌</button>
                     </td>
                 </tr>
             `).join('');
-            if(reqs.length === 0) tbody.innerHTML = "<tr><td colspan='4'>אין בקשות ממתינות</td></tr>";
+            if(reqs.length === 0) tbody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:20px;'>אין בקשות ממתינות כרגע 🎉</td></tr>";
         }
 
         async function updateStatus(id, status) {
@@ -76,7 +98,6 @@
         }
 
         function logout() { localStorage.clear(); window.location.href = 'index.html'; }
-        
         loadRequests();
     </script>
 </body>

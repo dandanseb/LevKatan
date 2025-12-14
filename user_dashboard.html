@@ -2,39 +2,79 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>לב קטן - קטלוג מוצרים</title>
+    <title>לב קטן - אזור אישי</title>
+    <link rel="icon" href="lev katan.jpg" type="image/jpeg">
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #FFF5F7; margin: 0; padding: 20px; }
-        .navbar { background: white; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        .btn { padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; color: white; background: #FF69B4; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
-        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .card h3 { color: #333; margin-top: 0; }
-        .status { font-size: 0.9em; color: #666; }
+        body { font-family: 'Segoe UI', sans-serif; background: #FFF5F7; margin: 0; }
+        
+        /* NEW TOP BAR STYLE */
+        .top-bar {
+            background: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 2px;
+        }
+        .brand-area { display: flex; align-items: center; gap: 10px; }
+        .brand-logo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+        .user-area { display: flex; align-items: center; gap: 15px; }
+        .welcome-text { color: #555; font-weight: 600; }
+        .logout-btn { color: #FF4444; border: 1px solid #FF4444; background: white; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+        .logout-btn:hover { background: #FF4444; color: white; }
+
+        /* TABS STYLE (Copied from Login) */
+        .tabs { display: flex; background: white; justify-content: center; box-shadow: 0 4px 6px -4px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .tab { padding: 15px 40px; cursor: pointer; font-weight: 600; color: #666; border-bottom: 3px solid transparent; font-size: 16px; transition: all 0.3s; }
+        .tab:hover { background: #FFF0F5; color: #FF69B4; }
+        .tab.active { color: #FF69B4; border-bottom-color: #FF69B4; }
+
+        /* Content Area */
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #eee; transition: transform 0.2s; }
+        .card:hover { transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
+        .card h3 { color: #333; margin-top: 0; margin-bottom: 5px; }
+        .cat-tag { display: inline-block; background: #E3F2FD; color: #1976D2; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-bottom: 10px; }
+        .btn-borrow { width: 100%; padding: 10px; background: #FF69B4; color: white; border: none; border-radius: 8px; cursor: pointer; margin-top: 10px; font-weight: bold; }
+        .btn-borrow:hover { background: #E05297; }
+        
+        .status-pending { color: orange; font-weight: bold; }
+        .status-approved { color: green; font-weight: bold; }
+        .status-rejected { color: red; font-weight: bold; }
     </style>
 </head>
 <body>
-    <div class="navbar">
-        <h2>👶 לב קטן - קטלוג</h2>
-        <div>
-            <button class="btn" onclick="showSection('catalog')">מוצרים</button>
-            <button class="btn" style="background: #999;" onclick="showSection('history')">הבקשות שלי</button>
-            <button class="btn" style="background: #333;" onclick="logout()">יציאה</button>
+    <div class="top-bar">
+        <div class="brand-area">
+            <img src="lev katan.jpg" alt="Logo" class="brand-logo">
+            <h2 style="margin:0; font-size: 20px; color:#333;">לב קטן</h2>
+        </div>
+        <div class="user-area">
+            <span class="welcome-text" id="userGreeting">שלום, אורח</span>
+            <button class="logout-btn" onclick="logout()">יציאה</button>
         </div>
     </div>
 
-    <div id="catalog" class="grid"></div>
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('catalog')">📚 קטלוג מוצרים</div>
+        <div class="tab" onclick="switchTab('history')">📋 הבקשות שלי</div>
+    </div>
 
-    <div id="history" style="display:none;">
-        <h3>ההיסטוריה שלי</h3>
-        <div id="historyList" class="grid"></div>
+    <div class="container">
+        <div id="catalog" class="grid"></div>
+
+        <div id="history" class="grid" style="display:none;"></div>
     </div>
 
     <script>
-        const API_URL = "http://127.0.0.1:5230/api"; // CHANGE THIS to your Azure URL if needed
+        const API_URL = "https://levkatan-api-dxh8azfdfua6e9gn.israelcentral-01.azurewebsites.net/api";
         const token = localStorage.getItem('userToken');
+        const username = localStorage.getItem('username');
 
         if(!token) window.location.href = 'index.html';
+        document.getElementById('userGreeting').innerText = `שלום, ${username || 'משתמש'}`;
 
         async function loadProducts() {
             const res = await fetch(`${API_URL}/products`);
@@ -42,11 +82,13 @@
             const container = document.getElementById('catalog');
             container.innerHTML = products.map(p => `
                 <div class="card">
+                    <div class="cat-tag">${p.category}</div>
                     <h3>${p.name}</h3>
-                    <p>קטגוריה: ${p.category}</p>
-                    <button class="btn" onclick="borrow(${p.id})">בקש להשאיל ✋</button>
+                    <p style="color:#777; font-size:14px;">זמין להשאלה מיידית</p>
+                    <button class="btn-borrow" onclick="borrow(${p.id})">בקש להשאיל ✋</button>
                 </div>
             `).join('');
+            if(products.length === 0) container.innerHTML = "<p>אין מוצרים זמינים כרגע.</p>";
         }
 
         async function loadHistory() {
@@ -54,13 +96,21 @@
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const reqs = await res.json();
-            document.getElementById('historyList').innerHTML = reqs.map(r => `
+            document.getElementById('history').innerHTML = reqs.map(r => `
                 <div class="card">
                     <h3>${r.product}</h3>
-                    <p>סטטוס: <strong>${r.status}</strong></p>
-                    <p>תאריך: ${r.date}</p>
+                    <p>תאריך בקשה: ${r.date.split(' ')[0]}</p>
+                    <p>סטטוס: <span class="status-${r.status}">${translateStatus(r.status)}</span></p>
                 </div>
             `).join('');
+            if(reqs.length === 0) document.getElementById('history').innerHTML = "<p>עדיין לא ביקשת מוצרים.</p>";
+        }
+
+        function translateStatus(s) {
+            if(s === 'pending') return 'ממתין לאישור';
+            if(s === 'approved') return 'אושר - ניתן לאסוף';
+            if(s === 'rejected') return 'נדחה';
+            return s;
         }
 
         async function borrow(id) {
@@ -72,12 +122,18 @@
             });
             const data = await res.json();
             alert(data.message);
-            loadProducts(); // Refresh
+            loadProducts(); // Refresh catalog
         }
 
-        function showSection(id) {
+        function switchTab(id) {
+            // UI Toggle
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Content Toggle
             document.getElementById('catalog').style.display = id === 'catalog' ? 'grid' : 'none';
-            document.getElementById('history').style.display = id === 'history' ? 'block' : 'none';
+            document.getElementById('history').style.display = id === 'history' ? 'grid' : 'none';
+            
             if(id === 'history') loadHistory();
         }
 

@@ -3,34 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <title>ניהול מערכת - אדמין</title>
+    <link rel="icon" href="lev katan.jpg" type="image/jpeg">
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #333; color: #fff; padding: 20px; }
-        .container { background: #444; padding: 30px; border-radius: 15px; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        table { width: 100%; background: #555; border-radius: 8px; overflow: hidden; }
-        th, td { padding: 12px; text-align: right; border-bottom: 1px solid #666; }
-        select { padding: 5px; border-radius: 4px; }
-        .btn-delete { background: #FF4444; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 4px; }
-        a { color: #4DB6AC; text-decoration: none; margin-left: 20px; font-weight: bold; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f4f4; margin: 0; }
+        
+        .top-bar {
+            background: #333; color: white;
+            padding: 10px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .brand-area { display: flex; align-items: center; gap: 10px; }
+        .brand-logo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #555; }
+        
+        .nav-links { display: flex; gap: 20px; }
+        .nav-item { color: #ccc; text-decoration: none; font-size: 14px; transition: 0.2s; }
+        .nav-item:hover { color: white; text-decoration: underline; }
+
+        .container { max-width: 1200px; margin: 30px auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background: #eee; padding: 12px; text-align: right; border-bottom: 2px solid #ddd; font-weight: bold; color: #555; }
+        td { padding: 12px; border-bottom: 1px solid #eee; color: #333; }
+        
+        select { padding: 6px; border-radius: 4px; border: 1px solid #ccc; }
+        .btn-delete { background: #FFEBEE; color: #D32F2F; border: 1px solid #FFCDD2; padding: 6px 12px; cursor: pointer; border-radius: 6px; transition: 0.2s; display: flex; align-items: center; gap: 5px; }
+        .btn-delete:hover { background: #FFCDD2; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h2>🔒 ניהול משתמשים (Admin)</h2>
-            <div>
-                <a href="employee_dashboard.html">→ מעבר לניהול בקשות (עובד)</a>
-                <a href="#" onclick="logout()">יציאה</a>
-            </div>
+    <div class="top-bar">
+        <div class="brand-area">
+            <img src="lev katan.jpg" alt="Logo" class="brand-logo">
+            <span style="font-weight:bold; font-size:18px;">פאנל ניהול</span>
+        </div>
+        
+        <div class="nav-links">
+            <a href="user_dashboard.html" class="nav-item">🪑 מעבר לקטלוג</a>
+            <span style="color:#555">|</span>
+            <a href="employee_dashboard.html" class="nav-item">🛠️ מעבר לממשק עובד</a>
         </div>
 
+        <div>
+            <span id="userGreeting" style="margin-left:15px; font-size:14px;"></span>
+            <button onclick="logout()" style="background:none; border:1px solid #777; color:#ddd; padding:4px 10px; border-radius:4px; cursor:pointer;">יציאה</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2 style="border-bottom: 2px solid #FF69B4; padding-bottom: 10px; color: #333;">משתמשים רשומים</h2>
         <table id="usersTable">
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>שם מלא</th>
+                    <th>מספר סידורי</th> <th>שם מלא</th>
                     <th>שם משתמש</th>
-                    <th>תפקיד</th>
+                    <th>טלפון</th> <th>אימייל</th> <th>תפקיד</th>
                     <th>פעולות</th>
                 </tr>
             </thead>
@@ -39,15 +65,12 @@
     </div>
 
     <script>
-        //const API_URL = "http://127.0.0.1:5230/api";
         const API_URL = "https://levkatan-api-dxh8azfdfua6e9gn.israelcentral-01.azurewebsites.net/api";
-        
         const token = localStorage.getItem('userToken');
+        const username = localStorage.getItem('username');
 
-        // Security check
-        if(!token || localStorage.getItem('userRole') !== 'admin') {
-            window.location.href = 'index.html';
-        }
+        if(!token || localStorage.getItem('userRole') !== 'admin') window.location.href = 'index.html';
+        document.getElementById('userGreeting').innerText = `שלום, ${username}`;
 
         async function loadUsers() {
             const res = await fetch(`${API_URL}/admin/users`, {
@@ -61,6 +84,8 @@
                     <td>${u.id}</td>
                     <td>${u.full_name}</td>
                     <td>${u.username}</td>
+                    <td>${u.phone_number || '-'}</td>
+                    <td>${u.email}</td>
                     <td>
                         <select onchange="changeRole(${u.id}, this.value)">
                             <option value="user" ${u.role === 'user' ? 'selected' : ''}>User</option>
@@ -69,7 +94,9 @@
                         </select>
                     </td>
                     <td>
-                        <button class="btn-delete" onclick="deleteUser(${u.id})">מחק משתמש</button>
+                        <button class="btn-delete" onclick="deleteUser(${u.id})">
+                            🗑️ מחק משתמש
+                        </button>
                     </td>
                 </tr>
             `).join('');
@@ -85,7 +112,7 @@
         }
 
         async function deleteUser(id) {
-            if(!confirm("האם אתה בטוח שברצונך למחוק משתמש זה?")) return;
+            if(!confirm("האם אתה בטוח שברצונך למחוק משתמש זה? הפעולה היא סופית.")) return;
             await fetch(`${API_URL}/admin/users/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
@@ -94,7 +121,6 @@
         }
 
         function logout() { localStorage.clear(); window.location.href = 'index.html'; }
-
         loadUsers();
     </script>
 </body>
