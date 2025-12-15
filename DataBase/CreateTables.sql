@@ -19,7 +19,7 @@ CREATE TABLE products (
     publish_date DATE DEFAULT CURRENT_DATE,
     last_status_change TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     status VARCHAR(20) CHECK (status IN ('available', 'borrowed', 'unavailable', 'confirmation_pending')) DEFAULT 'available',
-    owner_id INT REFERENCES personnal_infos(id) ON DELETE SET NULL,
+    donator_email VARCHAR(100),
     description VARCHAR(200)
 
 );
