@@ -87,7 +87,7 @@ def register():
     data = request.json
     full_name = data.get('fullName')
     username = data.get('username')
-    phone = data.get('phone')
+    phone_number = data.get('phone_number')
     email = data.get('email')
     passwd = data.get('password')
     password_bytes = passwd.encode('utf-8')
@@ -238,7 +238,7 @@ def get_all_users():
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute("SELECT id, full_name, username, phone_number, email, role FROM personnal_infos ORDER BY id;")
-    users = [dict(zip(['id', 'full_name', 'username', 'phone', 'email', 'role'], r)) for r in cur.fetchall()]
+    users = [dict(zip(['id', 'full_name', 'username', 'phone_number', 'email', 'role'], r)) for r in cur.fetchall()]
     conn.close()
     return jsonify(users), 200
 
@@ -268,4 +268,5 @@ def delete_user(user_id):
 if __name__ == '__main__':
     # Reads the string "True" or "False" from .env and converts to boolean
     debug_mode = os.getenv("FLASK_DEBUG", "False").lower() in ('true', '1', 't')
+
     app.run(debug=debug_mode, port=5230, host='0.0.0.0')
