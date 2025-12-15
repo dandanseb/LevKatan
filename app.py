@@ -220,6 +220,37 @@ def create_product():
     finally:
         conn.close()
 
+@app.route('/api/employee/products/<int:product_id>', methods=['GET'])
+@employee_required
+def get_single_product(product_id):
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({"message": "Erreur interne du serveur (DB)"}), 500
+
+    cur = conn.cursor()
+
+    try:
+        sql = """
+            SELECT id, product_name, category, description, donator_email, status 
+            FROM products 
+            WHERE id = %s;
+        """
+        cur.execute(sql, (product_id,))
+        product = cur.fetchone()
+
+        if product:
+            columns = ['id', 'product_name', 'category', 'description', 'donator_email', 'status']
+            result = dict(zip(columns, product))
+            return jsonify(result), 200
+        else:
+            return jsonify({"message": "Produit non trouvé"}), 404
+
+    except Exception as e:
+        print(f"Erreur lors de la récupération du produit: {e}")
+        return jsonify({"message": "Erreur serveur"}), 500
+    finally:
+        conn.close()
+
 
 @app.route('/api/employee/products', methods=['GET'])
 @employee_required
@@ -257,6 +288,61 @@ def get_all_products():
     finally:
         conn.close()
 
+@app.route('/api/employee/products/<int:product_id>', methods=['PUT'])
+@employee_required
+def update_product(product_id):
+    data = request.json
+
+    # Récupérer toutes les données du corps de la requête
+    product_name = data.get('product_name')
+    category = data.get('category')
+    description = data.get('description')
+    donator_email = data.get('donator_email')
+    status = data.get('status')
+
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({"message": "Erreur interne du serveur (DB)"}), 500
+
+    cur = conn.cursor()
+
+    try:
+        sql = """
+            UPDATE products 
+            SET product_name = %s, 
+                category = %s, 
+                description = %s, 
+                donator_email = %s, 
+                status = %s,
+                last_status_change = CURRENT_TIMESTAMP 
+            WHERE id = %s 
+            RETURNING id;
+        """
+        cur.execute(sql, (
+            product_name, 
+            category, 
+            description, 
+            donator_email, 
+            status, 
+            product_id 
+        ))
+
+        updated_id = cur.fetchone()
+
+        if updated_id:
+            conn.commit()
+            return jsonify({"message": "Produit mis à jour"}), 200
+        else:
+            conn.rollback()
+            return jsonify({"message": "Produit non trouvé"}), 404
+
+    except Exception as e:
+        conn.rollback()
+        print(f"Erreur lors de la mise à jour du produit: {e}")
+        return jsonify({"message": f"Erreur de mise à jour: {e}"}), 400
+    finally:
+        conn.close()
+
 
 @app.route('/api/employee/products/<int:product_id>', methods=['DELETE'])
 @employee_required
@@ -285,6 +371,8 @@ def delete_product(product_id):
             {"message": f"Erreur lors de la suppression du produit: {e}"}), 500
     finally:
         conn.close()
+
+
 
 # --- EMPLOYEE ROUTES (Manage Requests) ---
 
@@ -376,6 +464,7 @@ if __name__ == '__main__':
     debug_mode = os.getenv("FLASK_DEBUG", "False").lower() in ('true', '1', 't')
 
     app.run(debug=debug_mode, port=5230, host='0.0.0.0')
+
 
 
 
