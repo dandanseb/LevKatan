@@ -141,10 +141,10 @@
                     <label for="category">קטגוריה</label>
                     <select id="category" required>
                         <option value="" disabled selected>בחר קטגוריה</option>
-                        <option value="cribs">cribs</option>
-                        <option value="baby beds">baby beds</option>
-                        <option value="strollers">strollers</option>
-                        <option value="babycar seats">babycar seats</option>
+                        <option value="berceaux">berceaux</option>
+                        <option value="lit bébé">lit bébé</option>
+                        <option value="poussetes">poussetes</option>
+                        <option value="siege auto">siege auto</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -194,6 +194,53 @@
 
     </div>
 
+    <div id="editModal" style="display:none; position:fixed; z-index:100; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.4);">
+        <div style="background-color:var(--card-bg); margin:10% auto; padding:30px; border-radius:15px; border:1px solid var(--border-color); width:80%; max-width:600px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
+            <h3 style="margin-top:0;">ערוך פרטי מוצר <span id="editProductId" style="font-size:18px; opacity:0.6;"></span></h3>
+
+            <form id="editProductForm">
+                <input type="hidden" id="edit_id">
+
+                <div class="form-group">
+                    <label for="edit_product_name">שם המוצר</label>
+                    <input type="text" id="edit_product_name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit_category">קטגוריה</label>
+                    <select id="edit_category" required>
+                        <option value="berceaux">berceaux</option>
+                        <option value="lit bébé">lit bébé</option>
+                        <option value="poussetes">poussetes</option>
+                        <option value="siege auto">siege auto</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit_description">תיאור (עד 15 מילים)</label>
+                    <textarea id="edit_description" rows="3" maxlength="200" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit_donator_email">אימייל של התורם</label>
+                    <input type="email" id="edit_donator_email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit_status">סטטוס</label>
+                    <select id="edit_status" required>
+                        <option value="available">available</option>
+                        <option value="borrowed">borrowed</option>
+                        <option value="unavailable">unavailable</option>
+                        <option value="confirmation_pending">confirmation_pending</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn" style="width:auto; margin-top: 15px;">שמור שינויים</button>
+                <button type="button" onclick="document.getElementById('editModal').style.display='none'" class="btn-delete" style="width:auto; margin-top: 15px;">ביטול</button>
+            </form>
+        </div>
+    </div>
     <script>
         const API_URL = "https://levkatan-api-dxh8azfdfua6e9gn.israelcentral-01.azurewebsites.net/api";
         const token = localStorage.getItem('userToken');
@@ -308,7 +355,8 @@
                 document.getElementById('productForm').reset(); // Clear the form
                 loadProducts(); // Reload the list
             } else {
-                alert("שגיאה בהוספת המוצר.");
+                const errorData = await res.json();
+                alert(`שגיאה בהוספת המוצר: ${errorData.message || res.statusText}`);
             }
         });
 
@@ -329,11 +377,64 @@
             }
         }
 
-        // Step 5: Modifying a product (Requires a Modal/Inline form, not implemented here, but the link is there)
-        function editProduct(id) {
-            alert(`בקשה לעריכת מוצר ID ${id}. יישום העריכה יתבצע בשלב הבא.`);
-            // // We will implement the editing function later.
+        // ----------------------------------------------------------------------
+        // Step 5: Modifying a product (Récupération des données et affichage du modal)
+        async function editProduct(id) {
+            // 1. Récupérer les données actuelles du produit via une nouvelle route GET
+            const res = await fetch(`${API_URL}/employee/products/${id}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if(!res.ok) {
+                alert("Erreur: Impossible de charger les données du produit.");
+                return;
+            }
+
+            const product = await res.json();
+
+            // 2. Remplir le formulaire modal avec les données du produit
+            document.getElementById('edit_id').value = product.id;
+            document.getElementById('editProductId').innerText = `(ID: ${product.id})`;
+            document.getElementById('edit_product_name').value = product.product_name;
+            document.getElementById('edit_category').value = product.category;
+            document.getElementById('edit_description').value = product.description;
+            document.getElementById('edit_donator_email').value = product.donator_email;
+            document.getElementById('edit_status').value = product.status;
+
+            // 3. Afficher le modal
+            document.getElementById('editModal').style.display = 'block';
         }
+        // ----------------------------------------------------------------------
+
+
+        // Step 6: Soumission du formulaire de modification (PUT)
+        document.getElementById('editProductForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const id = document.getElementById('edit_id').value;
+            const updatedProduct = {
+                product_name: document.getElementById('edit_product_name').value,
+                category: document.getElementById('edit_category').value,
+                description: document.getElementById('edit_description').value,
+                donator_email: document.getElementById('edit_donator_email').value,
+                status: document.getElementById('edit_status').value, // On envoie le nouveau statut
+            };
+
+            const res = await fetch(`${API_URL}/employee/products/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify(updatedProduct)
+            });
+
+            if (res.ok) {
+                alert("מוצר עודכן בהצלחה!");
+                document.getElementById('editModal').style.display = 'none'; // Fermer le modal
+                loadProducts(); // Recharger la liste pour voir les changements
+            } else {
+                const errorData = await res.json();
+                alert(`שגיאה בעדכון המוצר: ${errorData.message || res.statusText}`);
+            }
+        });
 
 
         // Initial loading of both sections
