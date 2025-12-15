@@ -180,6 +180,113 @@ def get_my_requests():
     conn.close()
     return jsonify(requests), 200
 
+
+# --- EMPLOYEE ROUTES (Manage Products - CRUD) ---
+
+@app.route('/api/employee/products', methods=['POST'])
+@employee_required
+def create_product():
+    
+    data = request.json
+    product_name = data.get('product_name')
+    category = data.get('category')
+    description = data.get('description')
+    donator_email = data.get('donator_email')
+
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({"message": "Erreur interne du serveur (DB)"}), 500
+
+    cur = conn.cursor()
+
+    try:
+        sql = """
+            INSERT INTO products 
+            (product_name, category, description, donator_email, status, last_status_change)
+            VALUES (%s, %s, %s, %s, 'available', CURRENT_TIMESTAMP) 
+            RETURNING id;
+        """
+        # Le statut est défini par défaut sur 'available' et last_status_change sur la date/heure actuelle
+        cur.execute(sql, (product_name, category, description, donator_email))
+        product_id = cur.fetchone()[0]
+        conn.commit()
+
+        return jsonify(
+            {"message": "Produit créé avec succès", "id": product_id}), 201
+
+    except Exception as e:
+        conn.rollback()
+        return jsonify(
+            {"message": f"Erreur lors de la création du produit: {e}"}), 400
+    finally:
+        conn.close()
+
+
+@app.route('/api/employee/products', methods=['GET'])
+@employee_required
+def get_all_products():
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({"message": "Erreur interne du serveur (DB)"}), 500
+
+    cur = conn.cursor()
+
+    try:
+        # Sélectionne tous les champs nécessaires pour le tableau de bord
+        sql = """
+            SELECT id, product_name, category, status, donator_email, publish_date 
+            FROM products 
+            ORDER BY id DESC;
+        """
+        cur.execute(sql)
+
+        # Mapping des résultats
+        columns = ['id', 'product_name', 'category', 'status', 'donator_email',
+                   'publish_date']
+        products = [dict(zip(columns, r)) for r in cur.fetchall()]
+
+        # Convertir les objets date/datetime en string pour le JSON
+        for p in products:
+            p['publish_date'] = str(p['publish_date'])
+
+        return jsonify(products), 200
+
+    except Exception as e:
+        print(f"Erreur lors de la récupération des produits: {e}")
+        return jsonify(
+            {"message": "Erreur serveur lors de la lecture des produits"}), 500
+    finally:
+        conn.close()
+
+
+@app.route('/api/employee/products/<int:product_id>', methods=['DELETE'])
+@employee_required
+def delete_product(product_id):
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({"message": "Erreur interne du serveur (DB)"}), 500
+
+    cur = conn.cursor()
+
+    try:
+        cur.execute("DELETE FROM products WHERE id = %s RETURNING id;",
+                    (product_id,))
+        deleted_id = cur.fetchone()
+
+        if deleted_id:
+            conn.commit()
+            return jsonify({
+                               "message": "Produit supprimé"}), 204  # 204 No Content pour une suppression réussie
+        else:
+            return jsonify({"message": "Produit non trouvé"}), 404
+
+    except Exception as e:
+        conn.rollback()
+        return jsonify(
+            {"message": f"Erreur lors de la suppression du produit: {e}"}), 500
+    finally:
+        conn.close()
+
 # --- EMPLOYEE ROUTES (Manage Requests) ---
 
 @app.route('/api/employee/requests', methods=['GET'])
@@ -270,4 +377,5 @@ if __name__ == '__main__':
     debug_mode = os.getenv("FLASK_DEBUG", "False").lower() in ('true', '1', 't')
 
     app.run(debug=debug_mode, port=5230, host='0.0.0.0')
+
 
