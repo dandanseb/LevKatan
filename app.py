@@ -127,7 +127,7 @@ def get_products():
     conn = get_db_connection()
     cur = conn.cursor()
     # Fetch available products
-    cur.execute("SELECT id, product_name, category, status FROM product WHERE status = 'available';")
+    cur.execute("SELECT id, product_name, category, status FROM products WHERE status = 'available';")
     products = [{'id': r[0], 'name': r[1], 'category': r[2], 'status': r[3]} for r in cur.fetchall()]
     conn.close()
     return jsonify(products), 200
@@ -143,7 +143,7 @@ def borrow_product():
     cur = conn.cursor()
     try:
         # Check if available
-        cur.execute("SELECT status FROM product WHERE id = %s", (product_id,))
+        cur.execute("SELECT status FROM products WHERE id = %s", (product_id,))
         status = cur.fetchone()
         if not status or status[0] != 'available':
             return jsonify({"message": "Product not available"}), 400
@@ -376,6 +376,7 @@ if __name__ == '__main__':
     debug_mode = os.getenv("FLASK_DEBUG", "False").lower() in ('true', '1', 't')
 
     app.run(debug=debug_mode, port=5230, host='0.0.0.0')
+
 
 
 
