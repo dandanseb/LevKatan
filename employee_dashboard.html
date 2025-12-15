@@ -30,7 +30,8 @@
         }
 
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg-color); color: var(--text-color); margin: 0; transition: background 0.3s; }
-        
+
+        /* Layout Structure */
         .top-bar {
             background: var(--header-bg); padding: 10px 20px;
             display: flex; justify-content: space-between; align-items: center;
@@ -38,15 +39,14 @@
         }
         .brand-area { display: flex; align-items: center; gap: 10px; }
         .brand-logo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
-        
-        /* UNIFIED NAV BUTTONS */
+
         .nav-actions { display: flex; align-items: center; gap: 10px; }
-        .nav-item { 
-            text-decoration: none; 
-            color: var(--nav-btn-text); 
-            font-size: 14px; 
-            font-weight: 600; 
-            padding: 8px 16px; 
+        .nav-item {
+            text-decoration: none;
+            color: var(--nav-btn-text);
+            font-size: 14px;
+            font-weight: 600;
+            padding: 8px 16px;
             border-radius: 20px;
             background: var(--nav-btn-bg);
             transition: all 0.2s;
@@ -54,23 +54,60 @@
         }
         .nav-item:hover { background: var(--nav-btn-hover); color: var(--text-color); }
 
-        .theme-toggle { background: none; border: none; font-size: 20px; cursor: pointer; padding: 5px; border-radius: 50%; margin-left: 10px; }
+        .theme-toggle { background: none; border: none; font-size: 20px; cursor: pointer; padding: 5px; border-radius: 50%; margin-left: 10px; color: var(--text-color); }
         .theme-toggle:hover { background: rgba(128,128,128,0.2); }
 
-        .container { max-width: 900px; margin: 0 auto; background: var(--card-bg); padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        
+        /* Main Content Grid for Two Boxes */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            gap: 20px; /* Espace entre les deux boîtes */
+            padding: 0 20px 30px 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            flex: 1; /* Prend la même largeur */
+        }
+
+        /* Table Styles */
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th, td { padding: 12px; text-align: right; border-bottom: 1px solid var(--border-color); color: var(--text-color); }
         th { background-color: var(--table-head-bg); color: #006064; font-weight: bold; }
         body.dark-mode th { color: #80DEEA; }
 
+        /* Form Styles */
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-sizing: border-box;
+            background: var(--bg-color);
+            color: var(--text-color);
+        }
+        .form-group textarea { resize: vertical; }
+
+        /* Button Styles */
+        .btn { background: #00796B; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; transition: 0.2s; font-weight: bold; width: 100%; }
+        .btn:hover { background: #004D40; }
+        .btn-delete { background: #EF5350; margin-right: 5px; }
+        .btn-delete:hover { background: #D32F2F; }
+        .btn-edit { background: #FFA000; margin-right: 5px; }
+        .btn-edit:hover { background: #FF8F00; }
+        .logout-btn { background: #FF4444; color: white; border: none; padding: 6px 15px; border-radius: 20px; font-weight: bold; cursor: pointer; }
+        .logout-btn:hover { background: #D32F2F; }
         .btn-approve { background: #4CAF50; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; transition:0.2s; }
         .btn-approve:hover { background: #388E3C; }
         .btn-reject { background: #EF5350; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; transition:0.2s; margin-right: 5px; }
         .btn-reject:hover { background: #D32F2F; }
-        
-        .logout-btn { background: #FF4444; color: white; border: none; padding: 6px 15px; border-radius: 20px; font-weight: bold; cursor: pointer; }
-        .logout-btn:hover { background: #D32F2F; }
+
     </style>
 </head>
 <body>
@@ -81,28 +118,80 @@
         </div>
         <div class="nav-actions">
             <span id="dynamicNav"></span>
-            
+
             <a href="user_dashboard.html" class="nav-item">🪑 קטלוג</a>
             <span id="userGreeting" style="margin: 0 5px; font-weight:600; color:var(--text-color); opacity:0.7;"></span>
-            
+
             <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
             <button class="logout-btn" onclick="logout()">יציאה</button>
         </div>
     </div>
 
-    <div class="container">
-        <h3>🎁 בקשות השאלה ממתינות לאישור</h3>
-        <table id="requestsTable">
-            <thead>
-                <tr>
-                    <th>שם המשתמש</th>
-                    <th>המוצר</th>
-                    <th>תאריך בקשה</th>
-                    <th>פעולות</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-        </table>
+    <div class="main-content">
+
+        <div class="card" style="flex: 2;"> <h3>🛠️ ניהול פריטים (Products Management)</h3>
+
+            <form id="productForm">
+                <h4>➕ הוסף פריט חדש</h4>
+                <div class="form-group">
+                    <label for="product_name">שם המוצר</label>
+                    <input type="text" id="product_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="category">קטגוריה</label>
+                    <select id="category" required>
+                        <option value="" disabled selected>בחר קטגוריה</option>
+                        <option value="berceaux">berceaux</option>
+                        <option value="lit bébé">lit bébé</option>
+                        <option value="poussetes">poussetes</option>
+                        <option value="siege auto">siege auto</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="description">תיאור (עד 15 מילים)</label>
+                    <textarea id="description" rows="3" maxlength="200" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="donator_email">אימייל של התורם (Donator Email)</label>
+                    <input type="email" id="donator_email" required>
+                </div>
+
+                <button type="submit" class="btn">הוסף מוצר</button>
+
+            </form>
+
+            <h4 style="margin-top: 30px;">רשימת כל המוצרים</h4>
+            <table id="productsTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>שם</th>
+                        <th>קטגוריה</th>
+                        <th>סטטוס</th>
+                        <th>פעולות</th>
+                    </tr>
+                </thead>
+                <tbody id="productsTableBody">
+                    </tbody>
+            </table>
+        </div>
+
+        <div class="card" style="flex: 1;">
+            <h3>🎁 בקשות השאלה ממתינות לאישור</h3>
+            <table id="requestsTable">
+                <thead>
+                    <tr>
+                        <th>שם המשתמש</th>
+                        <th>המוצר</th>
+                        <th>תאריך בקשה</th>
+                        <th>פעולות</th>
+                    </tr>
+                </thead>
+                <tbody id="requestsTableBody">
+                    </tbody>
+            </table>
+        </div>
+
     </div>
 
     <script>
@@ -127,14 +216,21 @@
             document.getElementById('dynamicNav').innerHTML = `<a href="admin_dashboard.html" class="nav-item">🔒 ניהול אדמין</a>`;
         }
 
+        function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+
+
+        // ====================================================================
+        // GESTION DES REQUÊTES (EXISTANT)
+        // ====================================================================
+
         async function loadRequests() {
             const res = await fetch(`${API_URL}/employee/requests`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if(res.status === 403) { alert("אין לך גישה!"); window.location.href = 'index.html'; return; }
-            
+
             const reqs = await res.json();
-            const tbody = document.getElementById('tableBody');
+            const tbody = document.getElementById('requestsTableBody'); // Renommé ici
             tbody.innerHTML = reqs.map(r => `
                 <tr>
                     <td>${r.username}</td>
@@ -158,8 +254,91 @@
             loadRequests();
         }
 
-        function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+        // ====================================================================
+        // GESTION DES PRODUITS (NOUVEAU)
+        // ====================================================================
+
+        // Étape 1 : Charger la liste des produits
+        async function loadProducts() {
+            const res = await fetch(`${API_URL}/employee/products`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if(!res.ok) { console.error("Erreur de chargement des produits"); return; }
+
+            const products = await res.json();
+            renderProducts(products);
+        }
+
+        // Étape 2 : Rendre la liste dans le tableau
+        function renderProducts(products) {
+            const tbody = document.getElementById('productsTableBody');
+            tbody.innerHTML = products.map(p => `
+                <tr>
+                    <td>${p.id}</td>
+                    <td>${p.product_name}</td>
+                    <td>${p.category}</td>
+                    <td>${p.status}</td>
+                    <td>
+                        <button class="btn-edit" onclick="editProduct(${p.id})">ערוך ✏️</button>
+                        <button class="btn-delete" onclick="deleteProduct(${p.id})">מחק 🗑️</button>
+                    </td>
+                </tr>
+            `).join('');
+            if(products.length === 0) tbody.innerHTML = "<tr><td colspan='5' style='text-align:center; padding:20px;'>אין מוצרים רשומים כרגע.</td></tr>";
+        }
+
+        // Étape 3 : Ajouter un produit (Géré par le formulaire)
+        document.getElementById('productForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const newProduct = {
+                product_name: document.getElementById('product_name').value,
+                category: document.getElementById('category').value,
+                description: document.getElementById('description').value,
+                // Le statut par défaut sera 'available' géré par le Backend
+            };
+
+            const res = await fetch(`${API_URL}/employee/products`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify(newProduct)
+            });
+
+            if (res.status === 201) {
+                alert("מוצר נוסף בהצלחה!");
+                document.getElementById('productForm').reset(); // Vider le formulaire
+                loadProducts(); // Recharger la liste
+            } else {
+                alert("שגיאה בהוספת המוצר.");
+            }
+        });
+
+        // Étape 4 : Suppression d'un produit
+        async function deleteProduct(id) {
+            if (!confirm(`האם אתה בטוח שברצונך למחוק את מוצר ID ${id}?`)) return;
+
+            const res = await fetch(`${API_URL}/employee/products/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (res.status === 204) {
+                alert("מוצר נמחק בהצלחה!");
+                loadProducts();
+            } else {
+                alert("שגיאה במחיקת המוצר.");
+            }
+        }
+
+        // Étape 5 : Modification d'un produit (Nécessite un formulaire Modal/Inline, non implémenté ici, mais le lien est là)
+        function editProduct(id) {
+            alert(`בקשה לעריכת מוצר ID ${id}. יישום העריכה יתבצע בשלב הבא.`);
+            // Nous allons implémenter la fonction d'édition plus tard.
+        }
+
+
+        // Chargement initial des deux sections
         loadRequests();
+        loadProducts();
     </script>
 </body>
 </html>
