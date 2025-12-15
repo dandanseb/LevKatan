@@ -62,7 +62,7 @@
             max-width: 1400px;
             margin: 0 auto;
             display: flex;
-            gap: 20px; /* Espace entre les deux boîtes */
+            gap: 20px; /* Space between the two boxes */
             padding: 0 20px 30px 20px;
         }
 
@@ -220,7 +220,7 @@
 
 
         // ====================================================================
-        // GESTION DES REQUÊTES (EXISTANT)
+        // REQUEST MANAGEMENT
         // ====================================================================
 
         async function loadRequests() {
@@ -255,21 +255,21 @@
         }
 
         // ====================================================================
-        // GESTION DES PRODUITS (NOUVEAU)
+        // PRODUCT MANAGEMENT
         // ====================================================================
 
-        // Étape 1 : Charger la liste des produits
+        // Step 1: Load the product list
         async function loadProducts() {
             const res = await fetch(`${API_URL}/employee/products`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            if(!res.ok) { console.error("Erreur de chargement des produits"); return; }
+            if(!res.ok) { console.error("Product loading error"); return; }
 
             const products = await res.json();
             renderProducts(products);
         }
 
-        // Étape 2 : Rendre la liste dans le tableau
+        // Step 2: Submit the list to the table
         function renderProducts(products) {
             const tbody = document.getElementById('productsTableBody');
             tbody.innerHTML = products.map(p => `
@@ -287,15 +287,14 @@
             if(products.length === 0) tbody.innerHTML = "<tr><td colspan='5' style='text-align:center; padding:20px;'>אין מוצרים רשומים כרגע.</td></tr>";
         }
 
-        // Étape 3 : Ajouter un produit (Géré par le formulaire)
+        // Step 3: Add a product (Managed via the form)
         document.getElementById('productForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const newProduct = {
                 product_name: document.getElementById('product_name').value,
                 category: document.getElementById('category').value,
-                donator_email: document.getElementById('donator_email').value,
                 description: document.getElementById('description').value,
-                // Le statut par défaut sera 'available' géré par le Backend
+                donator_email: document.getElementById('donator_email').value,
             };
 
             const res = await fetch(`${API_URL}/employee/products`, {
@@ -306,14 +305,14 @@
 
             if (res.status === 201) {
                 alert("מוצר נוסף בהצלחה!");
-                document.getElementById('productForm').reset(); // Vider le formulaire
-                loadProducts(); // Recharger la liste
+                document.getElementById('productForm').reset(); // Clear the form
+                loadProducts(); // Reload the list
             } else {
                 alert("שגיאה בהוספת המוצר.");
             }
         });
 
-        // Étape 4 : Suppression d'un produit
+        // Step 4: Removing a product
         async function deleteProduct(id) {
             if (!confirm(`האם אתה בטוח שברצונך למחוק את מוצר ID ${id}?`)) return;
 
@@ -330,14 +329,14 @@
             }
         }
 
-        // Étape 5 : Modification d'un produit (Nécessite un formulaire Modal/Inline, non implémenté ici, mais le lien est là)
+        // Step 5: Modifying a product (Requires a Modal/Inline form, not implemented here, but the link is there)
         function editProduct(id) {
             alert(`בקשה לעריכת מוצר ID ${id}. יישום העריכה יתבצע בשלב הבא.`);
             // Nous allons implémenter la fonction d'édition plus tard.
         }
 
 
-        // Chargement initial des deux sections
+        // Initial loading of both sections
         loadRequests();
         loadProducts();
     </script>
