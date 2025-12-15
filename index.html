@@ -243,6 +243,9 @@
                 if (response.ok) {
                     const successMsg = document.getElementById('registerSuccess');
                     successMsg.classList.add('show');
+
+                    registerFormElement.reset();
+                    
                     setTimeout(() => { successMsg.classList.remove('show'); switchTab('login'); }, 2000);
                 } else {
                     const err = await response.json();
