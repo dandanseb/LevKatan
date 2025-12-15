@@ -71,7 +71,7 @@
             padding: 30px;
             border-radius: 15px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            flex: 1; /* Prend la même largeur */
+            flex: 1; /* Takes the same width */
         }
 
         /* Table Styles */
@@ -132,7 +132,7 @@
         <div class="card" style="flex: 2;"> <h3>🛠️ ניהול פריטים (Products Management)</h3>
 
             <form id="productForm">
-                <h4>➕ הוסף פריט חדש</h4>
+                <h4>הוסף פריט חדש</h4>
                 <div class="form-group">
                     <label for="product_name">שם המוצר</label>
                     <input type="text" id="product_name" required>
@@ -230,7 +230,7 @@
             if(res.status === 403) { alert("אין לך גישה!"); window.location.href = 'index.html'; return; }
 
             const reqs = await res.json();
-            const tbody = document.getElementById('requestsTableBody'); // Renommé ici
+            const tbody = document.getElementById('requestsTableBody'); 
             tbody.innerHTML = reqs.map(r => `
                 <tr>
                     <td>${r.username}</td>
@@ -332,7 +332,7 @@
         // Step 5: Modifying a product (Requires a Modal/Inline form, not implemented here, but the link is there)
         function editProduct(id) {
             alert(`בקשה לעריכת מוצר ID ${id}. יישום העריכה יתבצע בשלב הבא.`);
-            // Nous allons implémenter la fonction d'édition plus tard.
+            // // We will implement the editing function later.
         }
 
 
