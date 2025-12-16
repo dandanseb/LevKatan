@@ -464,7 +464,7 @@ def get_all_requests():
         FROM borrow_requests br
         JOIN personnal_infos u ON br.user_id = u.id
         JOIN products p ON br.product_id = p.id
-        WHERE br.status = 'confirmation_pending'
+        WHERE br.status = 'pending'
     """
     cur.execute(sql)
     requests = [{'id': r[0], 'username': r[1], 'product': r[2], 'status': r[3], 'date': str(r[4])} for r in cur.fetchall()]
@@ -542,6 +542,7 @@ if __name__ == '__main__':
     debug_mode = os.getenv("FLASK_DEBUG", "False").lower() in ('true', '1', 't')
 
     app.run(debug=debug_mode, port=5230, host='0.0.0.0')
+
 
 
 
