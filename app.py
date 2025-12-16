@@ -92,9 +92,7 @@ def register():
     conn = get_db_connection()
     cur = conn.cursor()
     try:
-        cur.execute("INSERT INTO personnal_infos (full_name, username, phone_number, email, passwd, role) 
-                        VALUES (%s, %s, %s, %s, %s, 'user') 
-                        RETURNING id;", (full_name, username, phone_number, email, hashed_password))
+        cur.execute("INSERT INTO personnal_infos (full_name, username, phone_number, email, passwd, role) VALUES (%s, %s, %s, %s, %s, 'user') RETURNING id;", (full_name, username, phone_number, email, hashed_password))
         user_id = cur.fetchone()[0]
         conn.commit()
         return jsonify({"message": "Registered", "userId": user_id}), 200
@@ -546,6 +544,7 @@ if __name__ == '__main__':
     debug_mode = os.getenv("FLASK_DEBUG", "False").lower() in ('true', '1', 't')
 
     app.run(debug=debug_mode, port=5230, host='0.0.0.0')
+
 
 
 
