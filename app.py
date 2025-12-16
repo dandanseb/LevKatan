@@ -79,8 +79,6 @@ def employee_required(f):
     return decorated
 
 # --- AUTH ROUTES (Login/Register) ---
-# [Keep your existing /api/register and /api/login routes exactly as they were in your uploaded file]
-# ... (Paste your existing Register/Login code here for brevity) ...
 @app.route('/api/register', methods=['POST'])
 def register():
     data = request.json
@@ -94,7 +92,9 @@ def register():
     conn = get_db_connection()
     cur = conn.cursor()
     try:
-        cur.execute("INSERT INTO personnal_infos (full_name, username, phone_number, email, passwd, role) VALUES (%s, %s, %s, %s, %s, 'user') RETURNING id;", (full_name, username, phone_number, email, hashed_password))
+        cur.execute("INSERT INTO personnal_infos (full_name, username, phone_number, email, passwd, role) 
+                        VALUES (%s, %s, %s, %s, %s, 'user') 
+                        RETURNING id;", (full_name, username, phone_number, email, hashed_password))
         user_id = cur.fetchone()[0]
         conn.commit()
         return jsonify({"message": "Registered", "userId": user_id}), 200
@@ -106,7 +106,6 @@ def register():
 
 @app.route('/api/login', methods=['POST'])
 def login():
-    # ... (Your existing code)
     data = request.json
     email = data.get('email')
     password = data.get('password')
@@ -120,8 +119,90 @@ def login():
         return jsonify({"message": "Success", "username": user[1], "role": user[3], "token": token}), 200
     return jsonify({"message": "Invalid credentials"}), 401
 
-# --- USER ROUTES (Catalog & Borrowing) ---
 
+# ----- USER ROUTES (Catalog / Borrowing requests / Profile) -----
+
+#---- PROFILE------
+@app.route('/api/user/me', methods=['GET'])
+@token_required
+def get_user_profile():
+    user_id = request.user_data['user_id']
+    
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({"message": "INTERNAL SERVOR ERROR (DB)"}), 500
+    cur = conn.cursor()
+    
+    try:
+        # Selects the user's personal data
+        sql = """
+            SELECT username, full_name, email, phone_number 
+            FROM personnal_infos 
+            WHERE id = %s;
+        """
+        cur.execute(sql, (user_id,))
+        user_info = cur.fetchone()
+        
+        if user_info:
+            columns = ['username', 'full_name', 'email', 'phone_number']
+            result = dict(zip(columns, user_info))
+            return jsonify(result), 200
+        else:
+            return jsonify({"message": "User profile not found"}), 404
+            
+    except Exception as e:
+        print(f"Error retrieving profile: {e}")
+        return jsonify({"message": "Server error"}), 500
+    finally:
+        conn.close()
+
+
+@app.route('/api/user/me', methods=['PUT'])
+@token_required
+def update_user_profile():
+    user_id = request.user_data['user_id']
+    data = request.json
+    
+    # Editable data sent by the Frontend: The username cannot be changed
+    full_name = data.get('full_name')
+    email = data.get('email')
+    phone_number = data.get('phone_number')
+    
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({"message": "INTERNAL SERVER ERROR (DB)"}), 500
+    cur = conn.cursor()
+    
+    try:
+        # Mise à jour des champs modifiables. L'email est mis à jour, mais l'utilisateur doit le valider
+        # dans une application réelle, ici, nous le mettons à jour directement.
+        sql = """
+            UPDATE personnal_infos 
+            SET full_name = %s, 
+                email = %s, 
+                phone_number = %s
+            WHERE id = %s 
+            RETURNING id;
+        """
+        cur.execute(sql, (full_name, email, phone_number, user_id))
+        
+        updated_id = cur.fetchone()
+        
+        if updated_id:
+            conn.commit()
+            return jsonify({"message": "Profil mis à jour"}), 200
+        else:
+            conn.rollback()
+            return jsonify({"message": "Profil non trouvé"}), 404
+            
+    except Exception as e:
+        conn.rollback()
+        print(f"Error updating profile: {e}")
+        return jsonify({"message": f"update error: {e}"}), 400
+    finally:
+        conn.close()
+
+#--- CATALOG ----
 @app.route('/api/products', methods=['GET'])
 def get_products():
     conn = get_db_connection()
@@ -162,6 +243,7 @@ def borrow_product():
     finally:
         conn.close()
 
+#---BORROWING REQUEST---
 @app.route('/api/my-requests', methods=['GET'])
 @token_required
 def get_my_requests():
@@ -464,6 +546,7 @@ if __name__ == '__main__':
     debug_mode = os.getenv("FLASK_DEBUG", "False").lower() in ('true', '1', 't')
 
     app.run(debug=debug_mode, port=5230, host='0.0.0.0')
+
 
 
 
