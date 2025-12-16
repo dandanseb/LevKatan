@@ -7,7 +7,7 @@
     <style>
         /* Shared variables for Unified Look */
         :root {
-            --bg-color: #E0F7FA; /* Slightly blueish default */
+            --bg-color: #E0F7FA;
             --header-bg: white;
             --text-color: #333;
             --card-bg: white;
@@ -16,6 +16,8 @@
             --nav-btn-hover: #e0e0e0;
             --border-color: #ddd;
             --table-head-bg: #f9f9f9;
+            --brand-pink: #FF69B4;
+            --brand-pink-hover: #E05297;
         }
         body.dark-mode {
             --bg-color: #121212;
@@ -30,83 +32,95 @@
         }
 
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg-color); color: var(--text-color); margin: 0; transition: background 0.3s; }
-
-        /* Layout Structure */
+        
+        /* HEADER STYLES */
         .top-bar {
             background: var(--header-bg); padding: 10px 20px;
             display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 2px;
         }
         .brand-area { display: flex; align-items: center; gap: 10px; }
         .brand-logo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
-
+        
         .nav-actions { display: flex; align-items: center; gap: 10px; }
-        .nav-item {
-            text-decoration: none;
-            color: var(--nav-btn-text);
-            font-size: 14px;
-            font-weight: 600;
-            padding: 8px 16px;
-            border-radius: 20px;
-            background: var(--nav-btn-bg);
-            transition: all 0.2s;
-            display: inline-flex; align-items: center; gap: 5px;
+        .nav-item { 
+            text-decoration: none; color: var(--nav-btn-text); font-size: 14px; font-weight: 600; 
+            padding: 8px 16px; border-radius: 20px; background: var(--nav-btn-bg);
+            transition: all 0.2s; display: inline-flex; align-items: center; gap: 5px;
         }
         .nav-item:hover { background: var(--nav-btn-hover); color: var(--text-color); }
 
-        .theme-toggle { background: none; border: none; font-size: 20px; cursor: pointer; padding: 5px; border-radius: 50%; margin-left: 10px; color: var(--text-color); }
-        .theme-toggle:hover { background: rgba(128,128,128,0.2); }
-
-        /* Main Content Grid for Two Boxes */
-        .main-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            gap: 20px; /* Space between the two boxes */
-            padding: 0 20px 30px 20px;
-        }
-
-        .card {
-            background: var(--card-bg);
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            flex: 1; /* Takes the same width */
-        }
-
-        /* Table Styles */
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 12px; text-align: right; border-bottom: 1px solid var(--border-color); color: var(--text-color); }
-        th { background-color: var(--table-head-bg); color: #006064; font-weight: bold; }
-        body.dark-mode th { color: #80DEEA; }
-
-        /* Form Styles */
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; }
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            box-sizing: border-box;
-            background: var(--bg-color);
-            color: var(--text-color);
-        }
-        .form-group textarea { resize: vertical; }
-
-        /* Button Styles */
-        .btn { background: #00796B; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; transition: 0.2s; font-weight: bold; width: 100%; }
-        .btn:hover { background: #004D40; }
-        .btn-delete { background: #EF5350; margin-right: 5px; }
-        .btn-delete:hover { background: #D32F2F; }
-        .btn-edit { background: #FFA000; margin-right: 5px; }
-        .btn-edit:hover { background: #FF8F00; }
+        .theme-toggle { background: none; border: none; font-size: 20px; cursor: pointer; padding: 5px; border-radius: 50%; margin-left: 10px; }
         .logout-btn { background: #FF4444; color: white; border: none; padding: 6px 15px; border-radius: 20px; font-weight: bold; cursor: pointer; }
         .logout-btn:hover { background: #D32F2F; }
-        .btn-approve { background: #4CAF50; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; transition:0.2s; }
-        .btn-approve:hover { background: #388E3C; }
-        .btn-reject { background: #EF5350; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; transition:0.2s; margin-right: 5px; }
-        .btn-reject:hover { background: #D32F2F; }
+
+        /* TABS STYLE */
+        .tabs { display: flex; background: var(--header-bg); justify-content: center; box-shadow: 0 4px 6px -4px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        .tab { padding: 15px 40px; cursor: pointer; font-weight: 600; color: #888; border-bottom: 3px solid transparent; font-size: 16px; transition: all 0.3s; }
+        .tab:hover { background: rgba(0,0,0,0.05); color: var(--brand-pink); }
+        .tab.active { color: var(--brand-pink); border-bottom-color: var(--brand-pink); }
+
+        /* CONTAINER & CARDS */
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
+        .card { background: var(--card-bg); padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); margin-bottom: 30px; }
+        
+        h3 { margin-top: 0; color: var(--text-color); border-bottom: 2px solid var(--brand-pink); padding-bottom: 10px; display: inline-block; }
+        h4 { margin-bottom: 15px; color: var(--text-color); opacity: 0.9; }
+
+        /* FORM STYLES */
+        .form-row { display: flex; gap: 15px; flex-wrap: wrap; }
+        .form-group { flex: 1; min-width: 200px; margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
+        .form-control, select, textarea, input { 
+            width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; 
+            background: var(--bg-color); color: var(--text-color); box-sizing: border-box; font-family: inherit;
+        }
+        
+        /* TABLE STYLES */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 15px; text-align: right; border-bottom: 1px solid var(--border-color); color: var(--text-color); }
+        th { background-color: var(--table-head-bg); color: #555; font-weight: bold; font-size: 14px; }
+        body.dark-mode th { color: #ccc; }
+
+        /* UNIFIED BUTTON STYLES (Pastel/Soft UI) */
+        
+        /* Primary Action (Add) - Solid Brand Pink */
+        .btn-primary {
+            background: var(--brand-pink); color: white; border: none; padding: 10px 20px; 
+            border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s;
+            display: inline-flex; align-items: center; gap: 8px; width: auto;
+        }
+        .btn-primary:hover { background: var(--brand-pink-hover); transform: translateY(-2px); box-shadow: 0 4px 10px rgba(255, 105, 180, 0.3); }
+
+        /* Edit - Soft Blue */
+        .btn-edit { 
+            background: #E3F2FD; color: #1565C0; border: 1px solid #BBDEFB;
+            padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s;
+            margin-left: 5px;
+        }
+        .btn-edit:hover { background: #BBDEFB; }
+
+        /* Delete/Reject - Soft Red */
+        .btn-delete, .btn-reject { 
+            background: #FFEBEE; color: #D32F2F; border: 1px solid #FFCDD2;
+            padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s;
+        }
+        .btn-delete:hover, .btn-reject:hover { background: #FFCDD2; }
+
+        /* Approve - Soft Green */
+        .btn-approve { 
+            background: #E8F5E9; color: #2E7D32; border: 1px solid #A5D6A7;
+            padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s;
+            margin-left: 5px;
+        }
+        .btn-approve:hover { background: #C8E6C9; }
+
+        /* Cancel (in Modal) - Grey */
+        .btn-cancel {
+            background: #f5f5f5; color: #333; border: 1px solid #ccc;
+            padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer;
+        }
+        .btn-cancel:hover { background: #e0e0e0; }
 
     </style>
 </head>
@@ -118,66 +132,73 @@
         </div>
         <div class="nav-actions">
             <span id="dynamicNav"></span>
-
             <a href="user_dashboard.html" class="nav-item">🪑 קטלוג</a>
             <span id="userGreeting" style="margin: 0 5px; font-weight:600; color:var(--text-color); opacity:0.7;"></span>
-
             <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
             <button class="logout-btn" onclick="logout()">יציאה</button>
         </div>
     </div>
 
-    <div class="main-content">
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('inventory')">🛠️ ניהול מלאי (Products)</div>
+        <div class="tab" onclick="switchTab('requests')">🎁 בקשות השאלה (Requests)</div>
+    </div>
 
-        <div class="card" style="flex: 2;"> <h3>🛠️ ניהול פריטים (Products Management)</h3>
+    <div class="container">
+        
+        <div id="inventory-view">
+            <div class="card">
+                <h3>הוספת פריט חדש</h3>
+                <form id="productForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="product_name">שם המוצר</label>
+                            <input type="text" id="product_name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="category">קטגוריה</label>
+                            <select id="category" required>
+                                <option value="" disabled selected>בחר קטגוריה</option>
+                                <option value="berceaux">berceaux</option>
+                                <option value="lit bébé">lit bébé</option>
+                                <option value="poussetes">poussetes</option>
+                                <option value="siege auto">siege auto</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="description">תיאור (עד 15 מילים)</label>
+                            <textarea id="description" rows="2" maxlength="200" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="donator_email">אימייל של התורם</label>
+                            <input type="email" id="donator_email" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary">➕ הוסף מוצר</button>
+                </form>
+            </div>
 
-            <form id="productForm">
-                <h4>הוסף פריט חדש</h4>
-                <div class="form-group">
-                    <label for="product_name">שם המוצר</label>
-                    <input type="text" id="product_name" required>
-                </div>
-                <div class="form-group">
-                    <label for="category">קטגוריה</label>
-                    <select id="category" required>
-                        <option value="" disabled selected>בחר קטגוריה</option>
-                        <option value="berceaux">berceaux</option>
-                        <option value="lit bébé">lit bébé</option>
-                        <option value="poussetes">poussetes</option>
-                        <option value="siege auto">siege auto</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="description">תיאור (עד 15 מילים)</label>
-                    <textarea id="description" rows="3" maxlength="200" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="donator_email">אימייל של התורם (Donator Email)</label>
-                    <input type="email" id="donator_email" required>
-                </div>
-
-                <button type="submit" class="btn">הוסף מוצר</button>
-
-            </form>
-
-            <h4 style="margin-top: 30px;">רשימת כל המוצרים</h4>
-            <table id="productsTable">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>שם</th>
-                        <th>קטגוריה</th>
-                        <th>סטטוס</th>
-                        <th>פעולות</th>
-                    </tr>
-                </thead>
-                <tbody id="productsTableBody">
-                    </tbody>
-            </table>
+            <div class="card">
+                <h3>רשימת מוצרים</h3>
+                <table id="productsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>שם</th>
+                            <th>קטגוריה</th>
+                            <th>סטטוס</th>
+                            <th>פעולות</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productsTableBody"></tbody>
+                </table>
+            </div>
         </div>
 
-        <div class="card" style="flex: 1;">
-            <h3>🎁 בקשות השאלה ממתינות לאישור</h3>
+        <div id="requests-view" class="card" style="display:none;">
+            <h3>בקשות השאלה ממתינות לאישור</h3>
             <table id="requestsTable">
                 <thead>
                     <tr>
@@ -187,16 +208,15 @@
                         <th>פעולות</th>
                     </tr>
                 </thead>
-                <tbody id="requestsTableBody">
-                    </tbody>
+                <tbody id="requestsTableBody"></tbody>
             </table>
         </div>
 
     </div>
 
     <div id="editModal" style="display:none; position:fixed; z-index:100; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.4);">
-        <div style="background-color:var(--card-bg); margin:10% auto; padding:30px; border-radius:15px; border:1px solid var(--border-color); width:80%; max-width:600px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
-            <h3 style="margin-top:0;">ערוך פרטי מוצר <span id="editProductId" style="font-size:18px; opacity:0.6;"></span></h3>
+        <div style="background-color:var(--card-bg); margin:5% auto; padding:30px; border-radius:15px; border:1px solid var(--border-color); width:90%; max-width:500px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
+            <h3 style="margin-top:0;">ערוך פרטי מוצר <span id="editProductId" style="font-size:16px; opacity:0.6;"></span></h3>
 
             <form id="editProductForm">
                 <input type="hidden" id="edit_id">
@@ -217,7 +237,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="edit_description">תיאור (עד 15 מילים)</label>
+                    <label for="edit_description">תיאור</label>
                     <textarea id="edit_description" rows="3" maxlength="200" required></textarea>
                 </div>
 
@@ -236,48 +256,55 @@
                     </select>
                 </div>
 
-                <button type="submit" class="btn" style="width:auto; margin-top: 15px;">שמור שינויים</button>
-                <button type="button" onclick="document.getElementById('editModal').style.display='none'" class="btn-delete" style="width:auto; margin-top: 15px;">ביטול</button>
+                <div style="display:flex; gap:10px; margin-top:20px;">
+                    <button type="submit" class="btn-primary" style="flex:1">💾 שמור</button>
+                    <button type="button" onclick="document.getElementById('editModal').style.display='none'" class="btn-cancel">ביטול</button>
+                </div>
             </form>
         </div>
     </div>
+
     <script>
         const API_URL = "https://levkatan-api-dxh8azfdfua6e9gn.israelcentral-01.azurewebsites.net/api";
         const token = localStorage.getItem('userToken');
         const username = localStorage.getItem('username');
         const role = localStorage.getItem('userRole');
 
-        // --- Theme Logic ---
+        // Theme Init
         function toggleTheme() {
             document.body.classList.toggle('dark-mode');
             localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
         }
         if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
-        // -------------------
 
+        // Auth Check
         if(!token) window.location.href = 'index.html';
         document.getElementById('userGreeting').innerText = username;
-
-        // Dynamic Nav with Unified Style
-        if(role === 'admin') {
-            document.getElementById('dynamicNav').innerHTML = `<a href="admin_dashboard.html" class="nav-item">🔒 ניהול אדמין</a>`;
-        }
+        if(role === 'admin') document.getElementById('dynamicNav').innerHTML = `<a href="admin_dashboard.html" class="nav-item">🔒 ניהול אדמין</a>`;
 
         function logout() { localStorage.clear(); window.location.href = 'index.html'; }
 
+        // --- TAB LOGIC ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.getElementById('inventory-view').style.display = tabId === 'inventory' ? 'block' : 'none';
+            document.getElementById('requests-view').style.display = tabId === 'requests' ? 'block' : 'none';
+            
+            if(tabId === 'inventory') loadProducts();
+            if(tabId === 'requests') loadRequests();
+        }
 
-        // ====================================================================
-        // REQUEST MANAGEMENT
-        // ====================================================================
-
+        // --- REQUESTS LOGIC ---
         async function loadRequests() {
             const res = await fetch(`${API_URL}/employee/requests`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            if(res.status === 403) { alert("אין לך גישה!"); window.location.href = 'index.html'; return; }
-
+            if(res.status === 403) { alert("אין גישה"); return; }
+            
             const reqs = await res.json();
-            const tbody = document.getElementById('requestsTableBody'); 
+            const tbody = document.getElementById('requestsTableBody');
             tbody.innerHTML = reqs.map(r => `
                 <tr>
                     <td>${r.username}</td>
@@ -289,7 +316,7 @@
                     </td>
                 </tr>
             `).join('');
-            if(reqs.length === 0) tbody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:20px;'>אין בקשות ממתינות כרגע 🎉</td></tr>";
+            if(reqs.length === 0) tbody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:20px;'>אין בקשות ממתינות</td></tr>";
         }
 
         async function updateStatus(id, status) {
@@ -301,23 +328,12 @@
             loadRequests();
         }
 
-        // ====================================================================
-        // PRODUCT MANAGEMENT
-        // ====================================================================
-
-        // Step 1: Load the product list
+        // --- INVENTORY LOGIC ---
         async function loadProducts() {
             const res = await fetch(`${API_URL}/employee/products`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            if(!res.ok) { console.error("Product loading error"); return; }
-
             const products = await res.json();
-            renderProducts(products);
-        }
-
-        // Step 2: Submit the list to the table
-        function renderProducts(products) {
             const tbody = document.getElementById('productsTableBody');
             tbody.innerHTML = products.map(p => `
                 <tr>
@@ -331,10 +347,10 @@
                     </td>
                 </tr>
             `).join('');
-            if(products.length === 0) tbody.innerHTML = "<tr><td colspan='5' style='text-align:center; padding:20px;'>אין מוצרים רשומים כרגע.</td></tr>";
+            if(products.length === 0) tbody.innerHTML = "<tr><td colspan='5' style='text-align:center; padding:20px;'>אין מוצרים</td></tr>";
         }
 
-        // Step 3: Add a product (Managed via the form)
+        // Add Product
         document.getElementById('productForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const newProduct = {
@@ -352,47 +368,32 @@
 
             if (res.status === 201) {
                 alert("מוצר נוסף בהצלחה!");
-                document.getElementById('productForm').reset(); // Clear the form
-                loadProducts(); // Reload the list
+                document.getElementById('productForm').reset();
+                loadProducts();
             } else {
-                const errorData = await res.json();
-                alert(`שגיאה בהוספת המוצר: ${errorData.message || res.statusText}`);
+                alert("שגיאה בהוספה");
             }
         });
 
-        // Step 4: Removing a product
+        // Delete Product
         async function deleteProduct(id) {
-            if (!confirm(`האם אתה בטוח שברצונך למחוק את מוצר ID ${id}?`)) return;
-
+            if (!confirm(`למחוק את מוצר ID ${id}?`)) return;
             const res = await fetch(`${API_URL}/employee/products/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-
-            if (res.status === 204) {
-                alert("מוצר נמחק בהצלחה!");
-                loadProducts();
-            } else {
-                alert("שגיאה במחיקת המוצר.");
-            }
+            if (res.status === 204) loadProducts();
+            else alert("שגיאה במחיקה");
         }
 
-        // ----------------------------------------------------------------------
-        // Step 5: Modifying a product (Récupération des données et affichage du modal)
+        // Edit Product - Load Data
         async function editProduct(id) {
-            // 1. Récupérer les données actuelles du produit via une nouvelle route GET
             const res = await fetch(`${API_URL}/employee/products/${id}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-
-            if(!res.ok) {
-                alert("Erreur: Impossible de charger les données du produit.");
-                return;
-            }
-
+            if(!res.ok) return alert("שגיאה בטעינת המוצר");
+            
             const product = await res.json();
-
-            // 2. Remplir le formulaire modal avec les données du produit
             document.getElementById('edit_id').value = product.id;
             document.getElementById('editProductId').innerText = `(ID: ${product.id})`;
             document.getElementById('edit_product_name').value = product.product_name;
@@ -400,24 +401,20 @@
             document.getElementById('edit_description').value = product.description;
             document.getElementById('edit_donator_email').value = product.donator_email;
             document.getElementById('edit_status').value = product.status;
-
-            // 3. Afficher le modal
+            
             document.getElementById('editModal').style.display = 'block';
         }
-        // ----------------------------------------------------------------------
 
-
-        // Step 6: Soumission du formulaire de modification (PUT)
+        // Edit Product - Submit
         document.getElementById('editProductForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-
             const id = document.getElementById('edit_id').value;
             const updatedProduct = {
                 product_name: document.getElementById('edit_product_name').value,
                 category: document.getElementById('edit_category').value,
                 description: document.getElementById('edit_description').value,
                 donator_email: document.getElementById('edit_donator_email').value,
-                status: document.getElementById('edit_status').value, // On envoie le nouveau statut
+                status: document.getElementById('edit_status').value
             };
 
             const res = await fetch(`${API_URL}/employee/products/${id}`, {
@@ -427,19 +424,16 @@
             });
 
             if (res.ok) {
-                alert("מוצר עודכן בהצלחה!");
-                document.getElementById('editModal').style.display = 'none'; // Fermer le modal
-                loadProducts(); // Recharger la liste pour voir les changements
+                document.getElementById('editModal').style.display = 'none';
+                loadProducts();
             } else {
-                const errorData = await res.json();
-                alert(`שגיאה בעדכון המוצר: ${errorData.message || res.statusText}`);
+                alert("שגיאה בעדכון");
             }
         });
 
-
-        // Initial loading of both sections
-        loadRequests();
+        // Initial Load
         loadProducts();
+        loadRequests();
     </script>
 </body>
 </html>
