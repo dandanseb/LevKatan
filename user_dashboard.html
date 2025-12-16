@@ -14,6 +14,8 @@
             --nav-btn-text: #555;
             --nav-btn-hover: #e0e0e0;
             --border-color: #eee;
+            --brand-pink: #FF69B4;
+            --brand-pink-hover: #E05297;
         }
         body.dark-mode {
             --bg-color: #121212;
@@ -28,50 +30,40 @@
 
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg-color); color: var(--text-color); margin: 0; transition: background 0.3s; }
         
+        /* HEADER & NAV */
         .top-bar {
-            background: var(--header-bg);
-            padding: 10px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            margin-bottom: 2px;
+            background: var(--header-bg); padding: 10px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 2px;
         }
         .brand-area { display: flex; align-items: center; gap: 10px; }
         .brand-logo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
         
         .nav-links { display: flex; gap: 10px; align-items: center; }
-        
-        /* UNIFIED BUTTON STYLE */
         .nav-item { 
-            text-decoration: none; 
-            color: var(--nav-btn-text); 
-            font-size: 14px; 
-            font-weight: 600; 
-            padding: 8px 16px; 
-            border-radius: 20px;
-            background: var(--nav-btn-bg);
-            transition: all 0.2s;
-            display: flex; align-items: center; gap: 5px;
+            text-decoration: none; color: var(--nav-btn-text); font-size: 14px; font-weight: 600; 
+            padding: 8px 16px; border-radius: 20px; background: var(--nav-btn-bg);
+            transition: all 0.2s; display: flex; align-items: center; gap: 5px;
         }
         .nav-item:hover { background: var(--nav-btn-hover); color: var(--text-color); }
         
         .theme-toggle { background: none; border: none; font-size: 20px; cursor: pointer; padding: 5px; border-radius: 50%; }
-        .theme-toggle:hover { background: rgba(128,128,128,0.2); }
-
+        
         .user-area { display: flex; align-items: center; gap: 15px; }
         .welcome-text { color: var(--text-color); font-weight: 600; opacity: 0.8; }
-        
-        .logout-btn { background: #FF4444; color: white; border: none; padding: 6px 15px; border-radius: 20px; cursor: pointer; font-size: 14px; font-weight: bold; transition: 0.2s; }
-        .logout-btn:hover { background: #D32F2F; box-shadow: 0 2px 5px rgba(255,68,68,0.3); }
+        .logout-btn { background: #FF4444; color: white; border: none; padding: 6px 15px; border-radius: 20px; cursor: pointer; font-size: 14px; font-weight: bold; }
+        .logout-btn:hover { background: #D32F2F; }
 
+        /* TABS */
         .tabs { display: flex; background: var(--header-bg); justify-content: center; box-shadow: 0 4px 6px -4px rgba(0,0,0,0.1); margin-bottom: 20px; }
         .tab { padding: 15px 40px; cursor: pointer; font-weight: 600; color: #888; border-bottom: 3px solid transparent; font-size: 16px; transition: all 0.3s; }
-        .tab:hover { background: rgba(0,0,0,0.05); color: #FF69B4; }
-        .tab.active { color: #FF69B4; border-bottom-color: #FF69B4; }
+        .tab:hover { background: rgba(0,0,0,0.05); color: var(--brand-pink); }
+        .tab.active { color: var(--brand-pink); border-bottom-color: var(--brand-pink); }
 
+        /* CONTAINER & GRID */
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        
         .card { background: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid var(--border-color); transition: transform 0.2s; }
         .card:hover { transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
         .card h3 { color: var(--text-color); margin-top: 0; margin-bottom: 5px; }
@@ -79,9 +71,28 @@
         .cat-tag { display: inline-block; background: #E3F2FD; color: #1976D2; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-bottom: 10px; }
         body.dark-mode .cat-tag { background: #1976D2; color: white; }
 
-        .btn-borrow { width: 100%; padding: 10px; background: #FF69B4; color: white; border: none; border-radius: 8px; cursor: pointer; margin-top: 10px; font-weight: bold; }
-        .btn-borrow:hover { background: #E05297; }
-        
+        .btn-borrow, .btn-save { width: 100%; padding: 10px; background: var(--brand-pink); color: white; border: none; border-radius: 8px; cursor: pointer; margin-top: 10px; font-weight: bold; }
+        .btn-borrow:hover, .btn-save:hover { background: var(--brand-pink-hover); }
+
+        /* FILTERS BAR */
+        .filters-bar {
+            display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; 
+            background: var(--card-bg); padding: 15px; border-radius: 12px; border: 1px solid var(--border-color);
+        }
+        .filter-input, .filter-select {
+            padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); 
+            background: var(--bg-color); color: var(--text-color); font-family: inherit;
+        }
+        .filter-input { flex: 2; min-width: 200px; }
+        .filter-select { flex: 1; min-width: 150px; }
+
+        /* FORM STYLES (Profile) */
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; color: var(--text-color); }
+        .form-control { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color); color: var(--text-color); box-sizing: border-box; }
+        .readonly-field { opacity: 0.7; cursor: not-allowed; }
+
+        /* STATUS COLORS */
         .status-pending { color: orange; font-weight: bold; }
         .status-approved { color: green; font-weight: bold; }
         .status-rejected { color: red; font-weight: bold; }
@@ -107,11 +118,54 @@
     <div class="tabs">
         <div class="tab active" onclick="switchTab('catalog')">📚 קטלוג מוצרים</div>
         <div class="tab" onclick="switchTab('history')">📋 הבקשות שלי</div>
+        <div class="tab" onclick="switchTab('profile')">👤 הפרופיל שלי</div>
     </div>
 
     <div class="container">
-        <div id="catalog" class="grid"></div>
+        <div id="catalog" style="display:block;">
+            <div class="filters-bar">
+                <input type="text" id="searchBox" class="filter-input" placeholder="🔍 חיפוש לפי שם או תיאור..." oninput="filterAndRender()">
+                <select id="catFilter" class="filter-select" onchange="filterAndRender()">
+                    <option value="">📂 כל הקטגוריות</option>
+                    <option value="strollers">עגלות (Strollers)</option>
+                    <option value="cribs">עריסות (Cribs)</option>
+                    <option value="car_seats">מושבי בטיחות (Car Seats)</option>
+                    <option value="toys">משחקים (Toys)</option>
+                    </select>
+                <select id="sortOption" class="filter-select" onchange="filterAndRender()">
+                    <option value="newest">📅 הכי חדש</option>
+                    <option value="name_asc">🔤 שם (א-ת)</option>
+                </select>
+            </div>
+            <div id="productsGrid" class="grid"></div>
+        </div>
+
         <div id="history" class="grid" style="display:none;"></div>
+
+        <div id="profile" style="display:none; max-width: 600px; margin: 0 auto;">
+            <div class="card">
+                <h3>עריכת פרטים אישיים</h3>
+                <form id="profileForm" onsubmit="updateProfile(event)">
+                    <div class="form-group">
+                        <label>שם משתמש (לא ניתן לשינוי)</label>
+                        <input type="text" id="prof_username" class="form-control readonly-field" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>שם מלא</label>
+                        <input type="text" id="prof_fullname" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>אימייל</label>
+                        <input type="email" id="prof_email" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>טלפון</label>
+                        <input type="tel" id="prof_phone" class="form-control">
+                    </div>
+                    <button type="submit" class="btn-save">💾 שמור שינויים</button>
+                </form>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -120,20 +174,23 @@
         const username = localStorage.getItem('username');
         const role = localStorage.getItem('userRole');
 
+        // Global variable to store fetched products for filtering
+        let allProducts = [];
+
         // --- Theme Logic ---
         function toggleTheme() {
             document.body.classList.toggle('dark-mode');
             localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
         }
         if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
-        // -------------------
 
+        // --- Auth Check ---
         if(!token) window.location.href = 'index.html';
         document.getElementById('userGreeting').innerText = `שלום, ${username || 'משתמש'}`;
 
+        // --- Dynamic Nav ---
         const navContainer = document.getElementById('roleNav');
         if(role === 'employee' || role === 'admin') {
-            // Added .nav-item class to match style
             const btn = document.createElement('a');
             btn.href = 'employee_dashboard.html';
             btn.className = 'nav-item';
@@ -148,21 +205,70 @@
             navContainer.prepend(btn);
         }
 
+        // --- CATALOG LOGIC ---
         async function loadProducts() {
-            const res = await fetch(`${API_URL}/products`);
-            const products = await res.json();
-            const container = document.getElementById('catalog');
-            container.innerHTML = products.map(p => `
+            try {
+                const res = await fetch(`${API_URL}/products`);
+                allProducts = await res.json();
+                
+                // Populate categories dynamically if needed, or stick to static HTML options
+                filterAndRender(); // Initial Render
+            } catch (e) { console.error("Error loading products", e); }
+        }
+
+        function filterAndRender() {
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+            const catFilter = document.getElementById('catFilter').value.toLowerCase();
+            const sortOption = document.getElementById('sortOption').value;
+
+            // 1. Filter
+            let filtered = allProducts.filter(p => {
+                const matchesSearch = (p.name && p.name.toLowerCase().includes(searchTerm)) || 
+                                      (p.description && p.description.toLowerCase().includes(searchTerm));
+                const matchesCat = catFilter === "" || (p.category && p.category.toLowerCase().includes(catFilter));
+                return matchesSearch && matchesCat;
+            });
+
+            // 2. Sort
+            filtered.sort((a, b) => {
+                if (sortOption === 'name_asc') return a.name.localeCompare(b.name, 'he');
+                if (sortOption === 'newest') return (b.id - a.id); // Assuming higher ID = newer
+                return 0;
+            });
+
+            // 3. Render
+            const container = document.getElementById('productsGrid');
+            if (filtered.length === 0) {
+                container.innerHTML = "<p style='grid-column: 1/-1; text-align:center;'>לא נמצאו מוצרים תואמים לחיפוש.</p>";
+                return;
+            }
+
+            container.innerHTML = filtered.map(p => `
                 <div class="card">
                     <div class="cat-tag">${p.category}</div>
                     <h3>${p.name}</h3>
-                    <p style="color:#777; font-size:14px;">זמין להשאלה מיידית</p>
+                    <p style="color:#777; font-size:14px; margin-bottom:5px;">
+                        ${p.description ? p.description : 'אין תיאור זמין'}
+                    </p>
+                    <p style="color:var(--brand-pink); font-size:12px; font-weight:bold;">זמין להשאלה</p>
                     <button class="btn-borrow" onclick="borrow(${p.id})">בקש להשאיל ✋</button>
                 </div>
             `).join('');
-            if(products.length === 0) container.innerHTML = "<p>אין מוצרים זמינים כרגע.</p>";
         }
 
+        async function borrow(id) {
+            if(!confirm("האם להגיש בקשה להשאלת מוצר זה?")) return;
+            const res = await fetch(`${API_URL}/borrow`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ product_id: id })
+            });
+            const data = await res.json();
+            alert(data.message);
+            loadProducts(); // Reload to update availability
+        }
+
+        // --- HISTORY LOGIC ---
         async function loadHistory() {
             const res = await fetch(`${API_URL}/my-requests`, {
                 headers: { 'Authorization': `Bearer ${token}` }
@@ -185,28 +291,63 @@
             return s;
         }
 
-        async function borrow(id) {
-            if(!confirm("האם להגיש בקשה להשאלת מוצר זה?")) return;
-            const res = await fetch(`${API_URL}/borrow`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                body: JSON.stringify({ product_id: id })
-            });
-            const data = await res.json();
-            alert(data.message);
-            loadProducts(); 
+        // --- PROFILE LOGIC ---
+        async function loadProfile() {
+            // Note: This endpoint (/api/user/me) needs to be implemented in app.py
+            try {
+                const res = await fetch(`${API_URL}/user/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    const user = await res.json();
+                    document.getElementById('prof_username').value = user.username;
+                    document.getElementById('prof_fullname').value = user.full_name;
+                    document.getElementById('prof_email').value = user.email;
+                    document.getElementById('prof_phone').value = user.phone_number || '';
+                } else {
+                    console.log("Profile endpoint not ready yet.");
+                }
+            } catch (e) { console.error("Error loading profile", e); }
         }
 
+        async function updateProfile(event) {
+            event.preventDefault();
+            const updatedData = {
+                full_name: document.getElementById('prof_fullname').value,
+                email: document.getElementById('prof_email').value,
+                phone_number: document.getElementById('prof_phone').value
+            };
+            
+            try {
+                const res = await fetch(`${API_URL}/user/me`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(updatedData)
+                });
+                const data = await res.json();
+                if(res.ok) alert("הפרטים עודכנו בהצלחה! ✅");
+                else alert("שגיאה: " + data.message);
+            } catch (e) { alert("שגיאה בתקשורת"); }
+        }
+
+        // --- TABS LOGIC ---
         function switchTab(id) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             event.target.classList.add('active');
-            document.getElementById('catalog').style.display = id === 'catalog' ? 'grid' : 'none';
-            document.getElementById('history').style.display = id === 'history' ? 'grid' : 'none';
+            
+            document.getElementById('catalog').style.display = 'none';
+            document.getElementById('history').style.display = 'none';
+            document.getElementById('profile').style.display = 'none';
+            
+            document.getElementById(id).style.display = id === 'catalog' ? 'block' : (id === 'history' ? 'grid' : 'block');
+            
             if(id === 'history') loadHistory();
+            if(id === 'profile') loadProfile();
         }
 
         function logout() { localStorage.clear(); window.location.href = 'index.html'; }
         
+        // Init
         loadProducts();
     </script>
 </body>
