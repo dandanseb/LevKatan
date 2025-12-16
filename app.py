@@ -463,8 +463,8 @@ def get_all_requests():
         SELECT br.id, u.username, p.product_name, br.status, br.request_date 
         FROM borrow_requests br
         JOIN personnal_infos u ON br.user_id = u.id
-        JOIN product p ON br.product_id = p.id
-        WHERE br.status = 'pending'
+        JOIN products p ON br.product_id = p.id
+        WHERE br.status = 'confirmation_pending'
     """
     cur.execute(sql)
     requests = [{'id': r[0], 'username': r[1], 'product': r[2], 'status': r[3], 'date': str(r[4])} for r in cur.fetchall()]
@@ -487,9 +487,9 @@ def update_request_status(req_id):
             product_id = result[0]
             # Update product status based on request approval
             if new_status == 'approved':
-                cur.execute("UPDATE product SET status = 'borrowed' WHERE id = %s", (product_id,))
+                cur.execute("UPDATE products SET status = 'borrowed' WHERE id = %s", (product_id,))
             elif new_status == 'rejected':
-                cur.execute("UPDATE product SET status = 'available' WHERE id = %s", (product_id,))
+                cur.execute("UPDATE products SET status = 'available' WHERE id = %s", (product_id,))
                 
             conn.commit()
             return jsonify({"message": "Status updated"}), 200
@@ -542,6 +542,7 @@ if __name__ == '__main__':
     debug_mode = os.getenv("FLASK_DEBUG", "False").lower() in ('true', '1', 't')
 
     app.run(debug=debug_mode, port=5230, host='0.0.0.0')
+
 
 
 
