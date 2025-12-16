@@ -229,9 +229,7 @@ def borrow_product():
             
         # Create request
         cur.execute("INSERT INTO borrow_requests (user_id, product_id) VALUES (%s, %s)", (user_id, product_id))
-        # Mark product as unavailable/borrowed temporarily or keep available until approved? 
-        # Let's mark as 'borrowed' (pending approval) so no one else takes it
-        cur.execute("UPDATE product SET status = 'unavailable' WHERE id = %s", (product_id,))
+        cur.execute("UPDATE products SET status = 'confirmation_pending' WHERE id = %s", (product_id,))
         
         conn.commit()
         return jsonify({"message": "Request sent successfully"}), 200
@@ -251,7 +249,7 @@ def get_my_requests():
     sql = """
         SELECT br.id, p.product_name, br.request_date, br.status 
         FROM borrow_requests br
-        JOIN product p ON br.product_id = p.id
+        JOIN products p ON br.product_id = p.id  
         WHERE br.user_id = %s ORDER BY br.request_date DESC
     """
     cur.execute(sql, (user_id,))
@@ -544,6 +542,7 @@ if __name__ == '__main__':
     debug_mode = os.getenv("FLASK_DEBUG", "False").lower() in ('true', '1', 't')
 
     app.run(debug=debug_mode, port=5230, host='0.0.0.0')
+
 
 
 
