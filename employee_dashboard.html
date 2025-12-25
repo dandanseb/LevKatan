@@ -294,6 +294,8 @@
         const username = localStorage.getItem('username');
         const role = localStorage.getItem('userRole');
 
+        let allInventory = []; // Local storage of filter products
+
         // Theme Init
         function toggleTheme() {
             document.body.classList.toggle('dark-mode');
@@ -357,22 +359,44 @@
             const res = await fetch(`${API_URL}/employee/products`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            const products = await res.json();
+            // On stocke le résultat dans la variable globale
+            allInventory = await res.json();
+            // On lance le rendu initial
+            renderInventory(allInventory);
+        }
+
+        // new filter func
+        function filterProducts() {
+            const selectedCat = document.getElementById('filterCategory').value;
+            const selectedStatus = document.getElementById('filterStatus').value;
+
+            const filtered = allInventory.filter(p => {
+                const matchCat = (selectedCat === 'all' || p.category === selectedCat);
+                const matchStatus = (selectedStatus === 'all' || p.status === selectedStatus);
+                return matchCat && matchStatus;
+            });
+
+            renderInventory(filtered);
+        }
+
+        // Isolated function for rendering (displaying) the table
+        function renderInventory(products) {
             const tbody = document.getElementById('productsTableBody');
             tbody.innerHTML = products.map(p => `
                 <tr>
                     <td>${p.id}</td>
                     <td>${p.product_name}</td>
                     <td>${p.category}</td>
-                    <td>${p.status}</td>
+                    <td class="status-cell">${p.status}</td>
                     <td>
                         <button class="btn-edit" onclick="editProduct(${p.id})">ערוך ✏️</button>
                         <button class="btn-delete" onclick="deleteProduct(${p.id})">מחק 🗑️</button>
                     </td>
                 </tr>
             `).join('');
-            if(products.length === 0) tbody.innerHTML = "<tr><td colspan='5' style='text-align:center; padding:20px;'>אין מוצרים</td></tr>";
+            if(products.length === 0) tbody.innerHTML = "<tr><td colspan='5' style='text-align:center; padding:20px;'>אין מוצרים תואמים לפילטר 🔍</td></tr>";
         }
+
 
         // Add Product
         document.getElementById('productForm').addEventListener('submit', async function(e) {
