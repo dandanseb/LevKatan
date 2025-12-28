@@ -241,25 +241,6 @@
             </div>
         </div>
     </div>
-
-    <div id="borrowModal" style="display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; display:none;">
-        <div class="card" style="max-width:400px; width:90%; margin:auto; margin-top:15%;">
-            <h3>📅 בחירת תאריך החזרה</h3>
-            <p>מתי בכוונתך להחזיר את המוצר?</p>
-        
-            <input type="hidden" id="borrowProductId">
-        
-            <div class="form-group">
-                <input type="date" id="returnDateInput" class="form-control" required>
-            </div>
-
-            <div style="display:flex; gap:10px; margin-top:20px;">
-                <button class="btn-borrow" onclick="submitBorrowRequest()" style="flex:2;">שלח בקשה</button>
-                <button class="logout-btn" onclick="closeBorrowModal()" style="flex:1; background:#888;">ביטול</button>
-            </div>
-        </div>
-    </div>
-
     
     <script>
         const API_URL = "https://levkatan-api-dxh8azfdfua6e9gn.israelcentral-01.azurewebsites.net/api";
@@ -427,52 +408,26 @@
         }
 
         // --- ACTION LOGIC ---
-        // 1. Ouvre le modal et prépare l'ID
-        function borrow(id) {
-            document.getElementById('borrowProductId').value = id;
-            document.getElementById('borrowModal').style.display = 'flex';
+        async function borrow(id) {
+            // 1. Demander la date de retour via un prompt HTML simple (ou vous pouvez créer un modal plus tard)
+            const returnDate = prompt("מתי בכוונתך להחזיר את המוצר? (YYYY-MM-DD)");
             
-            // Optionnel : Définir la date minimale à aujourd'hui
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('returnDateInput').setAttribute('min', today);
-        }
+            if (!returnDate) return; // Annuler si pas de date
         
-        // 2. Ferme le modal
-        function closeBorrowModal() {
-            document.getElementById('borrowModal').style.display = 'none';
-        }
-        
-        // 3. Envoie la requête au backend
-        async function submitBorrowRequest() {
-            const id = document.getElementById('borrowProductId').value;
-            const returnDate = document.getElementById('returnDateInput').value;
-        
-            if (!returnDate) {
-                alert("נא לבחור תאריך החזרה");
-                return;
-            }
+            if(!confirm(`האם להגיש בקשה להשאלת מוצר זה עד לתאריך ${returnDate}?`)) return;
         
             const res = await fetch(`${API_URL}/borrow`, {
                 method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json', 
-                    'Authorization': `Bearer ${token}` 
-                },
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ 
                     product_id: id,
-                    returned_date: returnDate 
+                    returned_date: returnDate // Envoyer la date au backend
                 })
             });
-        
-            const data = await res.json();
             
-            if (res.ok) {
-                alert(data.message);
-                closeBorrowModal();
-                loadProducts(); // Rafraîchir le catalogue
-            } else {
-                alert("שגיאה: " + data.message);
-            }
+            const data = await res.json();
+            alert(data.message);
+            loadProducts();
         }
 
         // --- HISTORY LOGIC ---
