@@ -487,7 +487,13 @@ def get_all_requests():
         WHERE br.status = 'pending'
     """
     cur.execute(sql)
-    requests = [{'id': r[0], 'username': r[1], 'product': r[2], 'status': r[3], 'date': str(r[4]),'returned_date': str(r[5]) if r[5] else 'לא צוין'
+    requests = [{
+                 'id': r[0], 
+                 'username': r[1],
+                 'product': r[2], 
+                 'status': r[3], 
+                 'date': str(r[4]),
+                 'returned_date': str(r[5]) if r[5] else 'לא צוין'
                 } for r in cur.fetchall()]
     conn.close()
     return jsonify(requests), 200
@@ -563,5 +569,6 @@ if __name__ == '__main__':
 
 
     app.run(debug=debug_mode, port=5230, host='0.0.0.0')
+
 
 
