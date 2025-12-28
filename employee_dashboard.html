@@ -337,7 +337,7 @@
                     <td>${r.username}</td>
                     <td>${r.product}</td>
                     <td>${r.date.split(' ')[0]}</td>
-                    <td>
+                    <td style="color: #FF69B4; font-weight: bold;">${r.returned_date}</td> <td>                    
                         <button class="btn-approve" onclick="updateStatus(${r.id}, 'approved')">אשר ✅</button>
                         <button class="btn-reject" onclick="updateStatus(${r.id}, 'rejected')">דחה ❌</button>
                     </td>
