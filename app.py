@@ -87,6 +87,11 @@ def register():
     phone_number = data.get('phone_number')
     email = data.get('email')
     passwd = data.get('password')
+    
+    # Basic validation
+    if not all([full_name, username, email, passwd]):
+        return jsonify({"message": "Missing required fields"}), 400
+
     password_bytes = passwd.encode('utf-8')
     hashed_password = bcrypt.hashpw(password_bytes, bcrypt.gensalt()).decode('utf-8')
     conn = get_db_connection()
@@ -172,8 +177,7 @@ def update_user_profile():
     cur = conn.cursor()
     
     try:
-        # Mise à jour des champs modifiables. L'email est mis à jour, mais l'utilisateur doit le valider
-        # dans une application réelle, ici, nous le mettons à jour directement.
+        # Mise à jour des champs modifiables.
         sql = """
             UPDATE personnal_infos 
             SET full_name = %s, 
@@ -205,9 +209,24 @@ def update_user_profile():
 def get_products():
     conn = get_db_connection()
     cur = conn.cursor()
-    # Fetch available products
-    cur.execute("SELECT id, product_name, category, status FROM products WHERE status = 'available';")
-    products = [{'id': r[0], 'name': r[1], 'category': r[2], 'status': r[3]} for r in cur.fetchall()]
+    try:
+        # UPDATED: Fetching description and donator_email as well
+        cur.execute("SELECT id, product_name, category, status, description, donator_email FROM products WHERE status = 'available';")
+        products = [{
+            'id': r[0], 
+            'name': r[1], 
+            'category': r[2], 
+            'status': r[3],
+            'description': r[4], 
+            'owner_email': r[5] # Mapping donator_email to owner_email for frontend compatibility
+        } for r in cur.fetchall()]
+    except Exception as e:
+        print(f"Error fetching products: {e}")
+        conn.rollback()
+        # Fallback query if columns are missing
+        cur.execute("SELECT id, product_name, category, status FROM products WHERE status = 'available';")
+        products = [{'id': r[0], 'name': r[1], 'category': r[2], 'status': r[3], 'description': '', 'owner_email': ''} for r in cur.fetchall()]
+
     conn.close()
     return jsonify(products), 200
 
@@ -502,7 +521,6 @@ def update_request_status(req_id):
         conn.close()
 
 # --- ADMIN ROUTES (Manage Users) ---
-# [Use the exact Admin code you provided in app.py]
 @app.route('/api/admin/users', methods=['GET', 'OPTIONS'])
 @admin_required
 def get_all_users():
@@ -542,13 +560,3 @@ if __name__ == '__main__':
     debug_mode = os.getenv("FLASK_DEBUG", "False").lower() in ('true', '1', 't')
 
     app.run(debug=debug_mode, port=5230, host='0.0.0.0')
-
-
-
-
-
-
-
-
-
-

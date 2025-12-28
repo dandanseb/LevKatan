@@ -2,6 +2,7 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>לב קטן - אזור אישי</title>
     <link rel="icon" href="logo.png" type="image/png">
     <style>
@@ -64,15 +65,35 @@
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
         
-        .card { background: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid var(--border-color); transition: transform 0.2s; }
+        .card { 
+            background: var(--card-bg); padding: 20px; border-radius: 12px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid var(--border-color); 
+            transition: transform 0.2s; cursor: pointer;
+        }
         .card:hover { transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
         .card h3 { color: var(--text-color); margin-top: 0; margin-bottom: 5px; }
         
-        .cat-tag { display: inline-block; background: #E3F2FD; color: #1976D2; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-bottom: 10px; }
+        .cat-wrapper { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+        .cat-tag { display: inline-block; background: #E3F2FD; color: #1976D2; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+        .cat-img { width: 24px; height: 24px; object-fit: contain; }
+        
         body.dark-mode .cat-tag { background: #1976D2; color: white; }
 
-        .btn-borrow, .btn-save { width: 100%; padding: 10px; background: var(--brand-pink); color: white; border: none; border-radius: 8px; cursor: pointer; margin-top: 10px; font-weight: bold; }
-        .btn-borrow:hover, .btn-save:hover { background: var(--brand-pink-hover); }
+        /* BUTTONS */
+        .btn-borrow, .btn-save, .btn-similar, .btn-reject { 
+            width: 100%; padding: 10px; border: none; border-radius: 8px; 
+            cursor: pointer; margin-top: 10px; font-weight: bold; transition: 0.2s;
+        }
+        .btn-borrow { background: var(--brand-pink); color: white; }
+        .btn-borrow:hover { background: var(--brand-pink-hover); }
+        
+        .btn-save { background: var(--brand-pink); color: white; }
+        
+        .btn-similar { background: #E0F7FA; color: #006064; }
+        .btn-similar:hover { background: #B2EBF2; }
+
+        .btn-reject { background: #f0f0f0; color: #555; }
+        .btn-reject:hover { background: #e0e0e0; }
 
         /* FILTERS BAR */
         .filters-bar {
@@ -96,6 +117,27 @@
         .status-pending { color: orange; font-weight: bold; }
         .status-approved { color: green; font-weight: bold; }
         .status-rejected { color: red; font-weight: bold; }
+
+        /* MODAL POPUP */
+        .modal {
+            display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center;
+            backdrop-filter: blur(2px);
+        }
+        .modal-content {
+            background-color: var(--card-bg); padding: 30px; border-radius: 16px; 
+            width: 90%; max-width: 500px; position: relative; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); text-align: center;
+            border: 1px solid var(--border-color);
+        }
+        .close-btn { position: absolute; top: 15px; left: 15px; font-size: 24px; cursor: pointer; color: #888; transition: 0.2s; }
+        .close-btn:hover { color: #333; }
+        
+        .modal-title { font-size: 22px; margin-bottom: 5px; color: var(--text-color); }
+        .modal-desc { color: var(--text-color); line-height: 1.6; margin: 20px 0; opacity: 0.9; }
+        .donor-info { background: var(--nav-btn-bg); padding: 10px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; color: var(--nav-btn-text); }
+        
+        .modal-actions { display: flex; flex-direction: column; gap: 10px; }
     </style>
 </head>
 <body>
@@ -122,6 +164,7 @@
     </div>
 
     <div class="container">
+        <!-- CATALOG TAB -->
         <div id="catalog" style="display:block;">
             <div class="filters-bar">
                 <input type="text" id="searchBox" class="filter-input" placeholder="🔍 חיפוש לפי שם או תיאור..." oninput="filterAndRender()">
@@ -132,7 +175,7 @@
                     <option value="car seats">מושבי בטיחות (Car Seats)</option>
                     <option value="toys">משחקים (Toys)</option>
                     <option value="baby beds">מיטת תינוק (Baby Beds)</option>
-                    </select>
+                </select>
                 <select id="sortOption" class="filter-select" onchange="filterAndRender()">
                     <option value="newest">📅 הכי חדש</option>
                     <option value="name_asc">🔤 שם (א-ת)</option>
@@ -141,10 +184,12 @@
             <div id="productsGrid" class="grid"></div>
         </div>
 
+        <!-- HISTORY TAB -->
         <div id="history" class="grid" style="display:none;"></div>
 
+        <!-- PROFILE TAB -->
         <div id="profile" style="display:none; max-width: 600px; margin: 0 auto;">
-            <div class="card">
+            <div class="card" style="cursor: default;">
                 <h3>עריכת פרטים אישיים</h3>
                 <form id="profileForm" onsubmit="updateProfile(event)">
                     <div class="form-group">
@@ -169,14 +214,41 @@
         </div>
     </div>
 
+    <!-- ITEM DETAILS MODAL -->
+    <div id="itemModal" class="modal" onclick="closeModalOnOutside(event)">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            
+            <div class="cat-wrapper" style="justify-content: center; margin-bottom: 15px;">
+                <img id="modalImg" class="cat-img" src="" alt="Icon">
+                <span id="modalCat" class="cat-tag" style="font-size: 14px; padding: 4px 10px;"></span>
+            </div>
+
+            <h2 id="modalTitle" class="modal-title"></h2>
+            
+            <div class="donor-info">
+                תורם: <span id="modalDonor" style="font-weight:bold;"></span> 🎁
+            </div>
+
+            <p id="modalDesc" class="modal-desc"></p>
+
+            <div class="modal-actions">
+                <button id="modalBorrowBtn" class="btn-borrow">בקש להשאיל ✋</button>
+                <button id="modalSimilarBtn" class="btn-similar">🔍 גלה מוצרים דומים</button>
+                <button class="btn-reject" onclick="closeModal()">סגור</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const API_URL = "https://levkatan-api-dxh8azfdfua6e9gn.israelcentral-01.azurewebsites.net/api";
         const token = localStorage.getItem('userToken');
         const username = localStorage.getItem('username');
         const role = localStorage.getItem('userRole');
 
-        // Global variable to store fetched products for filtering
+        // Global variable to store fetched products
         let allProducts = [];
+        let currentModalProductId = null;
 
         // --- Theme Logic ---
         function toggleTheme() {
@@ -211,9 +283,7 @@
             try {
                 const res = await fetch(`${API_URL}/products`);
                 allProducts = await res.json();
-                
-                // Populate categories dynamically if needed, or stick to static HTML options
-                filterAndRender(); // Initial Render
+                filterAndRender(); 
             } catch (e) { console.error("Error loading products", e); }
         }
 
@@ -233,7 +303,7 @@
             // 2. Sort
             filtered.sort((a, b) => {
                 if (sortOption === 'name_asc') return a.name.localeCompare(b.name, 'he');
-                if (sortOption === 'newest') return (b.id - a.id); // Assuming higher ID = newer
+                if (sortOption === 'newest') return (b.id - a.id);
                 return 0;
             });
 
@@ -245,18 +315,80 @@
             }
 
             container.innerHTML = filtered.map(p => `
-                <div class="card">
-                    <div class="cat-tag">${p.category}</div>
+                <div class="card" onclick="openPopup(${p.id})">
+                    <div class="cat-wrapper">
+                        <img src="images/${p.category}.png" class="cat-img" onerror="this.style.display='none'">
+                        <div class="cat-tag">${p.category}</div>
+                    </div>
                     <h3>${p.name}</h3>
-                    <p style="color:#777; font-size:14px; margin-bottom:5px;">
-                        ${p.description ? p.description : 'אין תיאור זמין'}
-                    </p>
-                    <p style="color:var(--brand-pink); font-size:12px; font-weight:bold;">זמין להשאלה</p>
-                    <button class="btn-borrow" onclick="borrow(${p.id})">בקש להשאיל ✋</button>
+                    <p style="color:var(--brand-pink); font-size:12px; font-weight:bold; margin-top:10px;">לחץ לפרטים נוספים</p>
                 </div>
             `).join('');
         }
 
+        // --- POPUP LOGIC ---
+        function openPopup(id) {
+            const p = allProducts.find(prod => prod.id === id);
+            if (!p) return;
+
+            currentModalProductId = id;
+
+            // Populate Modal Data
+            document.getElementById('modalTitle').innerText = p.name;
+            document.getElementById('modalCat').innerText = p.category;
+            document.getElementById('modalImg').src = `images/${p.category}.png`;
+            document.getElementById('modalDesc').innerText = p.description ? p.description : 'אין תיאור זמין עבור מוצר זה.';
+            
+            // Extract Donor Name from Email (everything before @)
+            const donorName = p.owner_email ? p.owner_email.split('@')[0] : 'אנונימי';
+            document.getElementById('modalDonor').innerText = donorName;
+
+            // Setup Buttons
+            const borrowBtn = document.getElementById('modalBorrowBtn');
+            borrowBtn.onclick = () => borrow(id);
+
+            const similarBtn = document.getElementById('modalSimilarBtn');
+            similarBtn.onclick = () => discoverSimilar(p.category);
+
+            // Show Modal
+            document.getElementById('itemModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('itemModal').style.display = 'none';
+        }
+
+        function closeModalOnOutside(event) {
+            if (event.target === document.getElementById('itemModal')) {
+                closeModal();
+            }
+        }
+
+        function discoverSimilar(category) {
+            // Set the dropdown value
+            const select = document.getElementById('catFilter');
+            
+            // Try to find a matching option case-insensitively
+            let found = false;
+            for(let i=0; i<select.options.length; i++) {
+                if(select.options[i].value.toLowerCase() === category.toLowerCase()) {
+                    select.selectedIndex = i;
+                    found = true;
+                    break;
+                }
+            }
+
+            if(found) {
+                filterAndRender();
+                closeModal();
+                // Scroll to top to see results
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                alert("לא נמצאה קטגוריה תואמת במסנן.");
+            }
+        }
+
+        // --- ACTION LOGIC ---
         async function borrow(id) {
             if(!confirm("האם להגיש בקשה להשאלת מוצר זה?")) return;
             const res = await fetch(`${API_URL}/borrow`, {
@@ -266,6 +398,7 @@
             });
             const data = await res.json();
             alert(data.message);
+            closeModal();
             loadProducts(); // Reload to update availability
         }
 
@@ -276,7 +409,7 @@
             });
             const reqs = await res.json();
             document.getElementById('history').innerHTML = reqs.map(r => `
-                <div class="card">
+                <div class="card" style="cursor: default;">
                     <h3>${r.product}</h3>
                     <p>תאריך בקשה: ${r.date.split(' ')[0]}</p>
                     <p>סטטוס: <span class="status-${r.status}">${translateStatus(r.status)}</span></p>
@@ -294,7 +427,6 @@
 
         // --- PROFILE LOGIC ---
         async function loadProfile() {
-            // Note: This endpoint (/api/user/me) needs to be implemented in app.py
             try {
                 const res = await fetch(`${API_URL}/user/me`, {
                     headers: { 'Authorization': `Bearer ${token}` }
@@ -305,8 +437,6 @@
                     document.getElementById('prof_fullname').value = user.full_name;
                     document.getElementById('prof_email').value = user.email;
                     document.getElementById('prof_phone').value = user.phone_number || '';
-                } else {
-                    console.log("Profile endpoint not ready yet.");
                 }
             } catch (e) { console.error("Error loading profile", e); }
         }
