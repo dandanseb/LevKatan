@@ -480,14 +480,15 @@ def get_all_requests():
     conn = get_db_connection()
     cur = conn.cursor()
     sql = """
-        SELECT br.id, u.username, p.product_name, br.status, br.request_date 
+        SELECT br.id, u.username, p.product_name, br.status, br.request_date, br.returned_date
         FROM borrow_requests br
         JOIN personnal_infos u ON br.user_id = u.id
         JOIN products p ON br.product_id = p.id
         WHERE br.status = 'pending'
     """
     cur.execute(sql)
-    requests = [{'id': r[0], 'username': r[1], 'product': r[2], 'status': r[3], 'date': str(r[4])} for r in cur.fetchall()]
+    requests = [{'id': r[0], 'username': r[1], 'product': r[2], 'status': r[3], 'date': str(r[4]),'returned_date': str(r[5]) if r[5] else 'לא צוין'
+                } for r in cur.fetchall()]
     conn.close()
     return jsonify(requests), 200
 
@@ -562,4 +563,5 @@ if __name__ == '__main__':
 
 
     app.run(debug=debug_mode, port=5230, host='0.0.0.0')
+
 
