@@ -87,11 +87,6 @@ def register():
     phone_number = data.get('phone_number')
     email = data.get('email')
     passwd = data.get('password')
-    
-    # Basic validation
-    if not all([full_name, username, email, passwd]):
-        return jsonify({"message": "Missing required fields"}), 400
-
     password_bytes = passwd.encode('utf-8')
     hashed_password = bcrypt.hashpw(password_bytes, bcrypt.gensalt()).decode('utf-8')
     conn = get_db_connection()
@@ -177,7 +172,8 @@ def update_user_profile():
     cur = conn.cursor()
     
     try:
-        # Mise à jour des champs modifiables.
+        # Mise à jour des champs modifiables. L'email est mis à jour, mais l'utilisateur doit le valider
+        # dans une application réelle, ici, nous le mettons à jour directement.
         sql = """
             UPDATE personnal_infos 
             SET full_name = %s, 
@@ -209,24 +205,9 @@ def update_user_profile():
 def get_products():
     conn = get_db_connection()
     cur = conn.cursor()
-    try:
-        # UPDATED: Fetching description and donator_email as well
-        cur.execute("SELECT id, product_name, category, status, description, donator_email FROM products WHERE status = 'available';")
-        products = [{
-            'id': r[0], 
-            'name': r[1], 
-            'category': r[2], 
-            'status': r[3],
-            'description': r[4], 
-            'owner_email': r[5] # Mapping donator_email to owner_email for frontend compatibility
-        } for r in cur.fetchall()]
-    except Exception as e:
-        print(f"Error fetching products: {e}")
-        conn.rollback()
-        # Fallback query if columns are missing
-        cur.execute("SELECT id, product_name, category, status FROM products WHERE status = 'available';")
-        products = [{'id': r[0], 'name': r[1], 'category': r[2], 'status': r[3], 'description': '', 'owner_email': ''} for r in cur.fetchall()]
-
+    # Fetch available products
+    cur.execute("SELECT id, product_name, category, status FROM products WHERE status = 'available';")
+    products = [{'id': r[0], 'name': r[1], 'category': r[2], 'status': r[3]} for r in cur.fetchall()]
     conn.close()
     return jsonify(products), 200
 
@@ -235,7 +216,6 @@ def get_products():
 def borrow_product():
     data = request.json
     product_id = data.get('product_id')
-    returned_date = data.get('returned_date')
     user_id = request.user_data['user_id'] # Extracted from token
     
     conn = get_db_connection()
@@ -248,11 +228,11 @@ def borrow_product():
             return jsonify({"message": "Product not available"}), 400
             
         # Create request
-        cur.execute("INSERT INTO borrow_requests (user_id, product_id, returned_date) VALUES (%s, %s, %s)", (user_id, product_id, returned_date))
+        cur.execute("INSERT INTO borrow_requests (user_id, product_id) VALUES (%s, %s)", (user_id, product_id))
         cur.execute("UPDATE products SET status = 'confirmation_pending' WHERE id = %s", (product_id,))
         
         conn.commit()
-        return jsonify({"message": "Request sent successfully! Wait for employee approval."}), 200
+        return jsonify({"message": "Request sent successfully"}), 200
     except Exception as e:
         conn.rollback()
         return jsonify({"error": str(e)}), 500
@@ -356,33 +336,33 @@ def get_all_products():
     conn = get_db_connection()
     if not conn:
         return jsonify({"message": "Erreur interne du serveur (DB)"}), 500
-        
+
     cur = conn.cursor()
-    
+
     try:
-        # Cette requête récupère le produit ET le username de l'emprunteur si le statut est 'approved'
+        # Sélectionne tous les champs nécessaires pour le tableau de bord
         sql = """
-            SELECT 
-                p.id, p.product_name, p.category, p.status, p.donator_email, p.publish_date,
-                u.username as borrower_name
-            FROM products p
-            LEFT JOIN borrow_requests br ON p.id = br.product_id AND br.status = 'approved'
-            LEFT JOIN personnal_infos u ON br.user_id = u.id
-            ORDER BY p.id DESC;
+            SELECT id, product_name, category, status, donator_email, publish_date 
+            FROM products 
+            ORDER BY id DESC;
         """
         cur.execute(sql)
-        
-        columns = ['id', 'product_name', 'category', 'status', 'donator_email', 'publish_date', 'borrower_name']
+
+        # Mapping des résultats
+        columns = ['id', 'product_name', 'category', 'status', 'donator_email',
+                   'publish_date']
         products = [dict(zip(columns, r)) for r in cur.fetchall()]
-        
+
+        # Convertir les objets date/datetime en string pour le JSON
         for p in products:
             p['publish_date'] = str(p['publish_date'])
-        
+
         return jsonify(products), 200
-        
+
     except Exception as e:
         print(f"Erreur lors de la récupération des produits: {e}")
-        return jsonify({"message": "Erreur serveur"}), 500
+        return jsonify(
+            {"message": "Erreur serveur lors de la lecture des produits"}), 500
     finally:
         conn.close()
 
@@ -480,21 +460,14 @@ def get_all_requests():
     conn = get_db_connection()
     cur = conn.cursor()
     sql = """
-        SELECT br.id, u.username, p.product_name, br.status, br.request_date, br.returned_date
+        SELECT br.id, u.username, p.product_name, br.status, br.request_date 
         FROM borrow_requests br
         JOIN personnal_infos u ON br.user_id = u.id
         JOIN products p ON br.product_id = p.id
         WHERE br.status = 'pending'
     """
     cur.execute(sql)
-    requests = [{
-                 'id': r[0], 
-                 'username': r[1],
-                 'product': r[2], 
-                 'status': r[3], 
-                 'date': str(r[4]),
-                 'returned_date': str(r[5]) if r[5] else 'לא צוין'
-                } for r in cur.fetchall()]
+    requests = [{'id': r[0], 'username': r[1], 'product': r[2], 'status': r[3], 'date': str(r[4])} for r in cur.fetchall()]
     conn.close()
     return jsonify(requests), 200
 
@@ -529,6 +502,7 @@ def update_request_status(req_id):
         conn.close()
 
 # --- ADMIN ROUTES (Manage Users) ---
+# [Use the exact Admin code you provided in app.py]
 @app.route('/api/admin/users', methods=['GET', 'OPTIONS'])
 @admin_required
 def get_all_users():
@@ -567,8 +541,14 @@ if __name__ == '__main__':
     # Reads the string "True" or "False" from .env and converts to boolean
     debug_mode = os.getenv("FLASK_DEBUG", "False").lower() in ('true', '1', 't')
 
-
     app.run(debug=debug_mode, port=5230, host='0.0.0.0')
+
+
+
+
+
+
+
 
 
 
