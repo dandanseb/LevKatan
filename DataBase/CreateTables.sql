@@ -17,7 +17,6 @@ CREATE TABLE products (
     product_name VARCHAR(100) NOT NULL,
     category VARCHAR(50) NOT NULL,
     publish_date DATE DEFAULT CURRENT_DATE,
-    last_status_change TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     status VARCHAR(20) CHECK (status IN ('available', 'borrowed', 'unavailable', 'confirmation_pending')) DEFAULT 'available',
     donator_email VARCHAR(100),
     description VARCHAR(200)
