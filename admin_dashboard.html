@@ -122,7 +122,7 @@
         // -------------------
 
         if(!token || localStorage.getItem('userRole') !== 'admin') window.location.href = 'index.html';
-        document.getElementById('userGreeting').innerText = `שלום, ${username}`;
+        document.getElementById('userGreeting').innerText = `${username}`;
 
         async function loadUsers() {
             const res = await fetch(`${API_URL}/admin/users`, {
