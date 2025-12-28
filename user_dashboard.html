@@ -427,50 +427,26 @@
         }
 
         // --- ACTION LOGIC ---
-        function borrow(id) {
-            document.getElementById('borrowProductId').value = id;
-            document.getElementById('borrowModal').style.display = 'flex';
+        async function borrow(id) {
+            // 1. Demander la date de retour via un prompt HTML simple (ou vous pouvez créer un modal plus tard)
+            const returnDate = prompt("מתי בכוונתך להחזיר את המוצר? (YYYY-MM-DD)");
             
-            // Optionnel : Définir la date minimale à aujourd'hui
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('returnDateInput').setAttribute('min', today);
-        }
+            if (!returnDate) return; // Annuler si pas de date
         
-        function closeBorrowModal() {
-            document.getElementById('borrowModal').style.display = 'none';
-        }
-
-        //send request to the backend
-        async function submitBorrowRequest() {
-            const id = document.getElementById('borrowProductId').value;
-            const returnDate = document.getElementById('returnDateInput').value;
-        
-            if (!returnDate) {
-                alert("נא לבחור תאריך החזרה");
-                return;
-            }
+            if(!confirm(`האם להגיש בקשה להשאלת מוצר זה עד לתאריך ${returnDate}?`)) return;
         
             const res = await fetch(`${API_URL}/borrow`, {
                 method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json', 
-                    'Authorization': `Bearer ${token}` 
-                },
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ 
                     product_id: id,
-                    returned_date: returnDate 
+                    returned_date: returnDate // Envoyer la date au backend
                 })
             });
-        
-            const data = await res.json();
             
-            if (res.ok) {
-                alert(data.message);
-                closeBorrowModal();
-                loadProducts();
-            } else {
-                alert("שגיאה: " + data.message);
-            }
+            const data = await res.json();
+            alert(data.message);
+            loadProducts();
         }
 
         // --- HISTORY LOGIC ---
