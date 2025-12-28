@@ -485,19 +485,40 @@
                 <div class="card" style="cursor: default;">
                     <h3>${r.product}</h3>
                     <p>תאריך בקשה: ${r.date.split(' ')[0]}</p>
-                    <p>סטטוס: <span class="status-${r.status}">${translateStatus(r.status)}</span></p>
+                   <p>תאריך החזרה מתוכנן: ${r.returned_date || 'לא צוין'}</p> <p>סטטוס: <span class="status-${r.status}">${translateStatus(r.status, r.returned_date)}</span></p>
                 </div>
             `).join('');
             if(reqs.length === 0) document.getElementById('history').innerHTML = "<p>עדיין לא ביקשת מוצרים.</p>";
         }
 
-        function translateStatus(s) {
-            if(s === 'pending') return 'ממתין לאישור';
-            if(s === 'approved') return 'אושר - יש לך 30 יום';
-            if(s === 'rejected') return 'נדחה';
-            if(s === 'confirmation_pending') return 'ממתין לאישור מנהל';
-            return s;
+        function translateStatus(s, returnedDate) {
+    if (s === 'pending') return 'ממתין לאישור';
+    if (s === 'rejected') return 'נדחה';
+    if (s === 'confirmation_pending') return 'ממתין לאישור מנהל';
+    
+    if (s === 'approved') {
+        if (!returnedDate || returnedDate === 'null' || returnedDate === 'לא צוין') {
+            return 'אושר - תאריך החזרה לא ידוע';
         }
+
+        // Calcul de la différence de jours
+        const today = new Date();
+        const returnD = new Date(returnedDate);
+        
+        // On calcule la différence en millisecondes puis en jours
+        const diffInTime = returnD.getTime() - today.getTime();
+        const diffInDays = Math.ceil(diffInTime / (1000 * 3600 * 24));
+
+        if (diffInDays < 0) {
+            return `אושר - איחור של ${Math.abs(diffInDays)} ימים! ⚠️`;
+        } else if (diffInDays === 0) {
+            return `אושר - להחזיר היום! 🔔`;
+        } else {
+            return `אושר - נותרו עוד ${diffInDays} ימים להחזרה`;
+        }
+    }
+    return s;
+}
 
         // --- PROFILE LOGIC ---
         async function loadProfile() {
