@@ -212,6 +212,7 @@
                             <th>שם</th>
                             <th>קטגוריה</th>
                             <th>סטטוס</th>
+                            <th>-מושאל ל</th>
                             <th>פעולות</th>
                         </tr>
                     </thead>
@@ -382,21 +383,26 @@
         // Isolated function for rendering (displaying) the table
         function renderInventory(products) {
             const tbody = document.getElementById('productsTableBody');
-            tbody.innerHTML = products.map(p => `
-                <tr>
-                    <td>${p.id}</td>
-                    <td>${p.product_name}</td>
-                    <td>${p.category}</td>
-                    <td class="status-cell">${p.status}</td>
-                    <td>
-                        <button class="btn-edit" onclick="editProduct(${p.id})">ערוך ✏️</button>
-                        <button class="btn-delete" onclick="deleteProduct(${p.id})">מחק 🗑️</button>
-                    </td>
-                </tr>
-            `).join('');
-            if(products.length === 0) tbody.innerHTML = "<tr><td colspan='5' style='text-align:center; padding:20px;'>אין מוצרים תואמים לפילטר 🔍</td></tr>";
+            tbody.innerHTML = products.map(p => {
+                const borrowerInfo = p.status === 'borrowed' && p.borrower_name 
+                    ? `<span style="color: #E05297; font-weight: bold;">👤 ${p.borrower_name}</span>` 
+                    : "-";
+        
+                return `
+                    <tr>
+                        <td>${p.id}</td>
+                        <td>${p.product_name}</td>
+                        <td>${p.category}</td>
+                        <td class="status-cell">${p.status}</td>
+                        <td>${borrowerInfo}</td> <td>
+                            <button class="btn-edit" onclick="editProduct(${p.id})">ערוך ✏️</button>
+                            <button class="btn-delete" onclick="deleteProduct(${p.id})">מחק 🗑️</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            if(products.length === 0) tbody.innerHTML = "<tr><td colspan='6' style='text-align:center; padding:20px;'>אין מוצרים תואמים לפילטר 🔍</td></tr>";
         }
-
 
         // Add Product
         document.getElementById('productForm').addEventListener('submit', async function(e) {
