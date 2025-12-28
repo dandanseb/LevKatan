@@ -10,7 +10,7 @@ CREATE TABLE personnal_infos (
     role VARCHAR(20) CHECK (role IN ('admin', 'user','employee')) DEFAULT 'user'
 );
 
---- PRODUCTS INFORTMATIONS ---
+------- PRODUCTS INFORTMATIONS -------
 
 CREATE TABLE products (
     id SERIAL PRIMARY KEY,
@@ -25,4 +25,16 @@ CREATE TABLE products (
 
 CREATE INDEX idx_product_name ON products (product_name);
 
---------------------------------------------
+----------------REQUESTS INFORMATIONS  ---------------------
+
+CREATE TABLE borrow_requests (
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL REFERENCES personnal_infos(id) ON DELETE CASCADE,
+    product_id INT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+    request_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+	returned_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    status VARCHAR(20) CHECK (status IN ('pending', 'approved', 'rejected')) DEFAULT 'pending', UNIQUE (user_id, product_id) 
+);
+
+CREATE INDEX idx_borrow_request_status ON borrow_requests (status);
+CREATE INDEX idx_borrow_request_product ON borrow_requests (product_id);
