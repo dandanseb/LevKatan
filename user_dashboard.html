@@ -74,10 +74,11 @@
         .card h3 { color: var(--text-color); margin-top: 0; margin-bottom: 5px; }
         
         .cat-wrapper { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-        .cat-tag { display: inline-block; background: #E3F2FD; color: #1976D2; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+        /* UPDATED: Category Pill Style */
+        .cat-tag { display: inline-block; background: var(--brand-pink); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
         .cat-img { width: 24px; height: 24px; object-fit: contain; }
         
-        body.dark-mode .cat-tag { background: #1976D2; color: white; }
+        body.dark-mode .cat-tag { background: var(--brand-pink-hover); color: white; }
 
         /* BUTTONS */
         .btn-borrow, .btn-save, .btn-similar, .btn-reject { 
@@ -143,7 +144,6 @@
 <body>
     <div class="top-bar">
         <div class="brand-area">
-            <!-- should be moved to the images folder -->
             <img src="logo.png" alt="Logo" class="brand-logo">
             <h2 style="margin:0; font-size: 20px; color:var(--text-color);">לב קטן</h2>
         </div>
@@ -169,13 +169,14 @@
         <div id="catalog" style="display:block;">
             <div class="filters-bar">
                 <input type="text" id="searchBox" class="filter-input" placeholder="🔍 חיפוש לפי שם או תיאור..." oninput="filterAndRender()">
+                <!-- UPDATED: Removed English text from options -->
                 <select id="catFilter" class="filter-select" onchange="filterAndRender()">
                     <option value="">📂 כל הקטגוריות</option>
-                    <option value="strollers">עגלות (Strollers)</option>
-                    <option value="cribs">עריסות (Cribs)</option>
-                    <option value="car seats">מושבי בטיחות (Car Seats)</option>
-                    <option value="toys">משחקים (Toys)</option>
-                    <option value="baby beds">מיטת תינוק (Baby Beds)</option>
+                    <option value="strollers">עגלות</option>
+                    <option value="cribs">עריסות</option>
+                    <option value="car seats">מושבי בטיחות</option>
+                    <option value="toys">משחקים</option>
+                    <option value="baby beds">מיטת תינוק</option>
                 </select>
                 <select id="sortOption" class="filter-select" onchange="filterAndRender()">
                     <option value="newest">📅 הכי חדש</option>
@@ -279,6 +280,18 @@
             navContainer.prepend(btn);
         }
 
+        // --- HELPER: Translate Category ---
+        function translateCategory(cat) {
+            const map = {
+                'strollers': 'עגלות',
+                'cribs': 'עריסות',
+                'car seats': 'מושבי בטיחות',
+                'toys': 'משחקים',
+                'baby beds': 'מיטת תינוק'
+            };
+            return map[cat.toLowerCase()] || cat;
+        }
+
         // --- CATALOG LOGIC ---
         async function loadProducts() {
             try {
@@ -295,8 +308,11 @@
 
             // 1. Filter
             let filtered = allProducts.filter(p => {
+                const hebrewCat = translateCategory(p.category).toLowerCase();
                 const matchesSearch = (p.name && p.name.toLowerCase().includes(searchTerm)) || 
-                                      (p.description && p.description.toLowerCase().includes(searchTerm));
+                                      (p.description && p.description.toLowerCase().includes(searchTerm)) ||
+                                      (hebrewCat.includes(searchTerm));
+
                 const matchesCat = catFilter === "" || (p.category && p.category.toLowerCase().includes(catFilter));
                 return matchesSearch && matchesCat;
             });
@@ -319,7 +335,8 @@
                 <div class="card" onclick="openPopup(${p.id})">
                     <div class="cat-wrapper">
                         <img src="images/${p.category}.png" class="cat-img" onerror="this.style.display='none'">
-                        <div class="cat-tag">${p.category}</div>
+                        <!-- UPDATED: Use translation function -->
+                        <div class="cat-tag">${translateCategory(p.category)}</div>
                     </div>
                     <h3>${p.name}</h3>
                     <p style="color:var(--brand-pink); font-size:12px; font-weight:bold; margin-top:10px;">לחץ לפרטים נוספים</p>
@@ -336,7 +353,8 @@
 
             // Populate Modal Data
             document.getElementById('modalTitle').innerText = p.name;
-            document.getElementById('modalCat').innerText = p.category;
+            // UPDATED: Use translation function for modal category
+            document.getElementById('modalCat').innerText = translateCategory(p.category);
             document.getElementById('modalImg').src = `images/${p.category}.png`;
             document.getElementById('modalDesc').innerText = p.description ? p.description : 'אין תיאור זמין עבור מוצר זה.';
             
@@ -423,6 +441,7 @@
             if(s === 'pending') return 'ממתין לאישור';
             if(s === 'approved') return 'אושר - ניתן לאסוף';
             if(s === 'rejected') return 'נדחה';
+            if(s === 'confirmation_pending') return 'ממתין לאישור מנהל';
             return s;
         }
 
