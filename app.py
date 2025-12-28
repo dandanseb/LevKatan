@@ -355,33 +355,33 @@ def get_all_products():
     conn = get_db_connection()
     if not conn:
         return jsonify({"message": "Erreur interne du serveur (DB)"}), 500
-
+        
     cur = conn.cursor()
-
+    
     try:
-        # Sélectionne tous les champs nécessaires pour le tableau de bord
+        # Cette requête récupère le produit ET le username de l'emprunteur si le statut est 'approved'
         sql = """
-            SELECT id, product_name, category, status, donator_email, publish_date 
-            FROM products 
-            ORDER BY id DESC;
+            SELECT 
+                p.id, p.product_name, p.category, p.status, p.donator_email, p.publish_date,
+                u.username as borrower_name
+            FROM products p
+            LEFT JOIN borrow_requests br ON p.id = br.product_id AND br.status = 'approved'
+            LEFT JOIN personnal_infos u ON br.user_id = u.id
+            ORDER BY p.id DESC;
         """
         cur.execute(sql)
-
-        # Mapping des résultats
-        columns = ['id', 'product_name', 'category', 'status', 'donator_email',
-                   'publish_date']
+        
+        columns = ['id', 'product_name', 'category', 'status', 'donator_email', 'publish_date', 'borrower_name']
         products = [dict(zip(columns, r)) for r in cur.fetchall()]
-
-        # Convertir les objets date/datetime en string pour le JSON
+        
         for p in products:
             p['publish_date'] = str(p['publish_date'])
-
+        
         return jsonify(products), 200
-
+        
     except Exception as e:
         print(f"Erreur lors de la récupération des produits: {e}")
-        return jsonify(
-            {"message": "Erreur serveur lors de la lecture des produits"}), 500
+        return jsonify({"message": "Erreur serveur"}), 500
     finally:
         conn.close()
 
@@ -558,5 +558,6 @@ def delete_user(user_id):
 if __name__ == '__main__':
     # Reads the string "True" or "False" from .env and converts to boolean
     debug_mode = os.getenv("FLASK_DEBUG", "False").lower() in ('true', '1', 't')
+
 
     app.run(debug=debug_mode, port=5230, host='0.0.0.0')
