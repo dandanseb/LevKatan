@@ -235,6 +235,7 @@ def get_products():
 def borrow_product():
     data = request.json
     product_id = data.get('product_id')
+    returned_date = data.get('returned_date')
     user_id = request.user_data['user_id'] # Extracted from token
     
     conn = get_db_connection()
@@ -247,11 +248,11 @@ def borrow_product():
             return jsonify({"message": "Product not available"}), 400
             
         # Create request
-        cur.execute("INSERT INTO borrow_requests (user_id, product_id) VALUES (%s, %s)", (user_id, product_id))
+        cur.execute("INSERT INTO borrow_requests (user_id, product_id, returned_date) VALUES (%s, %s, %s)", (user_id, product_id, returned_date))
         cur.execute("UPDATE products SET status = 'confirmation_pending' WHERE id = %s", (product_id,))
         
         conn.commit()
-        return jsonify({"message": "Request sent successfully"}), 200
+        return jsonify({"message": "Request sent successfully! Wait for employee approval."}), 200
     except Exception as e:
         conn.rollback()
         return jsonify({"error": str(e)}), 500
@@ -561,3 +562,4 @@ if __name__ == '__main__':
 
 
     app.run(debug=debug_mode, port=5230, host='0.0.0.0')
+
