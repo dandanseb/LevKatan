@@ -212,7 +212,7 @@
                             <th>שם</th>
                             <th>קטגוריה</th>
                             <th>סטטוס</th>
-                            <th>-מושאל ל</th>
+                            <th>מושאל ל</th>
                             <th>פעולות</th>
                         </tr>
                     </thead>
@@ -385,7 +385,7 @@
             const tbody = document.getElementById('productsTableBody');
             tbody.innerHTML = products.map(p => {
                 const borrowerInfo = p.status === 'borrowed' && p.borrower_name 
-                    ? `<span style="color: #E05297; font-weight: bold;">👤 ${p.borrower_name}</span>` 
+                    ? `<span style="color: #E05297; font-weight: bold;"> ${p.borrower_name}</span>` 
                     : "-";
         
                 return `
