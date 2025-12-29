@@ -386,7 +386,7 @@
             tbody.innerHTML = products.map(p => {
                 // Logique pour afficher le nom ou un tiret
                 const borrowerInfo = p.status === 'borrowed' && p.borrower_name 
-                    ? `<span style="color: #E05297; font-weight: bold;">👤 ${p.borrower_name}</span>` 
+                    ? `<span style="color: #E05297; font-weight: bold;"> ${p.borrower_name}</span>` 
                     : "-";
         
                 return `
