@@ -448,11 +448,32 @@
             if(reqs.length === 0) document.getElementById('history').innerHTML = "<p>עדיין לא ביקשת מוצרים.</p>";
         }
 
-        function translateStatus(s) {
-            if(s === 'pending') return 'ממתין לאישור';
-            if(s === 'approved') return 'אושר - ניתן לאסוף';
-            if(s === 'rejected') return 'נדחה';
-            if(s === 'confirmation_pending') return 'ממתין לאישור מנהל';
+       function translateStatus(s, returnedDate) {
+            if (s === 'pending') return 'ממתין לאישור';
+            if (s === 'rejected') return 'נדחה';
+            if (s === 'confirmation_pending') return 'ממתין לאישור מנהל';
+            
+            if (s === 'approved') {
+                if (!returnedDate || returnedDate === 'null' || returnedDate === 'לא צוין') {
+                    return 'אושר - תאריך החזרה לא ידוע';
+                }
+        
+                // Calcul de la différence de jours
+                const today = new Date();
+                const returnD = new Date(returnedDate);
+                
+                // On calcule la différence en millisecondes puis en jours
+                const diffInTime = returnD.getTime() - today.getTime();
+                const diffInDays = Math.ceil(diffInTime / (1000 * 3600 * 24));
+        
+                if (diffInDays < 0) {
+                    return `אושר - איחור של ${Math.abs(diffInDays)} ימים! ⚠️`;
+                } else if (diffInDays === 0) {
+                    return `אושר - להחזיר היום! 🔔`;
+                } else {
+                    return `אושר - נותרו עוד ${diffInDays} ימים להחזרה`;
+                }
+            }
             return s;
         }
 
