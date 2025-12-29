@@ -73,26 +73,27 @@
         .card:hover { transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
         .card h3 { color: var(--text-color); margin-top: 10px; margin-bottom: 5px; }
         
-        /* Category Pill Style */
+        /* UPDATED: Compact Centered Category Pill */
         .cat-tag { 
             display: inline-flex; 
             align-items: center; 
-            justify-content: center;
-            gap: 8px; 
+            justify-content: center; /* Ensures text is centered */
+            gap: 6px; /* Reduced gap */
             background: var(--brand-pink); 
             color: white; 
-            padding: 5px 12px; 
+            padding: 4px 10px; /* Reduced padding (smaller pill) */
             border-radius: 20px; 
             font-size: 12px; 
             font-weight: bold; 
             margin-bottom: 10px;
         }
         .cat-img { 
-            width: 23px; 
-            height: 23px; 
+            width: 18px; /* Reduced icon size */
+            height: 18px; 
             object-fit: contain;
             border-radius: 50%;
             padding: 1px;
+            background: rgba(255,255,255,0.2); /* Slight contrast for icon */
         }
         
         body.dark-mode .cat-tag { background: var(--brand-pink-hover); color: white; }
@@ -157,9 +158,26 @@
         
         .modal-actions { display: flex; flex-direction: column; gap: 10px; }
         
-        /* Modal Specific Tag Styling */
+        /* UPDATED: Modal Specific Styling */
         #modalTagContainer { display: flex; flex-direction: column; align-items: center; margin-bottom: 15px; }
-        .modal-big-icon { width: 120px; height: 120px; padding: 10px; background: white; border-radius: 50%; box-shadow: 0 5px 15px rgba(0,0,0,0.1); object-fit: contain; margin-bottom: 10px; border: 1px solid var(--border-color); }
+        
+        .modal-big-icon { 
+            width: 80px; height: 80px; 
+            padding: 15px; 
+            background: white; 
+            border-radius: 50%; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); 
+            object-fit: contain; 
+            margin-bottom: 10px; 
+            border: 1px solid var(--border-color); 
+        }
+
+        /* Missing style added for the text below the icon */
+        .modal-cat-badge {
+            background: var(--brand-pink); color: white; 
+            padding: 5px 15px; border-radius: 15px; 
+            font-size: 14px; font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -239,6 +257,7 @@
             
             <div id="modalTagContainer">
                 <img id="modalImg" class="modal-big-icon" src="" alt="Icon">
+                <span id="modalCat" class="modal-cat-badge"></span>
             </div>
 
             <h2 id="modalTitle" class="modal-title"></h2>
@@ -346,7 +365,7 @@
                 return;
             }
 
-            // UPDATED: Render Logic with new Image Path and Pill Structure
+            // UPDATED: Compact Pill Rendering
             container.innerHTML = filtered.map(p => `
                 <div class="card" onclick="openPopup(${p.id})">
                     <div class="cat-tag">
@@ -361,6 +380,7 @@
 
         // --- POPUP LOGIC ---
         function openPopup(id) {
+            console.log("Opening popup for ID:", id);
             const p = allProducts.find(prod => prod.id === id);
             if (!p) return;
 
@@ -368,15 +388,18 @@
 
             // Populate Modal Data
             document.getElementById('modalTitle').innerText = p.name;
-            document.getElementById('modalCat').innerText = translateCategory(p.category);
             
-            // UPDATED: Modal Image Path
+            // This line caused the error before because 'modalCat' didn't exist in HTML
+            const modalCatEl = document.getElementById('modalCat');
+            if(modalCatEl) modalCatEl.innerText = translateCategory(p.category);
+            
+            // Modal Image Path
             document.getElementById('modalImg').src = `../images/${p.category}.png`;
-            document.getElementById('modalImg').style.display = 'block'; // Reset display in case it was hidden
+            document.getElementById('modalImg').style.display = 'block'; 
             
             document.getElementById('modalDesc').innerText = p.description ? p.description : 'אין תיאור זמין עבור מוצר זה.';
             
-            // Extract Donor Name from Email (everything before @)
+            // Extract Donor Name from Email
             const donorName = p.owner_email ? p.owner_email.split('@')[0] : 'אנונימי';
             document.getElementById('modalDonor').innerText = donorName;
 
