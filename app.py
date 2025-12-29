@@ -230,33 +230,39 @@ def get_products():
     conn.close()
     return jsonify(products), 200
 
+
 @app.route('/api/borrow', methods=['POST'])
 @token_required
 def borrow_product():
     data = request.json
     product_id = data.get('product_id')
-    user_id = request.user_data['user_id'] # Extracted from token
+    returned_date = data.get('returned_date')
+    user_id = request.user_data['user_id']
     
     conn = get_db_connection()
     cur = conn.cursor()
     try:
-        # Check if available
+        # Vérifier disponibilité
         cur.execute("SELECT status FROM products WHERE id = %s", (product_id,))
         status = cur.fetchone()
         if not status or status[0] != 'available':
             return jsonify({"message": "Product not available"}), 400
             
-        # Create request
-        cur.execute("INSERT INTO borrow_requests (user_id, product_id) VALUES (%s, %s)", (user_id, product_id))
+        cur.execute("""
+            INSERT INTO borrow_requests (user_id, product_id, returned_date) 
+            VALUES (%s, %s, %s)
+        """, (user_id, product_id, returned_date))
+        
         cur.execute("UPDATE products SET status = 'confirmation_pending' WHERE id = %s", (product_id,))
         
         conn.commit()
-        return jsonify({"message": "Request sent successfully"}), 200
+        return jsonify({"message": "הבקשה נשלחה בהצלחה! המתן לאישור עובד."}), 200
     except Exception as e:
         conn.rollback()
         return jsonify({"error": str(e)}), 500
     finally:
         conn.close()
+
 
 #---BORROWING REQUEST---
 @app.route('/api/my-requests', methods=['GET'])
@@ -479,14 +485,22 @@ def get_all_requests():
     conn = get_db_connection()
     cur = conn.cursor()
     sql = """
-        SELECT br.id, u.username, p.product_name, br.status, br.request_date 
+        SELECT br.id, u.username, p.product_name, br.status, br.request_date, br.returned_date
         FROM borrow_requests br
         JOIN personnal_infos u ON br.user_id = u.id
         JOIN products p ON br.product_id = p.id
         WHERE br.status = 'pending'
     """
     cur.execute(sql)
-    requests = [{'id': r[0], 'username': r[1], 'product': r[2], 'status': r[3], 'date': str(r[4])} for r in cur.fetchall()]
+    # On ajoute r[5] qui est returned_date
+    requests = [{
+        'id': r[0], 
+        'username': r[1], 
+        'product': r[2], 
+        'status': r[3], 
+        'date': str(r[4]),
+        'returned_date': str(r[5]) if r[5] else 'לא צוין'
+    } for r in cur.fetchall()]
     conn.close()
     return jsonify(requests), 200
 
@@ -560,4 +574,5 @@ if __name__ == '__main__':
     debug_mode = os.getenv("FLASK_DEBUG", "False").lower() in ('true', '1', 't')
 
     app.run(debug=debug_mode, port=5230, host='0.0.0.0')
+
 
