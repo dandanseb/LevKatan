@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>לב קטן</title>
-    <link rel="icon" href="../images/transparent logo.png" type="image/png">
+    <link rel="icon" href="../images/logo.png" type="image/png">
     <style>
         :root {
             --bg-color: #FFF5F7;
@@ -68,15 +68,32 @@
         .card { 
             background: var(--card-bg); padding: 20px; border-radius: 12px; 
             box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid var(--border-color); 
-            transition: transform 0.2s; cursor: pointer;
+            transition: transform 0.2s; cursor: pointer; position: relative;
         }
         .card:hover { transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
-        .card h3 { color: var(--text-color); margin-top: 0; margin-bottom: 5px; }
+        .card h3 { color: var(--text-color); margin-top: 10px; margin-bottom: 5px; }
         
-        .cat-wrapper { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-        /* UPDATED: Category Pill Style */
-        .cat-tag { display: inline-block; background: var(--brand-pink); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
-        .cat-img { width: 24px; height: 24px; object-fit: contain; }
+        /* UPDATED: Category Pill Style with Image Inside */
+        .cat-tag { 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 8px; 
+            background: var(--brand-pink); 
+            color: white; 
+            padding: 5px 12px; 
+            border-radius: 20px; 
+            font-size: 13px; 
+            font-weight: bold; 
+            margin-bottom: 10px;
+        }
+        .cat-img { 
+            width: 20px; 
+            height: 20px; 
+            object-fit: contain; 
+            background: white; /* Optional: adds a tiny white bg behind icon for contrast */
+            border-radius: 50%;
+            padding: 2px;
+        }
         
         body.dark-mode .cat-tag { background: var(--brand-pink-hover); color: white; }
 
@@ -139,6 +156,9 @@
         .donor-info { background: var(--nav-btn-bg); padding: 10px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; color: var(--nav-btn-text); }
         
         .modal-actions { display: flex; flex-direction: column; gap: 10px; }
+        
+        /* Modal Specific Tag Styling */
+        #modalTagContainer { display: flex; justify-content: center; margin-bottom: 15px; }
     </style>
 </head>
 <body>
@@ -165,11 +185,9 @@
     </div>
 
     <div class="container">
-        <!-- CATALOG TAB -->
         <div id="catalog" style="display:block;">
             <div class="filters-bar">
                 <input type="text" id="searchBox" class="filter-input" placeholder="🔍 חיפוש לפי שם או תיאור..." oninput="filterAndRender()">
-                <!-- UPDATED: Removed English text from options -->
                 <select id="catFilter" class="filter-select" onchange="filterAndRender()">
                     <option value="">📂 כל הקטגוריות</option>
                     <option value="strollers">עגלות</option>
@@ -186,10 +204,8 @@
             <div id="productsGrid" class="grid"></div>
         </div>
 
-        <!-- HISTORY TAB -->
         <div id="history" class="grid" style="display:none;"></div>
 
-        <!-- PROFILE TAB -->
         <div id="profile" style="display:none; max-width: 600px; margin: 0 auto;">
             <div class="card" style="cursor: default;">
                 <h3>עריכת פרטים אישיים</h3>
@@ -216,14 +232,15 @@
         </div>
     </div>
 
-    <!-- ITEM DETAILS MODAL -->
     <div id="itemModal" class="modal" onclick="closeModalOnOutside(event)">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal()">&times;</span>
             
-            <div class="cat-wrapper" style="justify-content: center; margin-bottom: 15px;">
-                <img id="modalImg" class="cat-img" src="" alt="Icon">
-                <span id="modalCat" class="cat-tag" style="font-size: 14px; padding: 4px 10px;"></span>
+            <div id="modalTagContainer">
+                <div class="cat-tag">
+                    <img id="modalImg" class="cat-img" src="" alt="Icon">
+                    <span id="modalCat"></span>
+                </div>
             </div>
 
             <h2 id="modalTitle" class="modal-title"></h2>
@@ -331,12 +348,12 @@
                 return;
             }
 
+            // UPDATED: Render Logic with new Image Path and Pill Structure
             container.innerHTML = filtered.map(p => `
                 <div class="card" onclick="openPopup(${p.id})">
-                    <div class="cat-wrapper">
-                        <img src="images/${p.category}.png" class="cat-img" onerror="this.style.display='none'">
-                        <!-- UPDATED: Use translation function -->
-                        <div class="cat-tag">${translateCategory(p.category)}</div>
+                    <div class="cat-tag">
+                        <img src="../images/${p.category}.png" class="cat-img" onerror="this.style.display='none'">
+                        <span>${translateCategory(p.category)}</span>
                     </div>
                     <h3>${p.name}</h3>
                     <p style="color:var(--brand-pink); font-size:12px; font-weight:bold; margin-top:10px;">לחץ לפרטים נוספים</p>
@@ -353,9 +370,12 @@
 
             // Populate Modal Data
             document.getElementById('modalTitle').innerText = p.name;
-            // UPDATED: Use translation function for modal category
             document.getElementById('modalCat').innerText = translateCategory(p.category);
-            document.getElementById('modalImg').src = `images/${p.category}.png`;
+            
+            // UPDATED: Modal Image Path
+            document.getElementById('modalImg').src = `../images/${p.category}.png`;
+            document.getElementById('modalImg').style.display = 'block'; // Reset display in case it was hidden
+            
             document.getElementById('modalDesc').innerText = p.description ? p.description : 'אין תיאור זמין עבור מוצר זה.';
             
             // Extract Donor Name from Email (everything before @)
@@ -384,10 +404,7 @@
         }
 
         function discoverSimilar(category) {
-            // Set the dropdown value
             const select = document.getElementById('catFilter');
-            
-            // Try to find a matching option case-insensitively
             let found = false;
             for(let i=0; i<select.options.length; i++) {
                 if(select.options[i].value.toLowerCase() === category.toLowerCase()) {
@@ -400,19 +417,15 @@
             if(found) {
                 filterAndRender();
                 closeModal();
-                // Scroll to top to see results
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             } else {
                 alert("לא נמצאה קטגוריה תואמת במסנן.");
             }
         }
 
-        
         // --- ACTION LOGIC ---
         async function borrow(id) {
-            // 1. Demander la date de retour via un prompt HTML simple 
             const returnDate = prompt("מתי בכוונתך להחזיר את המוצר? (YYYY-MM-DD)");
-            
             if (!returnDate) return; 
         
             if(!confirm(`האם להגיש בקשה להשאלת מוצר זה עד לתאריך ${returnDate}?`)) return;
@@ -422,7 +435,7 @@
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ 
                     product_id: id,
-                    returned_date: returnDate // send to the backend
+                    returned_date: returnDate 
                 })
             });
             
@@ -442,7 +455,8 @@
                 <div class="card" style="cursor: default;">
                     <h3>${r.product}</h3>
                     <p>תאריך בקשה: ${r.date.split(' ')[0]}</p>
-                    <p>תאריך החזרה מתוכנן: ${r.returned_date || 'לא צוין'}</p> <p>סטטוס: <span class="status-${r.status}">${translateStatus(r.status, r.returned_date)}</span></p>
+                    <p>תאריך החזרה מתוכנן: ${r.returned_date || 'לא צוין'}</p> 
+                    <p>סטטוס: <span class="status-${r.status}">${translateStatus(r.status, r.returned_date)}</span></p>
                 </div>
             `).join('');
             if(reqs.length === 0) document.getElementById('history').innerHTML = "<p>עדיין לא ביקשת מוצרים.</p>";
@@ -457,12 +471,9 @@
                 if (!returnedDate || returnedDate === 'null' || returnedDate === 'לא צוין') {
                     return 'אושר - תאריך החזרה לא ידוע';
                 }
-        
-                // Calcul de la différence de jours
+                
                 const today = new Date();
                 const returnD = new Date(returnedDate);
-                
-                // On calcule la différence en millisecondes puis en jours
                 const diffInTime = returnD.getTime() - today.getTime();
                 const diffInDays = Math.ceil(diffInTime / (1000 * 3600 * 24));
         
