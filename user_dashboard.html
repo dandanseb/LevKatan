@@ -407,18 +407,28 @@
             }
         }
 
+        
         // --- ACTION LOGIC ---
         async function borrow(id) {
-            if(!confirm("האם להגיש בקשה להשאלת מוצר זה?")) return;
+            // 1. Demander la date de retour via un prompt HTML simple 
+            const returnDate = prompt("מתי בכוונתך להחזיר את המוצר? (YYYY-MM-DD)");
+            
+            if (!returnDate) return; 
+        
+            if(!confirm(`האם להגיש בקשה להשאלת מוצר זה עד לתאריך ${returnDate}?`)) return;
+        
             const res = await fetch(`${API_URL}/borrow`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                body: JSON.stringify({ product_id: id })
+                body: JSON.stringify({ 
+                    product_id: id,
+                    returned_date: returnDate // send to the backend
+                })
             });
+            
             const data = await res.json();
             alert(data.message);
-            closeModal();
-            loadProducts(); // Reload to update availability
+            loadProducts();
         }
 
         // --- HISTORY LOGIC ---
