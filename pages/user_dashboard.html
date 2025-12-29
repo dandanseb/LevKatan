@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>לב קטן</title>
-    <link rel="icon" href="../images/logo.png" type="image/png">
+    <link rel="icon" href="../images/transparent logo.png" type="image/png">
     <style>
         :root {
             --bg-color: #FFF5F7;
@@ -77,17 +77,19 @@
         .cat-tag { 
             display: inline-flex; 
             align-items: center; 
+            justify-content: center;
             gap: 8px; 
             background: var(--brand-pink); 
             color: white; 
-            padding: 5px 5px; 
+            padding: 5px 12px; 
             border-radius: 20px; 
-            font-size: 11px;
+            font-size: 12px; 
+            font-weight: bold; 
             margin-bottom: 10px;
         }
         .cat-img { 
-            width: 20px; 
-            height: 20px; 
+            width: 23px; 
+            height: 23px; 
             object-fit: contain;
             border-radius: 50%;
             padding: 1px;
@@ -157,7 +159,7 @@
         
         /* Modal Specific Tag Styling */
         #modalTagContainer { display: flex; flex-direction: column; align-items: center; margin-bottom: 15px; }
-        .modal-big-icon { width: 80px; height: 80px; padding: 15px; background: white; border-radius: 50%; box-shadow: 0 5px 15px rgba(0,0,0,0.1); object-fit: contain; margin-bottom: 10px; border: 1px solid var(--border-color); }
+        .modal-big-icon { width: 120px; height: 120px; padding: 10px; background: white; border-radius: 50%; box-shadow: 0 5px 15px rgba(0,0,0,0.1); object-fit: contain; margin-bottom: 10px; border: 1px solid var(--border-color); }
     </style>
 </head>
 <body>
@@ -237,7 +239,6 @@
             
             <div id="modalTagContainer">
                 <img id="modalImg" class="modal-big-icon" src="" alt="Icon">
-                <span id="modalCat" class="cat-tag" style="font-size: 16px; padding: 6px 16px;"></span>
             </div>
 
             <h2 id="modalTitle" class="modal-title"></h2>
