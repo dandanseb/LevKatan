@@ -32,7 +32,7 @@
         }
 
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg-color); color: var(--text-color); margin: 0; transition: background 0.3s; }
-        
+
         /* HEADER STYLES */
         .top-bar {
             background: var(--header-bg); padding: 10px 20px;
@@ -41,10 +41,10 @@
         }
         .brand-area { display: flex; align-items: center; gap: 10px; }
         .brand-logo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
-        
+
         .nav-actions { display: flex; align-items: center; gap: 10px; }
-        .nav-item { 
-            text-decoration: none; color: var(--nav-btn-text); font-size: 14px; font-weight: 600; 
+        .nav-item {
+            text-decoration: none; color: var(--nav-btn-text); font-size: 14px; font-weight: 600;
             padding: 8px 16px; border-radius: 20px; background: var(--nav-btn-bg);
             transition: all 0.2s; display: inline-flex; align-items: center; gap: 5px;
         }
@@ -63,7 +63,7 @@
         /* CONTAINER & CARDS */
         .container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
         .card { background: var(--card-bg); padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); margin-bottom: 30px; }
-        
+
         h3 { margin-top: 0; color: var(--text-color); border-bottom: 2px solid var(--brand-pink); padding-bottom: 10px; display: inline-block; }
         h4 { margin-bottom: 15px; color: var(--text-color); opacity: 0.9; }
 
@@ -71,11 +71,11 @@
         .form-row { display: flex; gap: 15px; flex-wrap: wrap; }
         .form-group { flex: 1; min-width: 200px; margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
-        .form-control, select, textarea, input { 
-            width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; 
+        .form-control, select, textarea, input {
+            width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px;
             background: var(--bg-color); color: var(--text-color); box-sizing: border-box; font-family: inherit;
         }
-        
+
         /* TABLE STYLES */
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { padding: 15px; text-align: right; border-bottom: 1px solid var(--border-color); color: var(--text-color); }
@@ -83,17 +83,17 @@
         body.dark-mode th { color: #ccc; }
 
         /* UNIFIED BUTTON STYLES (Pastel/Soft UI) */
-        
+
         /* Primary Action (Add) - Solid Brand Pink */
         .btn-primary {
-            background: var(--brand-pink); color: white; border: none; padding: 10px 20px; 
+            background: var(--brand-pink); color: white; border: none; padding: 10px 20px;
             border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s;
             display: inline-flex; align-items: center; gap: 8px; width: auto;
         }
         .btn-primary:hover { background: var(--brand-pink-hover); transform: translateY(-2px); box-shadow: 0 4px 10px rgba(255, 105, 180, 0.3); }
 
         /* Edit - Soft Blue */
-        .btn-edit { 
+        .btn-edit {
             background: #E3F2FD; color: #1565C0; border: 1px solid #BBDEFB;
             padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s;
             margin-left: 5px;
@@ -101,14 +101,14 @@
         .btn-edit:hover { background: #BBDEFB; }
 
         /* Delete/Reject - Soft Red */
-        .btn-delete, .btn-reject { 
+        .btn-delete, .btn-reject {
             background: #FFEBEE; color: #D32F2F; border: 1px solid #FFCDD2;
             padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s;
         }
         .btn-delete:hover, .btn-reject:hover { background: #FFCDD2; }
 
         /* Approve - Soft Green */
-        .btn-approve { 
+        .btn-approve {
             background: #E8F5E9; color: #2E7D32; border: 1px solid #A5D6A7;
             padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s;
             margin-left: 5px;
@@ -145,7 +145,7 @@
     </div>
 
     <div class="container">
-        
+
         <div id="inventory-view">
             <div class="card">
                 <h3>הוספת פריט חדש</h3>
@@ -182,7 +182,29 @@
             </div>
 
             <div class="card">
-                <h3>רשימת מוצרים</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
+                    <h3>רשימת מוצרים</h3>
+
+                    <div style="display: flex; gap: 10px;">
+                        <select id="filterCategory" onchange="filterProducts()" style="width: auto; min-width: 150px;">
+                            <option value="all">  כל הקטגוריות</option>
+                            <option value="strollers">עגלות (Strollers)</option>
+                            <option value="cribs">עריסות (Cribs)</option>
+                            <option value="car seats">מושבי בטיחות (Car Seats)</option>
+                            <option value="toys">משחקים (Toys)</option>
+                            <option value="baby beds">מיטת תינוק (Baby Beds)</option>
+                        </select>
+
+                        <select id="filterStatus" onchange="filterProducts()" style="width: auto; min-width: 150px;">
+                            <option value="all"> כל הסטטוסים </option>
+                            <option value="available">available</option>
+                            <option value="borrowed">borrowed</option>
+                            <option value="unavailable">unavailable</option>
+                            <option value="confirmation_pending">confirmation_pending</option>
+                        </select>
+                    </div>
+                </div>
+
                 <table id="productsTable">
                     <thead>
                         <tr>
@@ -272,6 +294,8 @@
         const username = localStorage.getItem('username');
         const role = localStorage.getItem('userRole');
 
+        let allInventory = []; // Local storage of filter products
+
         // Theme Init
         function toggleTheme() {
             document.body.classList.toggle('dark-mode');
@@ -290,10 +314,10 @@
         function switchTab(tabId) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             event.target.classList.add('active');
-            
+
             document.getElementById('inventory-view').style.display = tabId === 'inventory' ? 'block' : 'none';
             document.getElementById('requests-view').style.display = tabId === 'requests' ? 'block' : 'none';
-            
+
             if(tabId === 'inventory') loadProducts();
             if(tabId === 'requests') loadRequests();
         }
@@ -304,7 +328,7 @@
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if(res.status === 403) { alert("אין גישה"); return; }
-            
+
             const reqs = await res.json();
             const tbody = document.getElementById('requestsTableBody');
             tbody.innerHTML = reqs.map(r => `
@@ -335,22 +359,44 @@
             const res = await fetch(`${API_URL}/employee/products`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            const products = await res.json();
+            // On stocke le résultat dans la variable globale
+            allInventory = await res.json();
+            // On lance le rendu initial
+            renderInventory(allInventory);
+        }
+
+        // new filter func
+        function filterProducts() {
+            const selectedCat = document.getElementById('filterCategory').value;
+            const selectedStatus = document.getElementById('filterStatus').value;
+
+            const filtered = allInventory.filter(p => {
+                const matchCat = (selectedCat === 'all' || p.category === selectedCat);
+                const matchStatus = (selectedStatus === 'all' || p.status === selectedStatus);
+                return matchCat && matchStatus;
+            });
+
+            renderInventory(filtered);
+        }
+
+        // Isolated function for rendering (displaying) the table
+        function renderInventory(products) {
             const tbody = document.getElementById('productsTableBody');
             tbody.innerHTML = products.map(p => `
                 <tr>
                     <td>${p.id}</td>
                     <td>${p.product_name}</td>
                     <td>${p.category}</td>
-                    <td>${p.status}</td>
+                    <td class="status-cell">${p.status}</td>
                     <td>
                         <button class="btn-edit" onclick="editProduct(${p.id})">ערוך ✏️</button>
                         <button class="btn-delete" onclick="deleteProduct(${p.id})">מחק 🗑️</button>
                     </td>
                 </tr>
             `).join('');
-            if(products.length === 0) tbody.innerHTML = "<tr><td colspan='5' style='text-align:center; padding:20px;'>אין מוצרים</td></tr>";
+            if(products.length === 0) tbody.innerHTML = "<tr><td colspan='5' style='text-align:center; padding:20px;'>אין מוצרים תואמים לפילטר 🔍</td></tr>";
         }
+
 
         // Add Product
         document.getElementById('productForm').addEventListener('submit', async function(e) {
@@ -394,7 +440,7 @@
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if(!res.ok) return alert("שגיאה בטעינת המוצר");
-            
+
             const product = await res.json();
             document.getElementById('edit_id').value = product.id;
             document.getElementById('editProductId').innerText = `(ID: ${product.id})`;
@@ -403,7 +449,7 @@
             document.getElementById('edit_description').value = product.description;
             document.getElementById('edit_donator_email').value = product.donator_email;
             document.getElementById('edit_status').value = product.status;
-            
+
             document.getElementById('editModal').style.display = 'block';
         }
 
