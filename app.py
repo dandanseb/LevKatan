@@ -513,19 +513,28 @@ def update_request_status(req_id):
     conn = get_db_connection()
     cur = conn.cursor()
     try:
-        cur.execute("UPDATE borrow_requests SET status = %s WHERE id = %s RETURNING product_id", (new_status, req_id))
+        # 1. Mise à jour du statut de la requête
+        # Si le statut est 'rejected', on remet returned_date à NULL
+        if new_status == 'rejected':
+            sql_req = "UPDATE borrow_requests SET status = %s, returned_date = NULL WHERE id = %s RETURNING product_id"
+        else:
+            sql_req = "UPDATE borrow_requests SET status = %s WHERE id = %s RETURNING product_id"
+            
+        cur.execute(sql_req, (new_status, req_id))
         result = cur.fetchone()
         
         if result:
             product_id = result[0]
-            # Update product status based on request approval
+            
             if new_status == 'approved':
+                # Produit prêté
                 cur.execute("UPDATE products SET status = 'borrowed' WHERE id = %s", (product_id,))
             elif new_status == 'rejected':
+                # Produit refusé -> redevient disponible
                 cur.execute("UPDATE products SET status = 'available' WHERE id = %s", (product_id,))
                 
             conn.commit()
-            return jsonify({"message": "Status updated"}), 200
+            return jsonify({"message": "Status updated and date cleared if rejected"}), 200
         else:
             return jsonify({"message": "Request not found"}), 404
     except Exception as e:
@@ -533,6 +542,7 @@ def update_request_status(req_id):
         return jsonify({"error": str(e)}), 500
     finally:
         conn.close()
+        
 
 # --- ADMIN ROUTES (Manage Users) ---
 @app.route('/api/admin/users', methods=['GET', 'OPTIONS'])
@@ -574,5 +584,6 @@ if __name__ == '__main__':
     debug_mode = os.getenv("FLASK_DEBUG", "False").lower() in ('true', '1', 't')
 
     app.run(debug=debug_mode, port=5230, host='0.0.0.0')
+
 
 
