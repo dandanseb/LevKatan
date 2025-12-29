@@ -267,14 +267,14 @@
         const navContainer = document.getElementById('roleNav');
         if(role === 'employee' || role === 'admin') {
             const btn = document.createElement('a');
-            btn.href = 'employee_dashboard.html';
+            btn.href = 'dashboards/employee_dashboard.html';
             btn.className = 'nav-item';
             btn.innerHTML = '🛠️ ממשק עובד';
             navContainer.prepend(btn);
         }
         if(role === 'admin') {
             const btn = document.createElement('a');
-            btn.href = 'admin_dashboard.html';
+            btn.href = 'dashboards/admin_dashboard.html';
             btn.className = 'nav-item';
             btn.innerHTML = '🔒 ניהול אדמין';
             navContainer.prepend(btn);

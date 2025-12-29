@@ -2,8 +2,8 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>ניהול עובדים - לב קטן</title>
-    <link rel="icon" href="logo.png" type="image/png">
+    <title>לב קטן - ניהול המערכת</title>
+    <link rel="icon" href="images/transparent logo.png" type="image/png">
     <style>
         /* Shared variables for Unified Look */
         :root {
@@ -127,12 +127,12 @@
 <body>
     <div class="top-bar">
         <div class="brand-area">
-            <img src="logo.png" alt="Logo" class="brand-logo">
+            <img src="images/logo.png" alt="Logo" class="brand-logo">
             <h2 style="margin:0; font-size: 20px; color:var(--text-color);">ממשק עובד</h2>
         </div>
         <div class="nav-actions">
             <span id="dynamicNav"></span>
-            <a href="user_dashboard.html" class="nav-item">🪑 קטלוג</a>
+            <a href="dashboards/user_dashboard.html" class="nav-item">🪑 קטלוג</a>
             <span id="userGreeting" style="margin: 0 5px; font-weight:600; color:var(--text-color); opacity:0.7;"></span>
             <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
             <button class="logout-btn" onclick="logout()">יציאה</button>
@@ -308,7 +308,7 @@
         // Auth Check
         if(!token) window.location.href = 'index.html';
         document.getElementById('userGreeting').innerText = username;
-        if(role === 'admin') document.getElementById('dynamicNav').innerHTML = `<a href="admin_dashboard.html" class="nav-item">🔒 ניהול אדמין</a>`;
+        if(role === 'admin') document.getElementById('dynamicNav').innerHTML = `<a href="dashboards/admin_dashboard.html" class="nav-item">🔒 ניהול אדמין</a>`;
 
         function logout() { localStorage.clear(); window.location.href = 'index.html'; }
 
