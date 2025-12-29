@@ -73,26 +73,24 @@
         .card:hover { transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
         .card h3 { color: var(--text-color); margin-top: 10px; margin-bottom: 5px; }
         
-        /* UPDATED: Category Pill Style with Image Inside */
+        /* Category Pill Style */
         .cat-tag { 
             display: inline-flex; 
             align-items: center; 
             gap: 8px; 
             background: var(--brand-pink); 
             color: white; 
-            padding: 5px 12px; 
+            padding: 5px 5px; 
             border-radius: 20px; 
-            font-size: 13px; 
-            font-weight: bold; 
+            font-size: 11px;
             margin-bottom: 10px;
         }
         .cat-img { 
             width: 20px; 
             height: 20px; 
-            object-fit: contain; 
-            background: white; /* Optional: adds a tiny white bg behind icon for contrast */
+            object-fit: contain;
             border-radius: 50%;
-            padding: 2px;
+            padding: 1px;
         }
         
         body.dark-mode .cat-tag { background: var(--brand-pink-hover); color: white; }
@@ -158,7 +156,8 @@
         .modal-actions { display: flex; flex-direction: column; gap: 10px; }
         
         /* Modal Specific Tag Styling */
-        #modalTagContainer { display: flex; justify-content: center; margin-bottom: 15px; }
+        #modalTagContainer { display: flex; flex-direction: column; align-items: center; margin-bottom: 15px; }
+        .modal-big-icon { width: 80px; height: 80px; padding: 15px; background: white; border-radius: 50%; box-shadow: 0 5px 15px rgba(0,0,0,0.1); object-fit: contain; margin-bottom: 10px; border: 1px solid var(--border-color); }
     </style>
 </head>
 <body>
@@ -237,10 +236,8 @@
             <span class="close-btn" onclick="closeModal()">&times;</span>
             
             <div id="modalTagContainer">
-                <div class="cat-tag">
-                    <img id="modalImg" class="cat-img" src="" alt="Icon">
-                    <span id="modalCat"></span>
-                </div>
+                <img id="modalImg" class="modal-big-icon" src="" alt="Icon">
+                <span id="modalCat" class="cat-tag" style="font-size: 16px; padding: 6px 16px;"></span>
             </div>
 
             <h2 id="modalTitle" class="modal-title"></h2>
