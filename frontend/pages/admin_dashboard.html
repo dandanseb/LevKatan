@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>לב קטן - ניהול אדמין</title>
-    <link rel="icon" href="images/transparent logo.png" type="image/png">
+    <link rel="icon" href="../images/transparent logo.png" type="image/png">
     <style>
         /* Shared Variables - Unified Look */
         :root {
@@ -76,13 +76,13 @@
 <body>
     <div class="top-bar">
         <div class="brand-area">
-            <img src="images/logo.png" alt="Logo" class="brand-logo">
+            <img src="../images/logo.png" alt="Logo" class="brand-logo">
             <span style="font-weight:bold; font-size:18px;">פאנל ניהול</span>
         </div>
         
         <div class="nav-actions">
-            <a href="dashboards/user_dashboard.html" class="nav-item">🪑 קטלוג</a>
-            <a href="dashboards/employee_dashboard.html" class="nav-item">🛠️ ממשק עובד</a>
+            <a href="user_dashboard.html" class="nav-item">🪑 קטלוג</a>
+            <a href="employee_dashboard.html" class="nav-item">🛠️ ממשק עובד</a>
 
             <span id="userGreeting" style="margin: 0 5px; font-weight:600; color:var(--text-color); opacity:0.7;"></span>
             <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
@@ -121,7 +121,7 @@
         if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
         // -------------------
 
-        if(!token || localStorage.getItem('userRole') !== 'admin') window.location.href = 'index.html';
+        if(!token || localStorage.getItem('userRole') !== 'admin') window.location.href = 'login_page.html';
         document.getElementById('userGreeting').innerText = `${username}`;
 
         async function loadUsers() {
@@ -172,7 +172,7 @@
             loadUsers();
         }
 
-        function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+        function logout() { localStorage.clear(); window.location.href = 'login_page.html'; }
         loadUsers();
     </script>
 </body>

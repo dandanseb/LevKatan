@@ -3,253 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>לב קטן - התחברות</title>
-    <link rel="icon" href="images/transparent logo.png" type="image/png">
+    <title>לב קטן</title>
+    <link rel="icon" href="frontend/images/transparent logo.png" type="image/png">
+    <!-- Instant redirect to the pages folder -->
+    <meta http-equiv="refresh" content="1; url=frontend/pages/index.html">
+    <script>
+        // Fallback if meta refresh doesn't work immediately
+        setTimeout(() => {
+            window.location.href = "frontend/pages/index.html";
+        }, 1000);
+    </script>
     <style>
-        :root {
-            --bg-gradient-light: linear-gradient(135deg, #FFB6C1 0%, #FFC0CB 50%, #FFE4E1 100%);
-            --bg-gradient-dark: linear-gradient(135deg, #2c1e21 0%, #4a2c36 50%, #2c2c2c 100%);
-            --container-bg: white;
-            --text-color: #333;
-            --input-bg: #FAFAFA;
-            --input-border: #FFE4E9;
-            --header-bg: linear-gradient(135deg, #FF69B4 0%, #FFB6C1 100%);
-        }
-
-        body.dark-mode {
-            --bg-gradient-light: var(--bg-gradient-dark); /* Swap gradient */
-            --container-bg: #1E1E1E;
-            --text-color: #E0E0E0;
-            --input-bg: #2D2D2D;
-            --input-border: #444;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--bg-gradient-light);
-            color: var(--text-color);
-            min-height: 100vh;
+            margin: 0;
+            height: 100vh;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            padding: 20px;
-            transition: background 0.3s;
+            justify-content: center;
+            background: #FFF5F7; /* Light pink background */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+        }
+        
+        .logo-container {
+            text-align: center;
+            animation: fadeIn 0.5s ease-in;
         }
 
-        .container { 
-            background: var(--container-bg); 
-            border-radius: 25px; 
-            box-shadow: 0 20px 60px rgba(0,0,0,0.15); 
-            width: 100%; 
-            max-width: 480px; 
-            overflow: hidden; 
-            position: relative;
+        .logo {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            animation: pulse 2s infinite ease-in-out;
         }
 
-        .header { background: var(--header-bg); padding: 40px 20px 30px; text-align: center; color: white; position: relative; }
-        
-        /* Theme Toggle Button */
-        .theme-toggle {
-            position: absolute;
-            top: 20px;
-            left: 20px; /* Left side because RTL */
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-            padding: 5px 10px;
-            border-radius: 15px;
-            transition: 0.2s;
+        .loading-text {
+            font-size: 18px;
+            color: #555;
+            font-weight: 500;
         }
-        .theme-toggle:hover { background: rgba(255,255,255,0.4); }
 
-        .logo-img { width: 80px; height: auto; margin-bottom: 10px; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.2); background: white; padding: 5px; }
-        .site-name { font-size: 36px; font-weight: bold; margin-bottom: 8px; text-shadow: 2px 2px 4px rgba(0,0,0,0.1); }
-        .tagline { font-size: 16px; opacity: 0.95; font-weight: 300; }
-        
-        .tabs { display: flex; background: var(--input-bg); }
-        .tab { flex: 1; padding: 18px; text-align: center; cursor: pointer; font-weight: 600; color: #888; transition: all 0.3s ease; border-bottom: 3px solid transparent; }
-        .tab:hover { background: rgba(0,0,0,0.05); }
-        .tab.active { color: #FF69B4; background: var(--container-bg); border-bottom-color: #FF69B4; }
-        
-        .form-container { padding: 40px; }
-        .form-section { display: none; }
-        .form-section.active { display: block; animation: fadeIn 0.4s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        h2 { color: var(--text-color); margin-bottom: 10px; font-size: 26px; }
-        .subtitle { color: #888; margin-bottom: 30px; font-size: 14px; }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; color: var(--text-color); opacity: 0.8; font-weight: 600; font-size: 14px; }
-        
-        input { 
-            width: 100%; 
-            padding: 14px 16px; 
-            border: 2px solid var(--input-border); 
-            border-radius: 12px; 
-            font-size: 15px; 
-            outline: none; 
-            background: var(--input-bg); 
-            color: var(--text-color);
+        a {
+            color: #FF69B4;
+            text-decoration: none;
+            font-weight: bold;
         }
-        input:focus { border-color: #FF69B4; background: var(--container-bg); }
-        
-        .submit-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, #FF69B4 0%, #FFB6C1 100%); color: white; border: none; border-radius: 12px; font-size: 17px; font-weight: 600; cursor: pointer; margin-top: 10px; }
-        .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255,105,180,0.4); }
-        
-        .success-message { display: none; background: #D4F4DD; color: #1E7E34; padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 2px solid #A8E6B7; text-align: center; }
-        .success-message.show { display: block; }
-        
-        .info-box { background: rgba(255, 249, 230, 0.5); border: 2px solid #FFE4B3; border-radius: 12px; padding: 15px; margin-bottom: 25px; color: #856404; font-size: 14px; text-align: center; }
-        body.dark-mode .info-box { background: #332b00; border-color: #665200; color: #ffd633; }
-        
-        .footer-note { text-align: center; margin-top: 20px; font-size: 13px; color: #999; }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌓</button>
-            <img src="images/logo.png" alt="Lev Katan Logo" class="logo-img">
-            <div class="site-name">לב קטן</div>
-            <div class="tagline">גמ"ח להשאלת מוצרי תינוקות לילדים</div>
-        </div>
-
-        <div class="tabs">
-            <div class="tab active" onclick="switchTab('login')">התחברות</div>
-            <div class="tab" onclick="switchTab('register')">הרשמה</div>
-        </div>
-
-        <div class="form-container">
-            <div id="loginForm" class="form-section active">
-                <h2>ברוכים השבים</h2>
-                <p class="subtitle">הזינו את פרטי ההתחברות שלכם</p>
-                <div id="loginSuccess" class="success-message"></div>
-                <form onsubmit="handleLogin(event)">
-                    <div class="form-group">
-                        <label>דוא"ל</label>
-                        <input type="email" id="loginEmail" required>
-                    </div>
-                    <div class="form-group">
-                        <label>סיסמה</label>
-                        <input type="password" id="loginPassword" required minlength="6">
-                    </div>
-                    <button type="submit" class="submit-btn">התחברות</button>
-                </form>
-            </div>
-
-            <div id="registerForm" class="form-section">
-                <h2>הצטרפות לקהילה</h2>
-                <p class="subtitle">מלאו את הפרטים שלכם כדי להתחיל</p>
-                <div class="info-box">הצטרפו אלינו ותוכלו להשאיל מוצרים בחינם</div>
-                <div id="registerSuccess" class="success-message">✓ נרשמתם בהצלחה!</div>
-                <form onsubmit="handleRegister(event)">
-                    <div class="form-group">
-                        <label>שם מלא</label>
-                        <input type="text" id="fullName" required minlength="2">
-                    </div>
-                    <div class="form-group">
-                        <label>שם משתמש</label>
-                        <input type="text" id="username" required minlength="3">
-                    </div>
-                    <div class="form-group">
-                        <label>מספר טלפון</label>
-                        <input type="tel" id="phone_number" required>
-                    </div>
-                    <div class="form-group">
-                        <label>דוא"ל</label>
-                        <input type="email" id="registerEmail" required>
-                    </div>
-                    <div class="form-group">
-                        <label>סיסמה</label>
-                        <input type="password" id="registerPassword" required minlength="6">
-                    </div>
-                    <button type="submit" class="submit-btn">הרשמה</button>
-                </form>
-            </div>
+    <div class="logo-container">
+        <!-- Assuming images folder is in the root -->
+        <img src="frontend/images/transparent logo.png" alt="Lev Katan Logo" class="logo">
+        <div class="loading-text">
+            Redirecting to <a href="frontend/pages/index.html">Lev Katan...</a>
         </div>
     </div>
-
-    <script>
-        const API_URL = "https://levkatan-api-dxh8azfdfua6e9gn.israelcentral-01.azurewebsites.net/api";
-
-        // --- Theme Logic ---
-        function toggleTheme() {
-            document.body.classList.toggle('dark-mode');
-            localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
-        }
-        if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
-        // -------------------
-
-        function switchTab(tab) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-            document.querySelectorAll('.form-section').forEach(f => f.classList.remove('active'));
-            if (tab === 'login') document.getElementById('loginForm').classList.add('active');
-            else document.getElementById('registerForm').classList.add('active');
-        }
-
-        async function handleLogin(event) {
-            event.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-
-            try {
-                const response = await fetch(`${API_URL}/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    localStorage.setItem('userToken', data.token);
-                    localStorage.setItem('userRole', data.role);
-                    localStorage.setItem('username', data.username);
-
-                    const successMsg = document.getElementById('loginSuccess');
-                    successMsg.innerText = `✓ שלום ${data.username}, התחברת בהצלחה!`;
-                    successMsg.classList.add('show');
-                    
-                    setTimeout(() => {
-                        if(data.role === 'admin') window.location.href = 'dashboards/admin_dashboard.html';
-                        else if(data.role === 'employee') window.location.href = 'dashboards/employee_dashboard.html';
-                        else window.location.href = 'dashboards/user_dashboard.html';
-                    }, 1000);
-                } else {
-                    alert("שגיאה בהתחברות: פרטים שגויים");
-                }
-            } catch (error) { console.error(error); alert("שגיאה בתקשורת"); }
-        }
-
-        async function handleRegister(event) {
-            event.preventDefault();
-            const formData = {
-                fullName: document.getElementById('fullName').value,
-                username: document.getElementById('username').value,
-                phone_number: document.getElementById('phone_number').value,
-                email: document.getElementById('registerEmail').value,
-                password: document.getElementById('registerPassword').value
-            };
-            try {
-                const response = await fetch(`${API_URL}/register`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(formData)
-                });
-                if (response.ok) {
-                    const successMsg = document.getElementById('registerSuccess');
-                    successMsg.classList.add('show');
-                    setTimeout(() => { successMsg.classList.remove('show'); switchTab('login'); }, 2000);
-                } else {
-                    const err = await response.json();
-                    alert("שגיאה: " + (err.message || "נסה שוב"));
-                }
-            } catch (error) { console.error(error); alert("שגיאה בתקשורת"); }
-        }
-    </script>
 </body>
 </html>

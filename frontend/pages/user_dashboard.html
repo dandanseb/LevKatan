@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>לב קטן</title>
-    <link rel="icon" href="images/transparent logo.png" type="image/png">
+    <link rel="icon" href="../images/transparent logo.png" type="image/png">
     <style>
         :root {
             --bg-color: #FFF5F7;
@@ -144,7 +144,7 @@
 <body>
     <div class="top-bar">
         <div class="brand-area">
-            <img src="images/logo.png" alt="Logo" class="brand-logo">
+            <img src="../images/logo.png" alt="Logo" class="brand-logo">
             <h2 style="margin:0; font-size: 20px; color:var(--text-color);">לב קטן</h2>
         </div>
 
@@ -260,21 +260,21 @@
         if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
 
         // --- Auth Check ---
-        if(!token) window.location.href = 'index.html';
-        document.getElementById('userGreeting').innerText = `שלום, ${username || 'משתמש'}`;
+        if(!token) window.location.href = 'login_page.html';
+        document.getElementById('userGreeting').innerText = `שלום, ${username || 'אורח'}`;
 
         // --- Dynamic Nav ---
         const navContainer = document.getElementById('roleNav');
         if(role === 'employee' || role === 'admin') {
             const btn = document.createElement('a');
-            btn.href = 'dashboards/employee_dashboard.html';
+            btn.href = 'employee_dashboard.html';
             btn.className = 'nav-item';
             btn.innerHTML = '🛠️ ממשק עובד';
             navContainer.prepend(btn);
         }
         if(role === 'admin') {
             const btn = document.createElement('a');
-            btn.href = 'dashboards/admin_dashboard.html';
+            btn.href = 'admin_dashboard.html';
             btn.className = 'nav-item';
             btn.innerHTML = '🔒 ניהול אדמין';
             navContainer.prepend(btn);
@@ -286,7 +286,7 @@
                 'strollers': 'עגלות',
                 'cribs': 'עריסות',
                 'car seats': 'מושבי בטיחות',
-                'toys': 'משחקים',
+                'toys': 'צעצועים',
                 'baby beds': 'מיטת תינוק'
             };
             return map[cat.toLowerCase()] || cat;
@@ -528,7 +528,7 @@
             if(id === 'profile') loadProfile();
         }
 
-        function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+        function logout() { localStorage.clear(); window.location.href = 'login_page.html'; }
         
         // Init
         loadProducts();

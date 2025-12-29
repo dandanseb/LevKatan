@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>לב קטן - ניהול המערכת</title>
-    <link rel="icon" href="images/transparent logo.png" type="image/png">
+    <link rel="icon" href="../images/transparent logo.png" type="image/png">
     <style>
         /* Shared variables for Unified Look */
         :root {
@@ -127,12 +127,12 @@
 <body>
     <div class="top-bar">
         <div class="brand-area">
-            <img src="images/logo.png" alt="Logo" class="brand-logo">
+            <img src="../images/logo.png" alt="Logo" class="brand-logo">
             <h2 style="margin:0; font-size: 20px; color:var(--text-color);">ממשק עובד</h2>
         </div>
         <div class="nav-actions">
             <span id="dynamicNav"></span>
-            <a href="dashboards/user_dashboard.html" class="nav-item">🪑 קטלוג</a>
+            <a href="user_dashboard.html" class="nav-item">🪑 קטלוג</a>
             <span id="userGreeting" style="margin: 0 5px; font-weight:600; color:var(--text-color); opacity:0.7;"></span>
             <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
             <button class="logout-btn" onclick="logout()">יציאה</button>
@@ -188,11 +188,11 @@
                     <div style="display: flex; gap: 10px;">
                         <select id="filterCategory" onchange="filterProducts()" style="width: auto; min-width: 150px;">
                             <option value="all">  כל הקטגוריות</option>
-                            <option value="strollers">עגלות (Strollers)</option>
-                            <option value="cribs">עריסות (Cribs)</option>
-                            <option value="car seats">מושבי בטיחות (Car Seats)</option>
-                            <option value="toys">משחקים (Toys)</option>
-                            <option value="baby beds">מיטת תינוק (Baby Beds)</option>
+                            <option value="strollers">עגלות</option>
+                            <option value="cribs">עריסות</option>
+                            <option value="car seats">מושבי בטיחות</option>
+                            <option value="toys">משחקים</option>
+                            <option value="baby beds">מיטת תינוק</option>
                         </select>
 
                         <select id="filterStatus" onchange="filterProducts()" style="width: auto; min-width: 150px;">
@@ -254,11 +254,11 @@
                 <div class="form-group">
                     <label for="edit_category">קטגוריה</label>
                     <select id="edit_category" required>
-                        <option value="strollers">עגלות (Strollers)</option>
-                        <option value="cribs">עריסות (Cribs)</option>
-                        <option value="car seats">מושבי בטיחות (Car Seats)</option>
-                        <option value="toys">משחקים (Toys)</option>
-                        <option value="baby beds">מיטת תינוק (Baby Beds)</option>
+                        <option value="strollers">עגלות</option>
+                        <option value="cribs">עריסות</option>
+                        <option value="car seats">מושבי בטיחות</option>
+                        <option value="toys">משחקים</option>
+                        <option value="baby beds">מיטת תינוק</option>
                     </select>
                 </div>
 
@@ -275,10 +275,10 @@
                 <div class="form-group">
                     <label for="edit_status">סטטוס</label>
                     <select id="edit_status" required>
-                        <option value="available">available</option>
-                        <option value="borrowed">borrowed</option>
-                        <option value="unavailable">unavailable</option>
-                        <option value="confirmation_pending">confirmation_pending</option>
+                        <option value="available">זמין</option>
+                        <option value="borrowed">מושאל</option>
+                        <option value="unavailable">לא זמין</option>
+                        <option value="confirmation_pending">ממתין לאישור</option>
                     </select>
                 </div>
 
@@ -306,12 +306,11 @@
         if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
 
         // Auth Check
-        if(!token) window.location.href = 'index.html';
+        if(!token) window.location.href = 'login_page.html';
         document.getElementById('userGreeting').innerText = username;
-        if(role === 'admin') document.getElementById('dynamicNav').innerHTML = `<a href="dashboards/admin_dashboard.html" class="nav-item">🔒 ניהול אדמין</a>`;
+        if(role === 'admin') document.getElementById('dynamicNav').innerHTML = `<a href="admin_dashboard.html" class="nav-item">🔒 ניהול אדמין</a>`;
 
-        function logout() { localStorage.clear(); window.location.href = 'index.html'; }
-
+        function logout() { localStorage.clear(); window.location.href = 'login_page.html'; }
         // --- TAB LOGIC ---
         function switchTab(tabId) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
