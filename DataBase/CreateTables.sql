@@ -32,7 +32,7 @@ CREATE TABLE borrow_requests (
     user_id INT NOT NULL REFERENCES personnal_infos(id) ON DELETE CASCADE,
     product_id INT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
     request_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-	returned_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+	returned_date DATE,
     status VARCHAR(20) CHECK (status IN ('pending', 'approved', 'rejected')) DEFAULT 'pending', UNIQUE (user_id, product_id) 
 );
 
