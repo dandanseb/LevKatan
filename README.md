@@ -50,7 +50,7 @@ The system allows users to borrow useful items for their children free of charge
 
 ## 🛠️ Technology & Methodology
 - **Backend:** Python Flask with JWT (JSON Web Tokens) for secure authentication.
-- - **Frontend:** HTML, CSS, JavaScript
+- **Frontend:** HTML, CSS, JavaScript
 - **Database:** PostgreSQL (managed via **Supabase** - Cloud Database.)
 - **Project Management:** Agile methodology with Azure DevOps
 - **Hosting/Deployment:** **Azure App Services** (Backend) and **GitHub Pages** (Frontend).
