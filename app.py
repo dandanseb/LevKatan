@@ -251,7 +251,7 @@ def borrow_product():
         cur.execute("""
             INSERT INTO borrow_requests (user_id, product_id, returned_date) 
             VALUES (%s, %s, %s)
-        """, (user_id, product_id, returned_date))
+        """, (int(user_id), product_id, returned_date))
         
         cur.execute("UPDATE products SET status = 'confirmation_pending' WHERE id = %s", (product_id,))
         
@@ -574,6 +574,7 @@ if __name__ == '__main__':
     debug_mode = os.getenv("FLASK_DEBUG", "False").lower() in ('true', '1', 't')
 
     app.run(debug=debug_mode, port=5230, host='0.0.0.0')
+
 
 
 
