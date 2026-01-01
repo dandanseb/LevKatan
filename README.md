@@ -49,12 +49,11 @@ The system allows users to borrow useful items for their children free of charge
 ---
 
 ## 🛠️ Technology & Methodology
-- **Backend:** (to be defined, e.g., .NET Core, Node.js, or Python Flask)
-- **Frontend:** HTML, CSS, JavaScript
-- **Database:** PostgreSQL (managed via pgAdmin)
+- **Backend:** Python Flask with JWT (JSON Web Tokens) for secure authentication.
+- - **Frontend:** HTML, CSS, JavaScript
+- **Database:** PostgreSQL (managed via **Supabase** - Cloud Database.)
 - **Project Management:** Agile methodology with Azure DevOps
-- **Cloud/Hosting:** Azure 
-
+- **Hosting/Deployment:** **Azure App Services** (Backend) and **GitHub Pages** (Frontend).
 ---
 
 ## 📅 Constraints
@@ -64,19 +63,23 @@ The system allows users to borrow useful items for their children free of charge
 
 ---
 
-## 📂 Database Design (Initial)
-- **Table: `user`**
-  - `id`, `full_name`, `email`, `username`, `phone_number`, `password`, `role`
-- **Table: `product`**
-  - `id`, `product_name`, `category`, `publish_date`, `status`, `owner_id`
+## 📂 Database Design (Current)
 
+- **Table: `personnal_infos`**
+  - `id` (Serial), `full_name`, `username`, `phone_number`, `email`, `passwd` (Hashed), `role` (admin/employee/user).
+- **Table: `products`**
+  - `id` (Serial), `product_name`, `category`, `publish_date`, `status` (available, borrowed, etc.), `donator_email`, `description`.
+- **Table: `borrow_requests`**
+  - `id`, `user_id` (FK), `product_id` (FK), `request_date`, `returned_date` (Date), `status` (pending/approved/rejected).
 ---
 
-## 🚀 Next Steps
-1. Set up PostgreSQL database (`LevKatan`) with initial tables.
-2. Implement backend API to connect database with frontend.
-3. Build frontend interface for catalog browsing and loan requests.
-4. Configure Azure DevOps boards and dashboards for sprint tracking.
+## 🚀 Project Status
+- [x] Secure JWT Authentication.
+- [x] Inventory CRUD (Create, Read, Update, Delete) for Employees.
+- [x] User Catalog with Search and Category filters.
+- [x] Dynamic Loan Request System.
+- [x] Real-time countdown for return dates on User Dashboard.
+- [ ] Email notifications for return reminders (Coming Soon).
 
 ---
 
