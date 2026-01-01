@@ -395,7 +395,6 @@ def get_all_products():
 def update_product(product_id):
     data = request.json
 
-    # Récupérer toutes les données du corps de la requête
     product_name = data.get('product_name')
     category = data.get('category')
     description = data.get('description')
@@ -415,19 +414,11 @@ def update_product(product_id):
                 category = %s, 
                 description = %s, 
                 donator_email = %s, 
-                status = %s,
-                last_status_change = CURRENT_TIMESTAMP 
+                status = %s
             WHERE id = %s 
             RETURNING id;
         """
-        cur.execute(sql, (
-            product_name, 
-            category, 
-            description, 
-            donator_email, 
-            status, 
-            product_id 
-        ))
+        cur.execute(sql, (product_name, category, description, donator_email, status, product_id ))
 
         updated_id = cur.fetchone()
 
@@ -583,6 +574,7 @@ if __name__ == '__main__':
     debug_mode = os.getenv("FLASK_DEBUG", "False").lower() in ('true', '1', 't')
 
     app.run(debug=debug_mode, port=5230, host='0.0.0.0')
+
 
 
 
