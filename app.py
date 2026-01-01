@@ -304,11 +304,10 @@ def create_product():
     try:
         sql = """
             INSERT INTO products 
-            (product_name, category, description, donator_email, status, last_status_change)
-            VALUES (%s, %s, %s, %s, 'available', CURRENT_TIMESTAMP) 
+            (product_name, category, description, donator_email)
+            VALUES (%s, %s, %s, %s) 
             RETURNING id;
         """
-        # Le statut est défini par défaut sur 'available' et last_status_change sur la date/heure actuelle
         cur.execute(sql, (product_name, category, description, donator_email))
         product_id = cur.fetchone()[0]
         conn.commit()
@@ -584,6 +583,7 @@ if __name__ == '__main__':
     debug_mode = os.getenv("FLASK_DEBUG", "False").lower() in ('true', '1', 't')
 
     app.run(debug=debug_mode, port=5230, host='0.0.0.0')
+
 
 
 
