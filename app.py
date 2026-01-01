@@ -272,13 +272,15 @@ def get_my_requests():
     conn = get_db_connection()
     cur = conn.cursor()
     sql = """
-        SELECT br.id, p.product_name, br.request_date, br.status 
+        SELECT br.id, p.product_name, br.request_date, br.status, br.returned_date
         FROM borrow_requests br
         JOIN products p ON br.product_id = p.id  
         WHERE br.user_id = %s ORDER BY br.request_date DESC
     """
     cur.execute(sql, (user_id,))
-    requests = [{'id': r[0], 'product': r[1], 'date': str(r[2]), 'status': r[3]} for r in cur.fetchall()]
+    requests = [{'id': r[0], 'product': r[1], 'date': str(r[2]), 'status': r[3], 'returned_date': str(r[4]) if r[4] else None
+    } for r in cur.fetchall()]
+    
     conn.close()
     return jsonify(requests), 200
 
@@ -574,6 +576,7 @@ if __name__ == '__main__':
     debug_mode = os.getenv("FLASK_DEBUG", "False").lower() in ('true', '1', 't')
 
     app.run(debug=debug_mode, port=5230, host='0.0.0.0')
+
 
 
 
