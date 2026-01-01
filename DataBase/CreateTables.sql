@@ -33,7 +33,8 @@ CREATE TABLE borrow_requests (
     product_id INT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
     request_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 	returned_date DATE,
-    status VARCHAR(20) CHECK (status IN ('pending', 'approved', 'rejected')) DEFAULT 'pending', UNIQUE (user_id, product_id) 
+    status VARCHAR(20) CHECK (status IN ('pending', 'approved', 'rejected')) DEFAULT 'pending', 
+	UNIQUE (user_id, product_id) 
 );
 
 CREATE INDEX idx_borrow_request_status ON borrow_requests (status);
