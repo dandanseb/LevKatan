@@ -71,7 +71,7 @@ The system allows users to borrow useful items for their children free of charge
   - `id` (Serial), `product_name`, `category`, `publish_date`, `status` (available, borrowed, etc.), `donator_email`, `description`.
 - **Table: `borrow_requests`**
   - `id`, `user_id` (FK), `product_id` (FK), `request_date`, `returned_date` (Date), `status` (pending/approved/rejected).
-- **Table: `donation_requests`** (New!)
+- **Table: `donation_requests`**
   - `id` (Serial), `product_name`, `category`, `description`, `donator_email`, `status` (pending/approved/rejected), `created_at`.
 ---
 
