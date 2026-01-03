@@ -567,7 +567,7 @@ def update_request_status(req_id):
 def get_donations():
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute("SELECT id, product_name, category, description, donator_email, created_at FROM donation_requests WHERE status = 'pending' ORDER BY created_at DESC")
+    cur.execute("SELECT id, product_name, category, description, donator_email, created_at FROM donation_requests WHERE status = 'donation_pending' ORDER BY created_at DESC")
     dons = [{'id':r[0], 'product_name':r[1], 'category':r[2], 'description':r[3], 'donator_email':r[4], 'created_at':str(r[5])} for r in cur.fetchall()]
     conn.close()
     return jsonify(dons), 200
@@ -644,6 +644,7 @@ if __name__ == '__main__':
     debug_mode = os.getenv("FLASK_DEBUG", "False").lower() in ('true', '1', 't')
 
     app.run(debug=debug_mode, port=5230, host='0.0.0.0')
+
 
 
 
