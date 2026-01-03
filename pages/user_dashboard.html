@@ -178,6 +178,49 @@
             padding: 5px 15px; border-radius: 15px; 
             font-size: 14px; font-weight: bold;
         }
+
+        /* Bouton de don flottant */
+        .btn-donate-float {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: var(--brand-pink);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 105, 180, 0.4);
+            z-index: 999;
+            transition: transform 0.3s, background 0.3s;
+        }
+        .btn-donate-float:hover {
+            transform: scale(1.1);
+            background: var(--brand-pink-hover);
+        }
+        /* Tooltip au survol */
+        .btn-donate-float::after {
+            content: "תרמו מוצר";
+            position: absolute;
+            left: 70px;
+            background: #333;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .btn-donate-float:hover::after {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -276,6 +319,41 @@
         </div>
     </div>
 
+    <button class="btn-donate-float" onclick="openDonateModal()">🎁</button>
+
+    <div id="donateModal" class="modal">
+        <div class="modal-content" style="text-align: right;">
+            <span class="close-btn" onclick="closeDonateModal()">&times;</span>
+            <h2 class="modal-title">בקשה לתרומת מוצר</h2>
+            <p>מלאו את פרטי המוצר שברצונכם לתרום לגמ"ח.</p>
+            
+            <form id="donationForm" onsubmit="submitDonation(event)">
+                <div class="form-group">
+                    <label>שם המוצר</label>
+                    <input type="text" id="don_name" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>קטגוריה</label>
+                    <select id="don_category" class="form-control" required>
+                        <option value="strollers">עגלות</option>
+                        <option value="cribs">עריסות</option>
+                        <option value="car seats">מושבי בטיחות</option>
+                        <option value="toys">צעצועים</option>
+                        <option value="baby beds">מיטת תינוק</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>תיאור המוצר</label>
+                    <textarea id="don_description" class="form-control" rows="3" maxlength="200" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>אימייל של התורם</label>
+                    <input type="email" id="don_email" class="form-control" required>
+                </div>
+                <button type="submit" class="btn-borrow">שלח בקשת תרומה 💝</button>
+            </form>
+        </div>
+    </div>
     <script>
         const API_URL = "https://levkatan-api-dxh8azfdfua6e9gn.israelcentral-01.azurewebsites.net/api";
         const token = localStorage.getItem('userToken');
@@ -560,6 +638,46 @@
             if(id === 'profile') loadProfile();
         }
 
+        function openDonateModal() {
+            document.getElementById('donateModal').style.display = 'flex';
+        }
+        
+        function closeDonateModal() {
+            document.getElementById('donateModal').style.display = 'none';
+        }
+        
+        async function submitDonation(event) {
+            event.preventDefault();
+            
+            const donationData = {
+                product_name: document.getElementById('don_name').value,
+                category: document.getElementById('don_category').value,
+                description: document.getElementById('don_description').value,
+                donator_email: document.getElementById('don_email').value
+            };
+        
+            try {
+                const res = await fetch(`${API_URL}/donate`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    body: JSON.stringify(donationData)
+                });
+        
+                if (res.ok) {
+                    alert("תודה! בקשת התרומה נשלחה ונבחנת על ידי הצוות.");
+                    document.getElementById('donationForm').reset();
+                    closeDonateModal();
+                } else {
+                    const err = await res.json();
+                    alert("שגיאה: " + err.error);
+                }
+            } catch (e) {
+                alert("שגיאה בחיבור לשרת");
+            }
+        }
         function logout() { localStorage.clear(); window.location.href = 'login_page.html'; }
         
         // Init
