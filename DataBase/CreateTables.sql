@@ -38,3 +38,15 @@ CREATE TABLE borrow_requests (
 
 CREATE INDEX idx_borrow_request_status ON borrow_requests (status);
 CREATE INDEX idx_borrow_request_product ON borrow_requests (product_id);
+
+---------------- DONATION INFORMATIONS  ---------------------
+
+CREATE TABLE donation_requests (
+    id SERIAL PRIMARY KEY,
+    product_name VARCHAR(100) NOT NULL,
+    category VARCHAR(50) NOT NULL,
+    description VARCHAR(200),
+    donator_email VARCHAR(100) NOT NULL,
+    status VARCHAR(20) DEFAULT 'donation_pending', -- 'donation_pending', 'donation_approved', 'donation_rejected'
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
