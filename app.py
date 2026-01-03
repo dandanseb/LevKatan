@@ -559,7 +559,50 @@ def update_request_status(req_id):
         return jsonify({"error": str(e)}), 500
     finally:
         conn.close()
+
+# --- EMPLOYEE ROUTES (DONATIONS Requests) ---
+
+@app.route('/api/employee/donations', methods=['GET'])
+@employee_required
+def get_donations():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT id, product_name, category, description, donator_email, created_at FROM donation_requests WHERE status = 'pending' ORDER BY created_at DESC")
+    dons = [{'id':r[0], 'product_name':r[1], 'category':r[2], 'description':r[3], 'donator_email':r[4], 'created_at':str(r[5])} for r in cur.fetchall()]
+    conn.close()
+    return jsonify(dons), 200
+
+@app.route('/api/employee/donations/<int:don_id>/reject', methods=['DELETE'])
+@employee_required
+def reject_donation(don_id):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM donation_requests WHERE id = %s", (don_id,))
+    conn.commit()
+    conn.close()
+    return '', 204
+
+@app.route('/api/employee/donations/<int:don_id>/approve', methods=['POST'])
+@employee_required
+def approve_donation(don_id):
+    data = request.json
+    conn = get_db_connection()
+    cur = conn.cursor()
+    try:
+        cur.execute("""
+            INSERT INTO products (product_name, category, description, donator_email, status)
+            VALUES (%s, %s, %s, %s, 'available')
+        """, (data['product_name'], data['category'], data['description'], data['donator_email']))
         
+        cur.execute("UPDATE donation_requests SET status = 'approved' WHERE id = %s", (don_id,))
+        
+        conn.commit()
+        return jsonify({"message": "Donation converted to product"}), 201
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()
 
 # --- ADMIN ROUTES (Manage Users) ---
 @app.route('/api/admin/users', methods=['GET', 'OPTIONS'])
@@ -601,6 +644,7 @@ if __name__ == '__main__':
     debug_mode = os.getenv("FLASK_DEBUG", "False").lower() in ('true', '1', 't')
 
     app.run(debug=debug_mode, port=5230, host='0.0.0.0')
+
 
 
 
