@@ -123,7 +123,7 @@ def login():
     return jsonify({"message": "Invalid credentials"}), 401
 
 
-# ----- USER ROUTES (Catalog / Borrowing requests / Profile) -----
+# ----- USER ROUTES (Catalog / Borrowing requests / Profile / Donation requests) -----
 
 #---- PROFILE------
 @app.route('/api/user/me', methods=['GET'])
@@ -283,6 +283,31 @@ def get_my_requests():
     
     conn.close()
     return jsonify(requests), 200
+
+#---DONQTION REQUEST---
+@app.route('/api/donate', methods=['POST'])
+@token_required
+def request_donation():
+    data = request.json
+    p_name = data.get('product_name')
+    cat = data.get('category')
+    desc = data.get('description')
+    email = data.get('donator_email')
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+    try:
+        cur.execute("""
+            INSERT INTO donation_requests (product_name, category, description, donator_email)
+            VALUES (%s, %s, %s, %s)
+        """, (p_name, cat, desc, email))
+        conn.commit()
+        return jsonify({"message": "Donation request submitted"}), 201
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()
 
 
 # --- EMPLOYEE ROUTES (Manage Products - CRUD) ---
@@ -576,6 +601,7 @@ if __name__ == '__main__':
     debug_mode = os.getenv("FLASK_DEBUG", "False").lower() in ('true', '1', 't')
 
     app.run(debug=debug_mode, port=5230, host='0.0.0.0')
+
 
 
 
