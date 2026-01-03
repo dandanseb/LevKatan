@@ -236,7 +236,22 @@
                 <tbody id="requestsTableBody"></tbody>
             </table>
         </div>
-
+        
+        <div id="donations-view" class="card" style="display:none;">
+            <h3>בקשות תרומה </h3>
+            <table id="donationsTable">
+                <thead>
+                    <tr>
+                        <th> תאריך הבקשה</th>
+                        <th>שם המוצר</th>
+                        <th>אימייל התורם</th>
+                        <th>פעולות</th>
+                    </tr>
+                </thead>
+                <tbody id="donationsTableBody"></tbody>
+            </table>
+        </div>
+        
     </div>
 
     <div id="editModal" style="display:none; position:fixed; z-index:100; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.4);">
@@ -290,6 +305,42 @@
         </div>
     </div>
 
+    <div id="donationModal" style="display:none; position:fixed; z-index:100; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.4);">
+        <div style="background-color:var(--card-bg); margin:5% auto; padding:30px; border-radius:15px; width:90%; max-width:500px;">
+            <h3>אישור תרומה חדשה</h3>
+            <form id="approveDonationForm">
+                <input type="hidden" id="don_id">
+                <div class="form-group">
+                    <label>שם המוצר</label>
+                    <input type="text" id="don_name" required>
+                </div>
+                <div class="form-group">
+                    <label>קטגוריה</label>
+                    <select id="don_category" required>
+                        <option value="strollers">עגלות</option>
+                        <option value="cribs">עריסות</option>
+                        <option value="car seats">מושבי בטיחות</option>
+                        <option value="toys">צעצועים</option>
+                        <option value="baby beds">מיטת תינוק</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>תיאור</label>
+                    <textarea id="don_description" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>אימייל התורם</label>
+                    <input type="email" id="don_email" required>
+                </div>
+                <div style="display:flex; gap:10px; margin-top:20px;">
+                    <button type="submit" class="btn-approve" style="flex:1">שמור ואשר תרומה ✅</button>
+                    <button type="button" onclick="document.getElementById('donationModal').style.display='none'" class="btn-cancel">ביטול</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    
     <script>
         const API_URL = "https://levkatan-api-dxh8azfdfua6e9gn.israelcentral-01.azurewebsites.net/api";
         const token = localStorage.getItem('userToken');
@@ -311,16 +362,81 @@
         if(role === 'admin') document.getElementById('dynamicNav').innerHTML = `<a href="admin_dashboard.html" class="nav-item">🔒 ניהול אדמין</a>`;
 
         function logout() { localStorage.clear(); window.location.href = 'login_page.html'; }
+        
         // --- TAB LOGIC ---
         function switchTab(tabId) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-
+            if(event) event.target.classList.add('active');
+        
             document.getElementById('inventory-view').style.display = tabId === 'inventory' ? 'block' : 'none';
             document.getElementById('requests-view').style.display = tabId === 'requests' ? 'block' : 'none';
-
+            document.getElementById('donations-view').style.display = tabId === 'donations' ? 'block' : 'none';
+        
             if(tabId === 'inventory') loadProducts();
             if(tabId === 'requests') loadRequests();
+            if(tabId === 'donations') loadDonations();
+        }
+
+        // --- DONATION  ---
+        async function loadDonations() {
+            const res = await fetch(`${API_URL}/employee/donations`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const dons = await res.json();
+            const tbody = document.getElementById('donationsTableBody');
+            tbody.innerHTML = dons.map(d => `
+                <tr>
+                    <td>${d.created_at.split(' ')[0]}</td>
+                    <td>${d.product_name}</td>
+                    <td>${d.donator_email}</td>
+                    <td>
+                        <button class="btn-edit" onclick="openApproveDonation(${JSON.stringify(d).replace(/"/g, '&quot;')})">ערוך ואשר ✏️</button>
+                        <button class="btn-reject" onclick="rejectDonation(${d.id})">דחה ❌</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        function openApproveDonation(don) {
+            document.getElementById('don_id').value = don.id;
+            document.getElementById('don_name').value = don.product_name;
+            document.getElementById('don_category').value = don.category;
+            document.getElementById('don_description').value = don.description;
+            document.getElementById('don_email').value = don.donator_email;
+            document.getElementById('donationModal').style.display = 'block';
+        }
+        
+        // submission form (Acceptation)
+        document.getElementById('approveDonationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('don_id').value;
+            const data = {
+                product_name: document.getElementById('don_name').value,
+                category: document.getElementById('don_category').value,
+                description: document.getElementById('don_description').value,
+                donator_email: document.getElementById('don_email').value
+            };
+        
+            const res = await fetch(`${API_URL}/employee/donations/${id}/approve`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify(data)
+            });
+        
+            if(res.ok) {
+                alert("התרומה אושרה והתווספה למלאי!");
+                document.getElementById('donationModal').style.display = 'none';
+                loadDonations();
+            }
+        });
+        
+        async function rejectDonation(id) {
+            if(!confirm("האם למחוק בקשת תרומה זו?")) return;
+            await fetch(`${API_URL}/employee/donations/${id}/reject`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            loadDonations();
         }
 
         // --- REQUESTS LOGIC ---
@@ -491,6 +607,7 @@
         // Initial Load
         loadProducts();
         loadRequests();
+        loadDonations();
     </script>
 </body>
 </html>
