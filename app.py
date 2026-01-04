@@ -634,6 +634,58 @@ def request_extension():
     finally:
         conn.close()
 
+# List extension requests
+@app.route('/api/employee/extensions', methods=['GET'])
+@employee_required
+def get_extension_requests():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    sql = """
+        SELECT er.id, u.username, p.product_name, br.returned_date, er.new_returned_date
+        FROM extension_requests er
+        JOIN borrow_requests br ON er.borrow_id = br.id
+        JOIN personnal_infos u ON br.user_id = u.id
+        JOIN products p ON br.product_id = p.id
+        WHERE er.status = 'extension_pending'
+    """
+    cur.execute(sql)
+    results = cur.fetchall()
+    extensions = [{
+        'id': r[0],
+        'username': r[1],
+        'product_name': r[2],
+        'current_return_date': str(r[3]),
+        'new_return_date': str(r[4])
+    } for r in results]
+    conn.close()
+    return jsonify(extensions), 200
+
+#  Approve or Reject the extension
+@app.route('/api/employee/extensions/<int:ext_id>', methods=['PUT'])
+@employee_required
+def update_extension_status(ext_id):
+    data = request.json
+    status = data.get('status') # 'approved' or 'rejected'
+    
+    conn = get_db_connection()
+    cur = conn.cursor()
+    try:
+        if status == 'extension_approved':
+            cur.execute("SELECT borrow_id, new_returned_date FROM extension_requests WHERE id = %s", (ext_id,))
+            res = cur.fetchone()
+            if res:
+                borrow_id, new_date = res
+                cur.execute("UPDATE borrow_requests SET returned_date = %s WHERE id = %s", (new_date, borrow_id))
+        
+        cur.execute("UPDATE extension_requests SET status = %s WHERE id = %s", (status, ext_id))
+        
+        conn.commit()
+        return jsonify({"message": "Extension decision processed"}), 200
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()
 
 # --- ADMIN ROUTES (Manage Users) ---
 @app.route('/api/admin/users', methods=['GET', 'OPTIONS'])
@@ -675,6 +727,7 @@ if __name__ == '__main__':
     debug_mode = os.getenv("FLASK_DEBUG", "False").lower() in ('true', '1', 't')
 
     app.run(debug=debug_mode, port=5230, host='0.0.0.0')
+
 
 
 
