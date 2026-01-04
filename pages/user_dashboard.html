@@ -584,16 +584,30 @@
                 return;
             }
         
-            container.innerHTML = filtered.map(r => `
-                <div class="card" style="cursor: default;">
-                    <h3>${r.product}</h3>
-                    <p>תאריך בקשה: ${r.date.split(' ')[0]}</p>
-                    <p>תאריך החזרה מאושר: ${r.returned_date || 'לא צוין'}</p> 
-                    <p>סטטוס: <span class="status-${r.status}">${translateStatus(r.status, r.returned_date)}</span></p>
-                </div>
-            `).join('');
-        }
+            container.innerHTML = filtered.map(r => {
+                // 1. On prépare le bouton d'extension. 
+                // Il reste vide "" sauf si le statut est 'approved'
+                const extensionBtn = (r.status === 'approved') 
+                    ? `<button class="btn-borrow" 
+                               style="background-color: var(--brand-pink); margin-top:15px; border-radius: 20px;" 
+                               onclick="requestExtension(${r.id})">
+                               בקשת הארכת השאלה ⏳
+                       </button>` 
+                    : "";
+            
+                // 2. On retourne le HTML de la carte en incluant la variable du bouton à la fin
+                return `
+                    <div class="card" style="cursor: default;">
+                        <h3>${r.product}</h3>
+                        <p>תאריך בקשה: ${r.date.split(' ')[0]}</p>
+                        <p>תאריך החזרה מאושר: ${r.returned_date || 'לא צוין'}</p> 
+                        <p>סטטוס: <span class="status-${r.status}">${translateStatus(r.status, r.returned_date)}</span></p>
+                        ${extensionBtn}
+                    </div>
+                `;
+            }).join('');
 
+            
        function translateStatus(s, returnedDate) {
             if (s === 'pending') return 'ממתין לאישור';
             if (s === 'rejected') return 'נדחה';
@@ -718,9 +732,31 @@
             }
         }
         function logout() { localStorage.clear(); window.location.href = 'login_page.html'; }
+
+
+        async function requestExtension(borrowId) {
+            const newDate = prompt("לאיזה תאריך תרצה להאריך את ההשאלה? (YYYY-MM-DD)");
+            if (!newDate) return;
+        
+            const res = await fetch(`${API_URL}/extensions`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json', 
+                    'Authorization': `Bearer ${token}` 
+                },
+                body: JSON.stringify({
+                    borrow_id: borrowId,
+                    new_returned_date: newDate
+                })
+            });
+        
+            const data = await res.json();
+            alert(data.message);
+        }
         
         // Init
         loadProducts();
+
     </script>
 </body>
 </html>
