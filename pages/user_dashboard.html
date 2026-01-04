@@ -731,28 +731,10 @@
                 alert("שגיאה בחיבור לשרת");
             }
         }
+
+
+            
         function logout() { localStorage.clear(); window.location.href = 'login_page.html'; }
-
-
-        async function requestExtension(borrowId) {
-            const newDate = prompt("לאיזה תאריך תרצה להאריך את ההשאלה? (YYYY-MM-DD)");
-            if (!newDate) return;
-        
-            const res = await fetch(`${API_URL}/extensions`, {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json', 
-                    'Authorization': `Bearer ${token}` 
-                },
-                body: JSON.stringify({
-                    borrow_id: borrowId,
-                    new_returned_date: newDate
-                })
-            });
-        
-            const data = await res.json();
-            alert(data.message);
-        }
         
         // Init
         loadProducts();
