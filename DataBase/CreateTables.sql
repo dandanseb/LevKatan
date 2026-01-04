@@ -50,3 +50,14 @@ CREATE TABLE donation_requests (
     status VARCHAR(20) DEFAULT 'donation_pending', -- 'donation_pending', 'donation_approved', 'donation_rejected'
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+---------------- EXTENSION INFORMATIONS  ---------------------
+
+CREATE TABLE extension_requests (
+    id SERIAL PRIMARY KEY,
+    borrow_id INT NOT NULL REFERENCES borrow_requests(id) ON DELETE CASCADE,
+    new_returned_date DATE NOT NULL,
+    status VARCHAR(20) CHECK (status IN ('extension_pending', 'extension_approved', 'extension_rejected')) DEFAULT 'extension_pending',
+    request_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(borrow_id, status) 
+);
