@@ -604,6 +604,37 @@ def approve_donation(don_id):
     finally:
         conn.close()
 
+# --- EXTENSION Requests ---
+
+@app.route('/api/extensions', methods=['POST'])
+@token_required
+def request_extension():
+    data = request.json
+    borrow_id = data.get('borrow_id')
+    new_date = data.get('new_returned_date')
+    
+    conn = get_db_connection()
+    cur = conn.cursor()
+    try:
+        # Check if an extension request is already pending for this loan.
+        cur.execute("SELECT id FROM extension_requests WHERE borrow_id = %s AND status = 'extension_pending'", (borrow_id,))
+        if cur.fetchone():
+            return jsonify({"message": "כבר קיימת בקשת הארכה ממתינה עבור מוצר זה."}), 400
+
+        cur.execute("""
+            INSERT INTO extension_requests (borrow_id, new_returned_date)
+            VALUES (%s, %s)
+        """, (borrow_id, new_date))
+        
+        conn.commit()
+        return jsonify({"message": "בקשת ההארכה נשלחה בהצלחה! ממתין לאישור עובד."}), 201
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()
+
+
 # --- ADMIN ROUTES (Manage Users) ---
 @app.route('/api/admin/users', methods=['GET', 'OPTIONS'])
 @admin_required
@@ -644,6 +675,7 @@ if __name__ == '__main__':
     debug_mode = os.getenv("FLASK_DEBUG", "False").lower() in ('true', '1', 't')
 
     app.run(debug=debug_mode, port=5230, host='0.0.0.0')
+
 
 
 
