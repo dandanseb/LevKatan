@@ -266,8 +266,18 @@
             <div id="productsGrid" class="grid"></div>
         </div>
 
-        <div id="history" class="grid" style="display:none;"></div>
-
+        <div id="history" style="display:none;">
+            <div class="filters-bar">
+                <select id="requestStatusFilter" class="filter-select" onchange="filterAndRenderHistory()">
+                    <option value="all">📋 כל הסטטוסים (Tout)</option>
+                    <option value="pending">⏳ ממתין לאישור (En attente)</option>
+                    <option value="approved">✅ אושר (Acceptés)</option>
+                    <option value="rejected">❌ נדחה (Refusés)</option>
+                </select>
+            </div>
+            <div id="historyGrid" class="grid"></div>
+        </div>
+        
         <div id="profile" style="display:none; max-width: 600px; margin: 0 auto;">
             <div class="card" style="cursor: default;">
                 <h3>עריכת פרטים אישיים</h3>
@@ -545,12 +555,36 @@
         }
 
         // --- HISTORY LOGIC ---
+        let allMyRequests = []; // Variable globale pour le stockage
+        
         async function loadHistory() {
-            const res = await fetch(`${API_URL}/my-requests`, {
-                headers: { 'Authorization': `Bearer ${token}` }
+            try {
+                const res = await fetch(`${API_URL}/my-requests`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                allMyRequests = await res.json();
+                filterAndRenderHistory(); // On lance le premier affichage
+            } catch (e) {
+                console.error("Erreur chargement historique", e);
+            }
+        }
+        
+        function filterAndRenderHistory() {
+            const statusFilter = document.getElementById('requestStatusFilter').value;
+            const container = document.getElementById('historyGrid');
+        
+            // 1. Filtrer les données
+            let filtered = allMyRequests.filter(r => {
+                return statusFilter === 'all' || r.status === statusFilter;
             });
-            const reqs = await res.json();
-            document.getElementById('history').innerHTML = reqs.map(r => `
+        
+            // 2. Afficher les données
+            if(filtered.length === 0) {
+                container.innerHTML = "<p style='grid-column: 1/-1; text-align:center;'>לא נמצאו בקשות תואמות לסינון זה.</p>";
+                return;
+            }
+        
+            container.innerHTML = filtered.map(r => `
                 <div class="card" style="cursor: default;">
                     <h3>${r.product}</h3>
                     <p>תאריך בקשה: ${r.date.split(' ')[0]}</p>
@@ -558,7 +592,6 @@
                     <p>סטטוס: <span class="status-${r.status}">${translateStatus(r.status, r.returned_date)}</span></p>
                 </div>
             `).join('');
-            if(reqs.length === 0) document.getElementById('history').innerHTML = "<p>עדיין לא ביקשת מוצרים.</p>";
         }
 
        function translateStatus(s, returnedDate) {
@@ -638,7 +671,7 @@
             document.getElementById('history').style.display = 'none';
             document.getElementById('profile').style.display = 'none';
             
-            document.getElementById(id).style.display = id === 'catalog' ? 'block' : (id === 'history' ? 'grid' : 'block');
+            document.getElementById(id).style.display = 'block';  
             
             if(id === 'history') loadHistory();
             if(id === 'profile') loadProfile();
