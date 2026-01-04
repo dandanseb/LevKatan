@@ -143,6 +143,8 @@
         <div class="tab active" onclick="switchTab('inventory')">🛠️ ניהול מלאי</div>
         <div class="tab" onclick="switchTab('requests')">🎁 בקשות השאלה</div>
         <div class="tab" onclick="switchTab('donations')">💝 בקשות תרומה</div>
+        <div class="tab" onclick="switchTab('extensions')">⏳ בקשות הארכה</div>
+        
     </div>
 
     <div class="container">
@@ -250,6 +252,22 @@
                     </tr>
                 </thead>
                 <tbody id="donationsTableBody"></tbody>
+            </table>
+        </div>
+        
+        <div id="extensions-view" class="card" style="display:none;">
+            <h3>בקשות להארכת השאלה</h3>
+            <table id="extensionsTable">
+                <thead>
+                    <tr>
+                        <th>שם המשתמש</th>
+                        <th>מוצר</th>
+                        <th>תאריך החזרה נוכחי</th>
+                        <th>תאריך מבוקש חדש</th>
+                        <th>פעולות</th>
+                    </tr>
+                </thead>
+                <tbody id="extensionsTableBody"></tbody>
             </table>
         </div>
         
@@ -373,10 +391,12 @@
             document.getElementById('inventory-view').style.display = tabId === 'inventory' ? 'block' : 'none';
             document.getElementById('requests-view').style.display = tabId === 'requests' ? 'block' : 'none';
             document.getElementById('donations-view').style.display = tabId === 'donations' ? 'block' : 'none';
-        
+            document.getElementById('extensions-view').style.display = tabId === 'extensions' ? 'block' : 'none';
+            
             if(tabId === 'inventory') loadProducts();
             if(tabId === 'requests') loadRequests();
             if(tabId === 'donations') loadDonations();
+            if(tabId === 'extensions') loadExtensionRequests();
         }
 
         // --- DONATION  ---
@@ -398,7 +418,7 @@
                 </tr>
             `).join('');
         }
-        
+       
         function openApproveDonation(don) {
             document.getElementById('don_id').value = don.id;
             document.getElementById('don_name').value = don.product_name;
@@ -441,6 +461,46 @@
             loadDonations();
         }
 
+        //----- EXTENSION ------
+        async function loadExtensionRequests() {
+            const res = await fetch(`${API_URL}/employee/extensions`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await res.json();
+            const tbody = document.getElementById('extensionsTableBody');
+            
+            if (data.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='5' style='text-align:center;'>אין בקשות הארכה ממתינות</td></tr>";
+                return;
+            }
+        
+            tbody.innerHTML = data.map(ext => `
+                <tr>
+                    <td>${ext.username}</td>
+                    <td>${ext.product_name}</td>
+                    <td style="color: grey;">${ext.current_return_date}</td>
+                    <td style="color: var(--brand-pink); font-weight: bold;">${ext.new_return_date}</td>
+                    <td>
+                        <button class="btn-approve" onclick="handleExtension(${ext.id}, 'approved')">אשר ✅</button>
+                        <button class="btn-reject" onclick="handleExtension(${ext.id}, 'rejected')">דחה ❌</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        async function handleExtension(extId, status) {
+            const res = await fetch(`${API_URL}/employee/extensions/${extId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ status: status })
+            });
+            if(res.ok) {
+                alert(status === 'approved' ? "התאריך עודכן בהצלחה" : "הבקשה נדחתה");
+                loadExtensionRequests();
+            }
+        }
+
+        
         // --- REQUESTS LOGIC ---
         async function loadRequests() {
             const res = await fetch(`${API_URL}/employee/requests`, {
