@@ -269,10 +269,10 @@
         <div id="history" style="display:none;">
             <div class="filters-bar">
                 <select id="requestStatusFilter" class="filter-select" onchange="filterAndRenderHistory()">
-                    <option value="all">📋 כל הסטטוסים (Tout)</option>
-                    <option value="pending">⏳ ממתין לאישור (En attente)</option>
-                    <option value="approved">✅ אושר (Acceptés)</option>
-                    <option value="rejected">❌ נדחה (Refusés)</option>
+                    <option value="all">📋 כל הסטטוסים </option>
+                    <option value="pending">⏳ ממתין לאישור </option>
+                    <option value="approved">✅ אושר </option>
+                    <option value="rejected">❌ נדחה </option>
                 </select>
             </div>
             <div id="historyGrid" class="grid"></div>
@@ -605,7 +605,7 @@
                         ${extensionBtn}
                     </div>
                 `;
-            }).join('');
+        }).join('');
 
             
        function translateStatus(s, returnedDate) {
@@ -732,6 +732,25 @@
             }
         }
 
+        async function requestExtension(borrowId) {
+            const newDate = prompt("לאיזה תאריך תרצה להאריך את ההשאלה? (YYYY-MM-DD)");
+            if (!newDate) return;
+        
+            const res = await fetch(`${API_URL}/extensions`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json', 
+                    'Authorization': `Bearer ${token}` 
+                },
+                body: JSON.stringify({
+                    borrow_id: borrowId,
+                    new_returned_date: newDate
+                })
+            });
+        
+            const data = await res.json();
+            alert(data.message);
+        }
 
             
         function logout() { localStorage.clear(); window.location.href = 'login_page.html'; }
