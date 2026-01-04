@@ -575,8 +575,15 @@
             document.getElementById('edit_category').value = product.category;
             document.getElementById('edit_description').value = product.description;
             document.getElementById('edit_donator_email').value = product.donator_email;
-            document.getElementById('edit_status').value = product.status;
 
+            const statusTranslations = {
+                'available': 'זמין',
+                'borrowed': 'מושאל',
+                'unavailable': 'לא זמין',
+                'confirmation_pending': 'ממתין לאישור'
+            };
+            
+            document.getElementById('edit_status').value = statusTranslations[product.status] || product.status;
             document.getElementById('editModal').style.display = 'block';
         }
 
@@ -589,7 +596,6 @@
                 category: document.getElementById('edit_category').value,
                 description: document.getElementById('edit_description').value,
                 donator_email: document.getElementById('edit_donator_email').value,
-                //status: document.getElementById('edit_status').value -- REMOVED, CAN BE CHANGE--
             };
 
             const res = await fetch(`${API_URL}/employee/products/${id}`, {
