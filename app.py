@@ -667,20 +667,22 @@ def update_extension_status(ext_id):
     data = request.json
     status = data.get('status') # 'approved' or 'rejected'
     
+    new_status = f"extension_{decision}" # Transforme en 'extension_approved' ou 'extension_rejected'
+    
     conn = get_db_connection()
     cur = conn.cursor()
     try:
-        if status == 'extension_approved':
+        if status == 'approved':
             cur.execute("SELECT borrow_id, new_returned_date FROM extension_requests WHERE id = %s", (ext_id,))
             res = cur.fetchone()
             if res:
                 borrow_id, new_date = res
                 cur.execute("UPDATE borrow_requests SET returned_date = %s WHERE id = %s", (new_date, borrow_id))
         
-        cur.execute("UPDATE extension_requests SET status = %s WHERE id = %s", (status, ext_id))
+        cur.execute("UPDATE extension_requests SET status = %s WHERE id = %s", (new_status, ext_id))
         
         conn.commit()
-        return jsonify({"message": "Extension decision processed"}), 200
+        return jsonify({"message": f"Extension status updated to {new_status}"}), 200
     except Exception as e:
         conn.rollback()
         return jsonify({"error": str(e)}), 500
@@ -727,6 +729,7 @@ if __name__ == '__main__':
     debug_mode = os.getenv("FLASK_DEBUG", "False").lower() in ('true', '1', 't')
 
     app.run(debug=debug_mode, port=5230, host='0.0.0.0')
+
 
 
 
