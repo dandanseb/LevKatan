@@ -571,8 +571,14 @@
                     return 'אושר - תאריך החזרה לא ידוע';
                 }
                 
+                // today's date
                 const today = new Date();
+                today.setHours(0, 0, 0, 0);
+        
+                //return date
                 const returnD = new Date(returnedDate);
+                returnD.setHours(0, 0, 0, 0);
+        
                 const diffInTime = returnD.getTime() - today.getTime();
                 const diffInDays = Math.ceil(diffInTime / (1000 * 3600 * 24));
         
