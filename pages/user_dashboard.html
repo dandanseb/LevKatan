@@ -679,14 +679,18 @@
         // --- TABS LOGIC ---
         function switchTab(id) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
             
             document.getElementById('catalog').style.display = 'none';
             document.getElementById('history').style.display = 'none';
             document.getElementById('profile').style.display = 'none';
             
-            document.getElementById(id).style.display = 'block';  
-            
+            const target = document.getElementById(id);
+            if (target) {
+                target.style.display = 'block';
+            }            
             if(id === 'history') loadHistory();
             if(id === 'profile') loadProfile();
         }
