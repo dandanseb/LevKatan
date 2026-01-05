@@ -58,8 +58,8 @@ The system allows users to borrow useful items for their children free of charge
 
 ## 📅 Constraints
 - **Duration:** Limited to one semester, with a fixed deadline.
-- **Team:** 3 students (Database, Frontend, Backend).
-- **Security:** User data (name, phone number, email) must be stored securely and confidentiality guaranteed.
+- **Team:** 3 students 
+- **Security:** User password must be stored securely and confidentiality guaranteed.
 
 ---
 
