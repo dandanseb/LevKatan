@@ -667,7 +667,7 @@ def update_extension_status(ext_id):
     data = request.json
     status = data.get('status') # 'approved' or 'rejected'
     
-    new_status = f"extension_{decision}" # Transforme en 'extension_approved' ou 'extension_rejected'
+    new_status = f"extension_{status}" # Transforme en 'extension_approved' ou 'extension_rejected' -- decision---
     
     conn = get_db_connection()
     cur = conn.cursor()
@@ -729,6 +729,7 @@ if __name__ == '__main__':
     debug_mode = os.getenv("FLASK_DEBUG", "False").lower() in ('true', '1', 't')
 
     app.run(debug=debug_mode, port=5230, host='0.0.0.0')
+
 
 
 
