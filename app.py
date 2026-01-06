@@ -628,6 +628,40 @@ def approve_donation(don_id):
     finally:
         conn.close()
 
+# --- Early Return ---
+@app.route('/api/return', methods=['POST'])
+@token_required
+def return_product():
+    data = request.json
+    borrow_id = data.get('borrow_id')
+    user_id = request.user_data['user_id']
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+    try:
+        # Verify the borrow request belongs to the user and is currently active (approved)
+        cur.execute("SELECT product_id FROM borrow_requests WHERE id = %s AND user_id = %s AND status = 'approved'", (borrow_id, user_id))
+        result = cur.fetchone()
+
+        if not result:
+            return jsonify({"message": "Borrow request not found or not active."}), 404
+
+        product_id = result[0]
+
+        # 1. Mark the request as 'returned' (Historical record)
+        cur.execute("UPDATE borrow_requests SET status = 'returned' WHERE id = %s", (borrow_id,))
+
+        # 2. Mark the product as 'available' in the catalog
+        cur.execute("UPDATE products SET status = 'available' WHERE id = %s", (product_id,))
+
+        conn.commit()
+        return jsonify({"message": "Product returned successfully"}), 200
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()
+
 # --- EXTENSION Requests ---
 
 @app.route('/api/extensions', methods=['POST'])

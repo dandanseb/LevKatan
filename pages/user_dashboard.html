@@ -892,23 +892,54 @@
         function filterAndRenderHistory() {
             const filter = document.getElementById('requestStatusFilter').value;
             const container = document.getElementById('historyGrid');
+            // Allow 'returned' items to show when 'all' is selected
             const filtered = allMyRequests.filter(r => filter === 'all' || r.status === filter);
 
             container.innerHTML = filtered.map(r => {
-                const extensionBtn = (r.status === 'approved')
-                    ? `<button class="btn-borrow" style="background-color: var(--brand-pink); border-radius:20px; margin-top:10px;" onclick="requestExtension(${r.id})">בקשת הארכת השאלה ⏳</button>`
-                    : "";
+                let buttonsHtml = "";
+
+                // Only show actions for active loans
+                if (r.status === 'approved') {
+                    buttonsHtml += `
+                        <button class="btn-borrow" style="background-color: var(--brand-pink); border-radius:20px; margin-top:10px;" onclick="requestExtension(${r.id})">בקשת הארכת השאלה ⏳</button>
+                        <button class="btn-borrow" style="background-color: #4CAF50; border-radius:20px; margin-top:5px;" onclick="returnItem(${r.id})">החזר מוצר ↩️</button>
+                    `;
+                }
 
                 return `
                     <div class="card" style="cursor: default;">
                         <h3>${r.product}</h3>
                         <p>תאריך בקשה: ${r.date.split(' ')[0]}</p>
-                        <p>תאריך החזרה: ${r.returned_date || 'לא צוין'}</p>
+                        <p>תאריך החזרה (יעד): ${r.returned_date || 'לא צוין'}</p>
                         <p>סטטוס: <span class="status-${r.status}">${translateStatus(r.status, r.returned_date)}</span></p>
-                        ${extensionBtn}
+                        ${buttonsHtml}
                     </div>
                 `;
             }).join('');
+        }
+
+        async function returnItem(borrowId) {
+            if (!confirm("האם אתה בטוח שברצונך להחזיר את המוצר? פעולה זו תסמן את המוצר כזמין להשאלה שוב.")) return;
+
+            try {
+                const res = await fetch(`${API_URL}/return`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ borrow_id: borrowId })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    alert("המוצר הוחזר בהצלחה! ↩️");
+                    loadHistory(); // Updates list to show 'Returned' status
+                    loadProducts(); // Updates catalog availability
+                } else {
+                    alert("שגיאה: " + (data.message || "לא ניתן להחזיר"));
+                }
+            } catch (e) {
+                alert("שגיאה בתקשורת עם השרת");
+            }
         }
 
         async function requestExtension(borrowId) {
@@ -935,7 +966,7 @@
 
             // 3. Prompt User
             const newDate = prompt(`עד מתי ברצונך להאריך? (תאריך מקסימלי: ${maxDateStr})\nהכנס תאריך בפורמט YYYY-MM-DD:`, maxDateStr);
-            
+
             if (!newDate) return; // User cancelled
 
             // 4. Validate Input
@@ -957,22 +988,23 @@
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                     body: JSON.stringify({ borrow_id: borrowId, new_returned_date: newDate })
                 });
-                
+
                 const data = await res.json();
-                
+
                 if (res.ok) {
                     alert("בקשת ההארכה נשלחה בהצלחה! ⏳");
                     loadHistory(); // Refresh the list
                 } else {
                     alert("שגיאה: " + (data.message || "לא ניתן לבצע הארכה"));
                 }
-            } catch (e) { 
-                alert("שגיאה בתקשורת עם השרת"); 
+            } catch (e) {
+                alert("שגיאה בתקשורת עם השרת");
             }
         }
 
 
         function translateStatus(s, returnedDate) {
+            if (s === 'returned') return 'הוחזר';
             if (s === 'pending') return 'ממתין לאישור';
             if (s === 'rejected') return 'נדחה';
             if (s === 'confirmation_pending') return 'ממתין לאישור מנהל';
