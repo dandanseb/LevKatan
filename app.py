@@ -628,39 +628,6 @@ def approve_donation(don_id):
     finally:
         conn.close()
 
-# --- Manual Returns ---
-
-@app.route('/api/return', methods=['POST'])
-@token_required
-def return_product():
-    data = request.json
-    borrow_id = data.get('borrow_id')
-    
-    conn = get_db_connection()
-    cur = conn.cursor()
-    try:
-        # Get product_id from the borrow request
-        cur.execute("SELECT product_id FROM borrow_requests WHERE id = %s", (borrow_id,))
-        res = cur.fetchone()
-        if not res:
-            return jsonify({"message": "Request not found"}), 404
-        product_id = res[0]
-
-        # Update Request Status to 'returned' and set returned_date to today
-        cur.execute("UPDATE borrow_requests SET status = 'returned', returned_date = CURRENT_DATE WHERE id = %s", (borrow_id,))
-        
-        # Mark Product as Available again
-        # Note: Using 'product' (singular) as per your borrow_product function
-        cur.execute("UPDATE product SET status = 'available' WHERE id = %s", (product_id,))
-        
-        conn.commit()
-        return jsonify({"message": "המוצר הוחזר בהצלחה! תודה רבה 💖"}), 200
-    except Exception as e:
-        conn.rollback()
-        return jsonify({"error": str(e)}), 500
-    finally:
-        conn.close()
-
 # --- EXTENSION Requests ---
 
 @app.route('/api/extensions', methods=['POST'])
@@ -668,40 +635,20 @@ def return_product():
 def request_extension():
     data = request.json
     borrow_id = data.get('borrow_id')
-    new_date_str = data.get('new_returned_date')
+    new_date = data.get('new_returned_date')
     
     conn = get_db_connection()
     cur = conn.cursor()
     try:
-        # 1. Fetch System Limits (Validation Logic)
-        cur.execute("SELECT setting_value FROM system_settings WHERE setting_key = 'max_borrow_days'")
-        row = cur.fetchone()
-        max_days = int(row[0]) if row else 14
-
-        # 2. Validate Date
-        today = datetime.now().date()
-        try:
-            requested_date = datetime.strptime(new_date_str, "%Y-%m-%d").date()
-        except ValueError:
-             return jsonify({"message": "פורמט תאריך לא תקין"}), 400
-
-        if requested_date <= today:
-             return jsonify({"message": "תאריך ההחזרה חייב להיות עתידי"}), 400
-
-        # Calculate difference from TODAY (or from original start date? usually extensions are limited from *now*)
-        if (requested_date - today).days > max_days:
-             return jsonify({"message": f"תאריך זה חורג מהמותר ({max_days} ימים מהיום)."}), 400
-
-        # 3. Check for existing pending request
+        # Check if an extension request is already pending for this loan.
         cur.execute("SELECT id FROM extension_requests WHERE borrow_id = %s AND status = 'extension_pending'", (borrow_id,))
         if cur.fetchone():
             return jsonify({"message": "כבר קיימת בקשת הארכה ממתינה עבור מוצר זה."}), 400
 
-        # 4. Create Request
         cur.execute("""
             INSERT INTO extension_requests (borrow_id, new_returned_date)
             VALUES (%s, %s)
-        """, (borrow_id, new_date_str))
+        """, (borrow_id, new_date))
         
         conn.commit()
         return jsonify({"message": "בקשת ההארכה נשלחה בהצלחה! ממתין לאישור עובד."}), 201
@@ -873,17 +820,3 @@ if __name__ == '__main__':
     debug_mode = os.getenv("FLASK_DEBUG", "False").lower() in ('true', '1', 't')
 
     app.run(debug=debug_mode, port=5230, host='0.0.0.0')
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -369,7 +369,6 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             text-align: center;
             border: 1px solid var(--border-color);
-            min-height: 275px;
         }
 
         .close-btn {
@@ -434,6 +433,7 @@
             border: 1px solid var(--border-color);
         }
 
+        /* Missing style added for the text below the icon */
         .modal-cat-badge {
             background: var(--brand-pink);
             color: white;
@@ -443,7 +443,7 @@
             font-weight: bold;
         }
 
-        /* Floating Donate Button */
+        /* Bouton de don flottant */
         .btn-donate-float {
             position: fixed;
             bottom: 20px;
@@ -469,7 +469,7 @@
             background: var(--brand-pink-hover);
         }
 
-        /* Donate Tooltip */
+        /* Tooltip au survol */
         .btn-donate-float::after {
             content: "תרמו מוצר";
             position: absolute;
@@ -487,71 +487,6 @@
 
         .btn-donate-float:hover::after {
             opacity: 1;
-        }
-
-        /* --- ANIMATIONS --- */
-        /* Skeleton / Shimmer */
-        .skeleton {
-            background: #f0f0f0;
-            background: linear-gradient(90deg, var(--card-bg) 25%, var(--border-color) 50%, var(--card-bg) 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-            border-radius: 8px;
-            opacity: 0.7;
-        }
-
-        @keyframes shimmer {
-            0% {
-                background-position: 200% 0;
-            }
-
-            100% {
-                background-position: -200% 0;
-            }
-        }
-
-        .skeleton-card {
-            height: 250px;
-            pointer-events: none;
-        }
-
-        /* Loader Spinner */
-        .loader-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--card-bg);
-            border-radius: 16px;
-            z-index: 10;
-        }
-
-        .loader {
-            border: 5px solid var(--border-color);
-            border-top: 5px solid var(--brand-pink);
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* Hidden content while loading in modal */
-        .modal-body-content {
-            display: none;
         }
     </style>
 </head>
@@ -662,7 +597,6 @@
             <div class="modal-actions">
                 <button id="modalBorrowBtn" class="btn-borrow">בקש להשאיל ✋</button>
                 <button id="modalSimilarBtn" class="btn-similar">🔍 גלה מוצרים דומים</button>
-                <button class="btn-reject" onclick="closeModal()">סגור</button>
             </div>
         </div>
     </div>
@@ -743,13 +677,7 @@
             navContainer.prepend(btn);
         }
 
-        // --- HELPER: Skeleton ---
-        function renderSkeleton(containerId, count = 6) {
-            const container = document.getElementById(containerId);
-            container.innerHTML = Array(count).fill('<div class="card skeleton skeleton-card"></div>').join('');
-        }
-
-        // --- HELPER: Translators ---
+        // --- HELPER: Translate Category ---
         function translateCategory(cat) {
             const map = {
                 'strollers': 'עגלות',
@@ -759,25 +687,6 @@
                 'baby beds': 'מיטת תינוק'
             };
             return map[cat.toLowerCase()] || cat;
-        }
-
-        function translateStatus(s, returnedDate) {
-            if (s === 'pending') return 'ממתין לאישור';
-            if (s === 'rejected') return 'נדחה';
-            if (s === 'returned') return 'הוחזר';
-
-            if (s === 'approved') {
-                if (!returnedDate || returnedDate === 'null' || returnedDate === 'לא צוין')
-                    return 'אושר - תאריך החזרה לא ידוע';
-                const today = new Date(); today.setHours(0, 0, 0, 0);
-                const returnD = new Date(returnedDate); returnD.setHours(0, 0, 0, 0);
-                const diffInDays = Math.ceil((returnD - today) / (1000 * 3600 * 24));
-
-                if (diffInDays < 0) return `איחור של ${Math.abs(diffInDays)} ימים! ⚠️`;
-                if (diffInDays === 0) return `להחזיר היום! 🔔`;
-                return `נותרו ${diffInDays} ימים`;
-            }
-            return s;
         }
 
         // --- CATALOG LOGIC ---
@@ -838,51 +747,67 @@
             const p = allProducts.find(prod => prod.id === id);
             if (!p) return;
 
-            const modal = document.getElementById('itemModal');
-            const loader = document.getElementById('modalLoader');
-            const content = document.getElementById('modalContent');
+            currentModalProductId = id;
 
-            // Show modal and loader, hide content
-            modal.style.display = 'flex';
-            loader.style.display = 'flex';
-            content.style.display = 'none';
-
-            // Set static content
+            // Populate Modal Data
             document.getElementById('modalTitle').innerText = p.name;
-            document.getElementById('modalCat').innerText = translateCategory(p.category);
-            document.getElementById('modalImg').src = `../images/${p.category}.png`;
-            document.getElementById('modalDesc').innerText = p.description || 'אין תיאור';
-            document.getElementById('modalDonor').innerText = p.owner_email ? p.owner_email.split('@')[0] : 'אנונימי';
 
-            // Fetch Limits
+            // This line caused the error before because 'modalCat' didn't exist in HTML
+            const modalCatEl = document.getElementById('modalCat');
+            if (modalCatEl) modalCatEl.innerText = translateCategory(p.category);
+
+            // Modal Image Path
+            document.getElementById('modalImg').src = `../images/${p.category}.png`;
+            document.getElementById('modalImg').style.display = 'block';
+
+            document.getElementById('modalDesc').innerText = p.description ? p.description : 'אין תיאור זמין עבור מוצר זה.';
+
+            // Extract Donor Name from Email
+            const donorName = p.owner_email ? p.owner_email.split('@')[0] : 'אנונימי';
+            document.getElementById('modalDonor').innerText = donorName;
+
+            // Fetch and Display Borrow Status
             const limitBox = document.getElementById('borrowLimitInfo');
             const borrowBtn = document.getElementById('modalBorrowBtn');
 
             try {
-                const res = await fetch(`${API_URL}/borrow-status`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const res = await fetch(`${API_URL}/borrow-status`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
                 const status = await res.json();
 
-                currentLimits = { max_days: status.max_days, remaining: status.remaining_slots };
+                currentLimits.max_days = status.max_days;
+                currentLimits.remaining = status.remaining_slots;
 
                 if (status.remaining_slots > 0) {
                     limitBox.style.display = 'block';
-                    limitBox.innerHTML = `✅ נותרו <b>${status.remaining_slots}</b> מקומות. מקס' זמן: <b>${status.max_days}</b> ימים.`;
-                    limitBox.style.background = '#E3F2FD'; limitBox.style.color = '#0D47A1';
-                    borrowBtn.disabled = false; borrowBtn.style.opacity = "1"; borrowBtn.innerText = "בקש להשאיל ✋";
+                    limitBox.innerHTML = `✅ ניתן להשאיל עוד <b>${status.remaining_slots}</b> מוצרים (עד ${status.max_items} במקביל).<br>⏱️ זמן השאלה מקסימלי: <b>${status.max_days}</b> ימים.`;
+                    limitBox.style.background = '#E3F2FD'; // Blue
+                    limitBox.style.color = '#0D47A1';
+                    borrowBtn.disabled = false;
+                    borrowBtn.style.opacity = "1";
+                    borrowBtn.innerText = "בקש להשאיל ✋";
                 } else {
                     limitBox.style.display = 'block';
-                    limitBox.innerHTML = `⚠️ מכסה מלאה (${status.max_items} מוצרים).`;
-                    limitBox.style.background = '#FFEBEE'; limitBox.style.color = '#C62828';
-                    borrowBtn.disabled = true; borrowBtn.style.opacity = "0.5"; borrowBtn.innerText = "מכסה מלאה 🔒";
+                    limitBox.innerHTML = `⚠️ הגעת למכסת ההשאלות שלך! ניתן להשאיל עד ${status.max_items} מוצרים במקביל.<br>יש להחזיר מוצרים מושאלים לפני בקשת השאלה חדשה.`;
+                    limitBox.style.background = '#FFEBEE'; // Red
+                    limitBox.style.color = '#C62828';
+                    borrowBtn.disabled = true;
+                    borrowBtn.style.opacity = "0.5";
+                    borrowBtn.innerText = "מכסה מלאה 🔒";
                 }
-            } catch (e) { console.error(e); }
+            } catch (e) {
+                console.error("Error fetching limits", e);
+            }
 
+            // Setup Buttons
             borrowBtn.onclick = () => borrow(id);
-            document.getElementById('modalSimilarBtn').onclick = () => { closeModal(); filterAndRender(); };
 
-            // Show content
-            loader.style.display = 'none';
-            content.style.display = 'block';
+            const similarBtn = document.getElementById('modalSimilarBtn');
+            similarBtn.onclick = () => discoverSimilar(p.category);
+
+            // Show Modal
+            document.getElementById('itemModal').style.display = 'flex';
         }
 
         function closeModal() {
@@ -986,41 +911,66 @@
             }).join('');
         }
 
-        async function returnItem(borrowId) {
-            if (!confirm("האם להחזיר את המוצר? הפריט יסומן כזמין.")) return;
-            try {
-                const res = await fetch(`${API_URL}/return`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ borrow_id: borrowId })
-                });
-                alert((await res.json()).message);
-                loadHistory();
-            } catch (e) { alert("שגיאה"); }
-        }
-
         async function requestExtension(borrowId) {
-            // Need max days from config or cache
-            const maxDays = currentLimits.max_days || 14;
+            // 1. Ensure we have the latest limits (Max days)
+            if (currentLimits.max_days === 14 && currentLimits.remaining === 0) {
+                try {
+                    const res = await fetch(`${API_URL}/borrow-status`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (res.ok) {
+                        const status = await res.json();
+                        currentLimits.max_days = status.max_days;
+                    }
+                } catch (e) {
+                    console.error("Could not fetch limits, using default.");
+                }
+            }
+
+            // 2. Calculate Max Date (Today + Max Days allowed)
             const today = new Date();
-            const maxDate = new Date(); maxDate.setDate(today.getDate() + maxDays);
-            const maxStr = maxDate.toISOString().split('T')[0];
+            const maxDateObj = new Date();
+            maxDateObj.setDate(today.getDate() + currentLimits.max_days);
+            const maxDateStr = maxDateObj.toISOString().split('T')[0];
 
-            const newDate = prompt(`הארכת השאלה (עד ${maxStr}):`, maxStr);
-            if (!newDate) return;
+            // 3. Prompt User
+            const newDate = prompt(`עד מתי ברצונך להאריך? (תאריך מקסימלי: ${maxDateStr})\nהכנס תאריך בפורמט YYYY-MM-DD:`, maxDateStr);
+            
+            if (!newDate) return; // User cancelled
 
-            if (new Date(newDate) > maxDate) { alert("תאריך חורג מהמותר!"); return; }
+            // 4. Validate Input
+            const selectedDate = new Date(newDate);
+            if (isNaN(selectedDate.getTime())) {
+                alert("תאריך לא תקין.");
+                return;
+            }
 
+            if (selectedDate > maxDateObj) {
+                alert(`תאריך זה חורג מהמותר! ניתן להאריך עד ${currentLimits.max_days} ימים מהיום (${maxDateStr}).`);
+                return;
+            }
+
+            // 5. Send Request
             try {
                 const res = await fetch(`${API_URL}/extensions`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                     body: JSON.stringify({ borrow_id: borrowId, new_returned_date: newDate })
                 });
-                alert((await res.json()).message);
-                loadHistory();
-            } catch (e) { alert("שגיאה"); }
+                
+                const data = await res.json();
+                
+                if (res.ok) {
+                    alert("בקשת ההארכה נשלחה בהצלחה! ⏳");
+                    loadHistory(); // Refresh the list
+                } else {
+                    alert("שגיאה: " + (data.message || "לא ניתן לבצע הארכה"));
+                }
+            } catch (e) { 
+                alert("שגיאה בתקשורת עם השרת"); 
+            }
         }
+
 
         function translateStatus(s, returnedDate) {
             if (s === 'pending') return 'ממתין לאישור';
