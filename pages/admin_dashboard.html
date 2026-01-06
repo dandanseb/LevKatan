@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <title>לב קטן - ניהול אדמין</title>
@@ -17,6 +18,7 @@
             --border-color: #eee;
             --table-head-bg: #eee;
         }
+
         body.dark-mode {
             --bg-color: #121212;
             --header-bg: #1E1E1E;
@@ -29,73 +31,195 @@
             --table-head-bg: #333;
         }
 
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg-color); color: var(--text-color); margin: 0; transition: background 0.3s; }
-        
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            transition: background 0.3s;
+        }
+
         .top-bar {
-            background: var(--header-bg); 
+            background: var(--header-bg);
             color: var(--text-color);
             padding: 10px 20px;
-            display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         }
-        .brand-area { display: flex; align-items: center; gap: 10px; }
-        .brand-logo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
-        
+
+        .brand-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
         /* UNIFIED NAV BUTTONS */
-        .nav-actions { display: flex; align-items: center; gap: 10px; }
-        .nav-item { 
-            text-decoration: none; 
-            color: var(--nav-btn-text); 
-            font-size: 14px; 
-            font-weight: 600; 
-            padding: 8px 16px; 
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-item {
+            text-decoration: none;
+            color: var(--nav-btn-text);
+            font-size: 14px;
+            font-weight: 600;
+            padding: 8px 16px;
             border-radius: 20px;
             background: var(--nav-btn-bg);
             transition: all 0.2s;
-            display: inline-flex; align-items: center; gap: 5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
         }
-        .nav-item:hover { background: var(--nav-btn-hover); color: var(--text-color); }
 
-        .theme-toggle { background: none; border: none; font-size: 20px; cursor: pointer; padding: 5px; border-radius: 50%; margin-left: 10px; }
-        .theme-toggle:hover { background: rgba(128,128,128,0.2); }
+        .nav-item:hover {
+            background: var(--nav-btn-hover);
+            color: var(--text-color);
+        }
 
-        .container { max-width: 1200px; margin: 30px auto; padding: 20px; background: var(--card-bg); border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { background: var(--table-head-bg); padding: 12px; text-align: right; border-bottom: 2px solid var(--border-color); font-weight: bold; color: var(--text-color); opacity: 0.8; }
-        td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--text-color); }
-        
-        select { padding: 6px; border-radius: 4px; border: 1px solid #ccc; background: var(--bg-color); color: var(--text-color); }
-        .btn-delete { background: #FFEBEE; color: #D32F2F; border: 1px solid #FFCDD2; padding: 6px 12px; cursor: pointer; border-radius: 6px; transition: 0.2s; display: flex; align-items: center; gap: 5px; }
-        .btn-delete:hover { background: #FFCDD2; }
-        
-        .logout-btn { background: #FF4444; color: white; border: none; padding: 6px 15px; border-radius: 20px; font-weight: bold; cursor: pointer; }
-        .logout-btn:hover { background: #D32F2F; }
+        .theme-toggle {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            margin-left: 10px;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(128, 128, 128, 0.2);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th {
+            background: var(--table-head-bg);
+            padding: 12px;
+            text-align: right;
+            border-bottom: 2px solid var(--border-color);
+            font-weight: bold;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-color);
+        }
+
+        select {
+            padding: 6px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            background: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .btn-delete {
+            background: #FFEBEE;
+            color: #D32F2F;
+            border: 1px solid #FFCDD2;
+            padding: 6px 12px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-delete:hover {
+            background: #FFCDD2;
+        }
+
+        .logout-btn {
+            background: #FF4444;
+            color: white;
+            border: none;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .logout-btn:hover {
+            background: #D32F2F;
+        }
     </style>
 </head>
+
 <body>
     <div class="top-bar">
         <div class="brand-area">
             <img src="../images/logo.png" alt="Logo" class="brand-logo">
             <span style="font-weight:bold; font-size:18px;">פאנל ניהול</span>
         </div>
-        
+
         <div class="nav-actions">
             <a href="user_dashboard.html" class="nav-item">🪑 קטלוג</a>
             <a href="employee_dashboard.html" class="nav-item">🛠️ ממשק עובד</a>
 
-            <span id="userGreeting" style="margin: 0 5px; font-weight:600; color:var(--text-color); opacity:0.7;"></span>
+            <span id="userGreeting"
+                style="margin: 0 5px; font-weight:600; color:var(--text-color); opacity:0.7;"></span>
             <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
             <button class="logout-btn" onclick="logout()">יציאה</button>
         </div>
     </div>
 
     <div class="container">
-        <h2 style="border-bottom: 2px solid #FF69B4; padding-bottom: 10px; color: var(--text-color);">משתמשים רשומים</h2>
+        <div
+            style="background: #fff; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid var(--border-color);">
+            <h3 style="color: var(--text-color); margin-top:0;">⚙️ הגדרות מערכת</h3>
+            <div style="display: flex; gap: 20px; align-items: flex-end;">
+                <div>
+                    <label style="display:block; font-weight:bold; margin-bottom:5px;">מקס' ימי השאלה:</label>
+                    <input type="number" id="settingMaxDays"
+                        style="padding:8px; border-radius:4px; border:1px solid #ccc;">
+                </div>
+                <div>
+                    <label style="display:block; font-weight:bold; margin-bottom:5px;">מקס' פריטים למשתמש:</label>
+                    <input type="number" id="settingMaxItems"
+                        style="padding:8px; border-radius:4px; border:1px solid #ccc;">
+                </div>
+                <button onclick="saveSettings()"
+                    style="background: #FF69B4; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold;">
+                    💾 שמור הגדרות
+                </button>
+            </div>
+        </div>
+
+        <h2 style="border-bottom: 2px solid #FF69B4; padding-bottom: 10px; color: var(--text-color);">משתמשים רשומים
+        </h2>
         <table id="usersTable">
             <thead>
                 <tr>
-                    <th>מספר סידורי</th> 
+                    <th>מספר סידורי</th>
                     <th>שם מלא</th>
                     <th>שם משתמש</th>
                     <th>טלפון</th>
@@ -121,7 +245,7 @@
         if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
         // -------------------
 
-        if(!token || localStorage.getItem('userRole') !== 'admin') window.location.href = 'login_page.html';
+        if (!token || localStorage.getItem('userRole') !== 'admin') window.location.href = 'login_page.html';
         document.getElementById('userGreeting').innerText = `${username}`;
 
         async function loadUsers() {
@@ -129,7 +253,7 @@
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const users = await res.json();
-            
+
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = users.map(u => `
                 <tr>
@@ -164,7 +288,7 @@
         }
 
         async function deleteUser(id) {
-            if(!confirm("האם אתה בטוח שברצונך למחוק משתמש זה? הפעולה היא סופית.")) return;
+            if (!confirm("האם אתה בטוח שברצונך למחוק משתמש זה? הפעולה היא סופית.")) return;
             await fetch(`${API_URL}/admin/users/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
@@ -172,8 +296,36 @@
             loadUsers();
         }
 
+        async function loadSettings() {
+            try {
+                const res = await fetch(`${API_URL}/config`);
+                const data = await res.json();
+                document.getElementById('settingMaxDays').value = data.max_borrow_days;
+                document.getElementById('settingMaxItems').value = data.max_borrow_items;
+            } catch (e) { console.error("Error loading settings"); }
+        }
+
+        async function saveSettings() {
+            const maxDays = document.getElementById('settingMaxDays').value;
+            const maxItems = document.getElementById('settingMaxItems').value;
+
+            try {
+                const res = await fetch(`${API_URL}/admin/config`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ max_borrow_days: maxDays, max_borrow_items: maxItems })
+                });
+                if (res.ok) alert("ההגדרות נשמרו בהצלחה!");
+                else alert("שגיאה בשמירה");
+            } catch (e) { alert("שגיאה בתקשורת"); }
+        }
+
+        // Call this on load
+        loadSettings();
+
         function logout() { localStorage.clear(); window.location.href = 'login_page.html'; }
         loadUsers();
     </script>
 </body>
+
 </html>

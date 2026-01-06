@@ -236,27 +236,51 @@ def get_products():
 def borrow_product():
     data = request.json
     product_id = data.get('product_id')
-    returned_date = data.get('returned_date')
+    returned_date_str = data.get('returned_date') # YYYY-MM-DD
     user_id = request.user_data['user_id']
     
     conn = get_db_connection()
     cur = conn.cursor()
     try:
-        # Vérifier disponibilité
-        cur.execute("SELECT status FROM products WHERE id = %s", (product_id,))
+        # 1. Fetch Limits
+        cur.execute("SELECT setting_key, setting_value FROM system_settings;")
+        rows = cur.fetchall()
+        settings = {row[0]: row[1] for row in rows}
+        max_items = int(settings.get('max_borrow_items', 3))
+        max_days = int(settings.get('max_borrow_days', 14))
+
+        # 2. Check User's Current Limit
+        cur.execute("SELECT COUNT(*) FROM borrow_requests WHERE user_id = %s AND status IN ('pending', 'approved', 'confirmation_pending')", (user_id,))
+        current_count = cur.fetchone()[0]
+        
+        if current_count >= max_items:
+            return jsonify({"message": f"הגעת למכסת ההשאלות שלך ({max_items} פריטים)."}), 400
+
+        # 3. Validate Date
+        if not returned_date_str:
+            return jsonify({"message": "Date is required"}), 400
+            
+        return_date = datetime.strptime(returned_date_str, "%Y-%m-%d").date()
+        today = datetime.now().date()
+        
+        if return_date <= today:
+            return jsonify({"message": "תאריך ההחזרה חייב להיות עתידי"}), 400
+            
+        delta = return_date - today
+        if delta.days > max_days:
+            return jsonify({"message": f"תקופת ההשאלה חורגת מהמותר ({max_days} ימים)."}), 400
+
+        # 4. Check Availability & Create Request (Existing Logic)
+        cur.execute("SELECT status FROM product WHERE id = %s", (product_id,))
         status = cur.fetchone()
         if not status or status[0] != 'available':
             return jsonify({"message": "Product not available"}), 400
             
-        cur.execute("""
-            INSERT INTO borrow_requests (user_id, product_id, returned_date) 
-            VALUES (%s, %s, %s)
-        """, (int(user_id), product_id, returned_date))
-        
-        cur.execute("UPDATE products SET status = 'confirmation_pending' WHERE id = %s", (product_id,))
+        cur.execute("INSERT INTO borrow_requests (user_id, product_id, returned_date) VALUES (%s, %s, %s)", (user_id, product_id, returned_date_str))
+        cur.execute("UPDATE product SET status = 'unavailable' WHERE id = %s", (product_id,))
         
         conn.commit()
-        return jsonify({"message": "הבקשה נשלחה בהצלחה! המתן לאישור עובד."}), 200
+        return jsonify({"message": "בקשתך נשלחה בהצלחה!"}), 200
     except Exception as e:
         conn.rollback()
         return jsonify({"error": str(e)}), 500
@@ -723,6 +747,73 @@ def delete_user(user_id):
     conn.commit()
     conn.close()
     return jsonify({"message": "User deleted"}), 200
+
+# --- SETTINGS & LIMITS ROUTES ---
+@app.route('/api/config', methods=['GET'])
+def get_config():
+    """Returns the system settings (max days, max items)."""
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT setting_key, setting_value FROM system_settings;")
+    rows = cur.fetchall()
+    conn.close()
+    
+    settings = {row[0]: row[1] for row in rows}
+    # Provide defaults if missing
+    return jsonify({
+        "max_borrow_days": int(settings.get('max_borrow_days', 14)),
+        "max_borrow_items": int(settings.get('max_borrow_items', 3))
+    }), 200
+
+@app.route('/api/admin/config', methods=['POST'])
+@admin_required
+def update_config():
+    """Updates system settings."""
+    data = request.json
+    max_days = data.get('max_borrow_days')
+    max_items = data.get('max_borrow_items')
+    
+    conn = get_db_connection()
+    cur = conn.cursor()
+    try:
+        # Upsert logic (Update if exists, Insert if not)
+        cur.execute("INSERT INTO system_settings (setting_key, setting_value) VALUES ('max_borrow_days', %s) ON CONFLICT (setting_key) DO UPDATE SET setting_value = EXCLUDED.setting_value;", (max_days,))
+        cur.execute("INSERT INTO system_settings (setting_key, setting_value) VALUES ('max_borrow_items', %s) ON CONFLICT (setting_key) DO UPDATE SET setting_value = EXCLUDED.setting_value;", (max_items,))
+        conn.commit()
+        return jsonify({"message": "Settings updated successfully"}), 200
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()
+
+@app.route('/api/borrow-status', methods=['GET'])
+@token_required
+def get_borrow_status():
+    """Checks how many items the user has currently borrowed vs the limit."""
+    user_id = request.user_data['user_id']
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    # Get Limits
+    cur.execute("SELECT setting_key, setting_value FROM system_settings;")
+    rows = cur.fetchall()
+    settings = {row[0]: row[1] for row in rows}
+    max_items = int(settings.get('max_borrow_items', 3))
+    max_days = int(settings.get('max_borrow_days', 14))
+
+    # Count active requests (pending or approved)
+    cur.execute("SELECT COUNT(*) FROM borrow_requests WHERE user_id = %s AND status IN ('pending', 'approved', 'confirmation_pending')", (user_id,))
+    current_count = cur.fetchone()[0]
+    
+    conn.close()
+    
+    return jsonify({
+        "current_borrowed": current_count,
+        "max_items": max_items,
+        "remaining_slots": max_items - current_count,
+        "max_days": max_days
+    }), 200
 
 if __name__ == '__main__':
     # Reads the string "True" or "False" from .env and converts to boolean
