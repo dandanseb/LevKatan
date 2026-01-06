@@ -729,7 +729,7 @@
                 return;
             }
 
-            // UPDATED: Compact Pill Rendering
+            // Compact Pill Rendering
             container.innerHTML = filtered.map(p => `
                 <div class="card" onclick="openPopup(${p.id})">
                     <div class="cat-tag">
@@ -782,7 +782,7 @@
 
                 if (status.remaining_slots > 0) {
                     limitBox.style.display = 'block';
-                    limitBox.innerHTML = `✅ נותרו לך <b>${status.remaining_slots}</b> מקומות להשאלה.<br>⏱️ זמן השאלה מקסימלי: <b>${status.max_days}</b> ימים.`;
+                    limitBox.innerHTML = `✅ ניתן להשאיל עוד <b>${status.remaining_slots}</b> מוצרים (עד ${status.max_items} במקביל).<br>⏱️ זמן השאלה מקסימלי: <b>${status.max_days}</b> ימים.`;
                     limitBox.style.background = '#E3F2FD'; // Blue
                     limitBox.style.color = '#0D47A1';
                     borrowBtn.disabled = false;
@@ -790,7 +790,7 @@
                     borrowBtn.innerText = "בקש להשאיל ✋";
                 } else {
                     limitBox.style.display = 'block';
-                    limitBox.innerHTML = `⚠️ הגעת למכסת ההשאלות שלך (${status.max_items} פריטים). לא ניתן להשאיל כרגע.`;
+                    limitBox.innerHTML = `⚠️ הגעת למכסת ההשאלות שלך! ניתן להשאיל עד ${status.max_items} מוצרים במקביל.<br>יש להחזיר מוצרים מושאלים לפני בקשת השאלה חדשה.`;
                     limitBox.style.background = '#FFEBEE'; // Red
                     limitBox.style.color = '#C62828';
                     borrowBtn.disabled = true;
