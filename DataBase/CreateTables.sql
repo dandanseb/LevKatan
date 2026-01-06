@@ -33,7 +33,7 @@ CREATE TABLE borrow_requests (
     product_id INT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
     request_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 	returned_date DATE,
-    status VARCHAR(20) CHECK (status IN ('pending', 'approved', 'rejected')) DEFAULT 'pending', 
+    status VARCHAR(20) CHECK (status IN ('pending', 'approved', 'rejected', 'returned', 'confirmation_pending')) DEFAULT 'pending', 
 );
 
 CREATE INDEX idx_borrow_request_status ON borrow_requests (status);
@@ -61,3 +61,11 @@ CREATE TABLE extension_requests (
     request_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(borrow_id, status) 
 );
+
+---------------- SYSTEM SETTING INFORMATIONS  ---------------------
+
+CREATE TABLE system_settings (
+    setting_key VARCHAR(50) PRIMARY KEY,
+    setting_value VARCHAR(50)
+);
+
