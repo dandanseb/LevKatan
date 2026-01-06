@@ -287,27 +287,29 @@
 
         <div class="controls-bar">
             <div class="control-group">
-                <label class="filter-label">Sort By:</label>
+                <label class="filter-label">מיון לפי:</label>
                 <select id="sortSelect" class="sort-select" onchange="renderTable()">
-                    <option value="id">🔢 Serial Number (ID)</option>
-                    <option value="name_asc">🔤 Name (A-Z)</option>
-                    <option value="name_desc">🔤 Name (Z-A)</option>
-                    <option value="username_asc">👤 Username (A-Z)</option>
+                    <option value="id">🔢 מספר סידורי (סדר עולה)</option>
+                    <option value="name_asc">🔤 שם מלא (סדר עולה)</option>
+                    <option value="name_desc">🔤 שם מלא (סדר יורד)</option>
+                    <option value="username_asc">👤 שם משתמש (סדר עולה)</option>
                 </select>
             </div>
 
             <div class="control-group">
-                <label class="filter-label">Show Roles:</label>
+                <label class="filter-label">סינון לפי תפקידים:</label>
                 <div class="checkbox-group">
                     <label class="checkbox-item">
-                        <input type="checkbox" class="role-filter" value="admin" checked onchange="renderTable()"> Admin
+                        <input type="checkbox" class="role-filter" value="מנהלים" checked onchange="renderTable()">
+                        Admin
                     </label>
                     <label class="checkbox-item">
-                        <input type="checkbox" class="role-filter" value="employee" checked onchange="renderTable()">
+                        <input type="checkbox" class="role-filter" value="עובדים" checked onchange="renderTable()">
                         Employee
                     </label>
                     <label class="checkbox-item">
-                        <input type="checkbox" class="role-filter" value="user" checked onchange="renderTable()"> User
+                        <input type="checkbox" class="role-filter" value="משתמשים" checked onchange="renderTable()">
+                        User
                     </label>
                 </div>
             </div>
