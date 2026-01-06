@@ -102,6 +102,26 @@
             background: rgba(128, 128, 128, 0.2);
         }
 
+        /* Settings Panel Styling */
+        .settings-panel {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            transition: background 0.3s, border 0.3s;
+        }
+
+        .settings-input {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-color);
+            /* Adapts to dark/light bg */
+            color: var(--text-color);
+        }
+
         .container {
             max-width: 1200px;
             margin: 30px auto;
@@ -193,19 +213,16 @@
     </div>
 
     <div class="container">
-        <div
-            style="background: #fff; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid var(--border-color);">
-            <h3 style="color: var(--text-color); margin-top:0;">⚙️ הגדרות מערכת</h3>
-            <div style="display: flex; gap: 20px; align-items: flex-end;">
+        <div class="settings-panel">
+            <h3 style="margin-top:0; color: var(--text-color);">⚙️ הגדרות מערכת</h3>
+            <div style="display: flex; gap: 20px; align-items: flex-end; flex-wrap: wrap;">
                 <div>
                     <label style="display:block; font-weight:bold; margin-bottom:5px;">מקס' ימי השאלה:</label>
-                    <input type="number" id="settingMaxDays"
-                        style="padding:8px; border-radius:4px; border:1px solid #ccc;">
+                    <input type="number" id="settingMaxDays" class="settings-input">
                 </div>
                 <div>
                     <label style="display:block; font-weight:bold; margin-bottom:5px;">מקס' פריטים למשתמש:</label>
-                    <input type="number" id="settingMaxItems"
-                        style="padding:8px; border-radius:4px; border:1px solid #ccc;">
+                    <input type="number" id="settingMaxItems" class="settings-input">
                 </div>
                 <button onclick="saveSettings()"
                     style="background: #FF69B4; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold;">
