@@ -18,6 +18,7 @@
             --table-head-bg: #f9f9f9;
             --brand-pink: #FF69B4;
             --brand-pink-hover: #E05297;
+            --input-disabled-bg: #e9e9e9; /* Light mode disabled bg */
         }
         body.dark-mode {
             --bg-color: #121212;
@@ -29,6 +30,7 @@
             --nav-btn-hover: #444;
             --border-color: #444;
             --table-head-bg: #333;
+            --input-disabled-bg: #3a3a3a; /* Dark mode disabled bg */
         }
 
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg-color); color: var(--text-color); margin: 0; transition: background 0.3s; }
@@ -74,6 +76,14 @@
         .form-control, select, textarea, input {
             width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px;
             background: var(--bg-color); color: var(--text-color); box-sizing: border-box; font-family: inherit;
+        }
+
+        /* Read-only / Disabled Input Style for Dark/Light Mode */
+        input:read-only, input:disabled {
+            background-color: var(--input-disabled-bg) !important;
+            color: var(--text-color);
+            opacity: 0.8;
+            cursor: not-allowed;
         }
 
         /* TABLE STYLES */
@@ -282,12 +292,12 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="donator_email">אימייל של התורם</label>
-                    <input list="userEmailsList" type="email" id="donator_email" placeholder="הקלד או בחר מהרשימה" required>
-                    <datalist id="userEmailsList"></datalist>
+                    <label for="donator_username">שם משתמש של התורם</label>
+                    <input list="userUsernamesList" type="text" id="donator_username" placeholder="הקלד או בחר מהרשימה" required>
+                    <datalist id="userUsernamesList"></datalist>
 
                     <label class="checkbox-wrapper">
-                        <input type="checkbox" id="orgCheckbox" onchange="toggleOrgEmail()">
+                        <input type="checkbox" id="orgCheckbox" onchange="toggleOrgUser()">
                         עמותת לב קטן
                     </label>
                 </div>
@@ -329,14 +339,13 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="edit_donator_email">אימייל של התורם</label>
-                    <input type="email" id="edit_donator_email" required>
+                    <label for="edit_donator_username">שם משתמש של התורם</label>
+                    <input type="text" id="edit_donator_username" required>
                 </div>
 
                 <div class="form-group">
                     <label for="edit_status">סטטוס (לקריאה בלבד)</label>
-                    <input type="text" id="edit_status" readonly 
-                           style="background-color: #f0f0f0; border: 1px solid #ccc; color: #666; cursor: not-allowed; font-weight: bold; text-align: center;">
+                    <input type="text" id="edit_status" readonly>
                 </div>
 
                 <div style="display:flex; gap:10px; margin-top:20px;">
@@ -390,6 +399,22 @@
 
         let allInventory = [];
 
+        // Dictionaries for translation
+        const categoryMap = {
+            'strollers': 'עגלות',
+            'cribs': 'עריסות',
+            'car seats': 'מושבי בטיחות',
+            'toys': 'צעצועים',
+            'baby beds': 'מיטת תינוק'
+        };
+
+        const statusMap = {
+            'available': 'זמין',
+            'borrowed': 'מושאל',
+            'unavailable': 'לא זמין',
+            'confirmation_pending': 'ממתין לאישור'
+        };
+
         // --- AUTH & THEME ---
         function toggleTheme() {
             document.body.classList.toggle('dark-mode');
@@ -418,33 +443,29 @@
             if(tabId === 'extensions') loadExtensionRequests();
         }
 
-        // --- NEW FEATURES: ADD MODAL & EMAIL LOGIC ---
+        // --- NEW FEATURES: ADD MODAL & USERNAME LOGIC ---
 
         function openAddModal() {
             document.getElementById('addProductModal').style.display = 'block';
-            loadUserEmailsForDropdown(); // Fetch emails when modal opens
+            loadUserUsernamesForDropdown(); 
         }
 
-        function toggleOrgEmail() {
+        function toggleOrgUser() {
             const checkbox = document.getElementById('orgCheckbox');
-            const emailInput = document.getElementById('donator_email');
-            const ORG_EMAIL = "office@levkatan.org.il"; // Default Org Email
+            const userInput = document.getElementById('donator_username');
+            const ORG_USERNAME = "lev_katan_org"; // Default Org Username
 
             if (checkbox.checked) {
-                emailInput.value = ORG_EMAIL;
-                emailInput.readOnly = true;
-                emailInput.style.backgroundColor = "#f0f0f0";
+                userInput.value = ORG_USERNAME;
+                userInput.readOnly = true;
+                // Background color is handled by CSS (input:read-only)
             } else {
-                emailInput.value = "";
-                emailInput.readOnly = false;
-                emailInput.style.backgroundColor = "var(--bg-color)";
+                userInput.value = "";
+                userInput.readOnly = false;
             }
         }
 
-        async function loadUserEmailsForDropdown() {
-            // Note: In current app.py, only admins can access /api/admin/users. 
-            // If the current user is an employee, this might return 403. 
-            // We catch the error silently so the rest of the form still works.
+        async function loadUserUsernamesForDropdown() {
             if(role !== 'admin') return; 
 
             try {
@@ -453,8 +474,9 @@
                 });
                 if(res.ok) {
                     const users = await res.json();
-                    const dataList = document.getElementById('userEmailsList');
-                    dataList.innerHTML = users.map(u => `<option value="${u.email}">`).join('');
+                    const dataList = document.getElementById('userUsernamesList');
+                    // Changed to map usernames instead of emails
+                    dataList.innerHTML = users.map(u => `<option value="${u.username}">`).join('');
                 }
             } catch (e) {
                 console.log("Could not load user list (requires admin)");
@@ -489,14 +511,19 @@
                 const borrowerInfo = p.status === 'borrowed' && p.borrower_name 
                     ? `<span style="color: #E05297; font-weight: bold;"> ${p.borrower_name}</span>` 
                     : "-";
+                
+                // Use dictionaries to translate to Hebrew
+                const displayCategory = categoryMap[p.category] || p.category;
+                const displayStatus = statusMap[p.status] || p.status;
         
                 return `
                     <tr>
                         <td>${p.id}</td>
                         <td>${p.product_name}</td>
-                        <td>${p.category}</td>
-                        <td class="status-cell">${p.status}</td>
-                        <td>${borrowerInfo}</td> <td>
+                        <td>${displayCategory}</td>
+                        <td class="status-cell">${displayStatus}</td>
+                        <td>${borrowerInfo}</td> 
+                        <td>
                             <button class="btn-edit" onclick="editProduct(${p.id})">ערוך ✏️</button>
                             <button class="btn-delete" onclick="deleteProduct(${p.id})">מחק 🗑️</button>
                         </td>
@@ -514,7 +541,8 @@
                 product_name: document.getElementById('product_name').value,
                 category: document.getElementById('category').value,
                 description: document.getElementById('description').value,
-                donator_email: document.getElementById('donator_email').value,
+                // Changed key to donator_username
+                donator_username: document.getElementById('donator_username').value,
             };
 
             const res = await fetch(`${API_URL}/employee/products`, {
@@ -526,8 +554,8 @@
             if (res.status === 201) {
                 alert("מוצר נוסף בהצלחה!");
                 document.getElementById('productForm').reset();
-                document.getElementById('addProductModal').style.display = 'none'; // Close modal
-                toggleOrgEmail(); // Reset styles
+                document.getElementById('addProductModal').style.display = 'none'; 
+                toggleOrgUser(); 
                 loadProducts();
             } else {
                 alert("שגיאה בהוספה");
@@ -558,16 +586,14 @@
             document.getElementById('edit_product_name').value = product.product_name;
             document.getElementById('edit_category').value = product.category;
             document.getElementById('edit_description').value = product.description;
-            document.getElementById('edit_donator_email').value = product.donator_email;
-
-            const statusTranslations = {
-                'available': 'זמין',
-                'borrowed': 'מושאל',
-                'unavailable': 'לא זמין',
-                'confirmation_pending': 'ממתין לאישור'
-            };
             
-            document.getElementById('edit_status').value = statusTranslations[product.status] || product.status;
+            // Populate username instead of email
+            // Assuming API now returns 'donator_username' or we use 'donator_email' field as username storage temporarily
+            document.getElementById('edit_donator_username').value = product.donator_username || product.donator_email;
+
+            // Translate status for display in the read-only field
+            document.getElementById('edit_status').value = statusMap[product.status] || product.status;
+            
             document.getElementById('editModal').style.display = 'block';
         }
 
@@ -578,7 +604,8 @@
                 product_name: document.getElementById('edit_product_name').value,
                 category: document.getElementById('edit_category').value,
                 description: document.getElementById('edit_description').value,
-                donator_email: document.getElementById('edit_donator_email').value,
+                // Changed key to donator_username
+                donator_username: document.getElementById('edit_donator_username').value,
             };
 
             const res = await fetch(`${API_URL}/employee/products/${id}`, {
