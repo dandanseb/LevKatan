@@ -82,8 +82,7 @@
         th { background-color: var(--table-head-bg); color: #555; font-weight: bold; font-size: 14px; }
         body.dark-mode th { color: #ccc; }
 
-        /* UNIFIED BUTTON STYLES */
-
+        /* BUTTONS */
         .btn-primary {
             background: var(--brand-pink); color: white; border: none; padding: 10px 20px;
             border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s;
@@ -92,26 +91,19 @@
         .btn-primary:hover { background: var(--brand-pink-hover); transform: translateY(-2px); box-shadow: 0 4px 10px rgba(255, 105, 180, 0.3); }
 
         .btn-edit { background: #E3F2FD; color: #1565C0; border: 1px solid #BBDEFB; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; margin-left: 5px; }
-            padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s;
         .btn-delete, .btn-reject { background: #FFEBEE; color: #D32F2F; border: 1px solid #FFCDD2; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; }
-            margin-left: 5px;
         .btn-approve { background: #E8F5E9; color: #2E7D32; border: 1px solid #A5D6A7; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; margin-left: 5px; }
-        }
         .btn-cancel { background: #f5f5f5; color: #333; border: 1px solid #ccc; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .btn-edit:hover { background: #BBDEFB; }
+
         /* Floating Action Button (FAB) */
-        /* Delete/Reject - Soft Red */
         .fab-btn {
-        .btn-delete, .btn-reject {
             position: fixed;
             bottom: 30px;
             left: 30px; /* RTL - Start side */
             width: 60px;
             height: 60px;
             background-color: var(--brand-pink);
-            background: #FFEBEE; color: #D32F2F; border: 1px solid #FFCDD2;
             color: white;
-            padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s;
             border-radius: 50%;
             border: none;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
@@ -123,34 +115,21 @@
             transition: transform 0.2s, background-color 0.2s;
             z-index: 90;
         }
-        }
         .fab-btn:hover { background-color: var(--brand-pink-hover); transform: scale(1.1); }
-        .btn-delete:hover, .btn-reject:hover { background: #FFCDD2; }
+
         /* Modal Styles */
-        /* Approve - Soft Green */
         .modal {
-        .btn-approve {
             display:none; position:fixed; z-index:100; left:0; top:0; width:100%; height:100%;
-            background: #E8F5E9; color: #2E7D32; border: 1px solid #A5D6A7;
             overflow:auto; background-color:rgba(0,0,0,0.4);
-            padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s;
             animation: fadeIn 0.3s;
-            margin-left: 5px;
         }
-        }
-        .btn-approve:hover { background: #C8E6C9; }
-        /* Cancel (in Modal) - Grey */
         .modal-content {
-        .btn-cancel {
             background-color:var(--card-bg); margin:5% auto; padding:30px; border-radius:15px;
-            background: #f5f5f5; color: #333; border: 1px solid #ccc;
             border:1px solid var(--border-color); width:90%; max-width:550px;
-            padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
-        }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .btn-cancel:hover { background: #e0e0e0; }
+
         /* Checkbox styling within Form Group */
         .checkbox-wrapper {
             display: flex; align-items: center; gap: 8px; margin-top: 5px;
@@ -183,6 +162,7 @@
     </div>
 
     <div class="container">
+
         <div id="inventory-view">
             <div class="card">
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
@@ -190,7 +170,7 @@
 
                     <div style="display: flex; gap: 10px;">
                         <select id="filterCategory" onchange="filterProducts()" style="width: auto; min-width: 150px;">
-                            <option value="all">  כל הקטגוריות</option>
+                            <option value="all">כל הקטגוריות</option>
                             <option value="strollers">עגלות</option>
                             <option value="cribs">עריסות</option>
                             <option value="car seats">מושבי בטיחות</option>
@@ -199,7 +179,7 @@
                         </select>
 
                         <select id="filterStatus" onchange="filterProducts()" style="width: auto; min-width: 150px;">
-                            <option value="all"> כל הסטטוסים </option>
+                            <option value="all">כל הסטטוסים</option>
                             <option value="available">זמין</option>
                             <option value="borrowed">מושאל</option>
                             <option value="unavailable">לא זמין</option>
@@ -215,14 +195,14 @@
                             <th>שם המוצר</th>
                             <th>קטגוריה</th>
                             <th>סטטוס</th>
-                            <th> מושאל ל</th>
+                            <th>מושאל ל</th>
                             <th>פעולות</th>
                         </tr>
                     </thead>
                     <tbody id="productsTableBody"></tbody>
                 </table>
             </div>
-
+            
             <button class="fab-btn" onclick="openAddModal()">+</button>
         </div>
 
@@ -272,18 +252,18 @@
                 <tbody id="extensionsTableBody"></tbody>
             </table>
         </div>
+        
     </div>
 
     <div id="addProductModal" class="modal">
-    <div id="editModal" style="display:none; position:fixed; z-index:100; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.4);">
         <div class="modal-content">
-        <div style="background-color:var(--card-bg); margin:5% auto; padding:30px; border-radius:15px; border:1px solid var(--border-color); width:90%; max-width:500px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
             <h3 style="margin-top:0;">הוספת פריט חדש</h3>
             <form id="productForm">
                 <div class="form-group">
                     <label for="product_name">שם המוצר</label>
                     <input type="text" id="product_name" required>
                 </div>
+
                 <div class="form-group">
                     <label for="category">קטגוריה</label>
                     <select id="category" required>
@@ -295,26 +275,31 @@
                         <option value="baby beds">מיטת תינוק</option>
                     </select>
                 </div>
+
                 <div class="form-group">
                     <label for="description">תיאור המוצר</label>
                     <textarea id="description" rows="3" maxlength="200" required></textarea>
                 </div>
+
                 <div class="form-group">
-                    <label for="donator_username">שם משתמש של התורם</label>
-                    <input list="usernamesList" type="username" id="donator_username" placeholder="הקלד או בחר מהרשימה" required>
-                    <datalist id="usernamesList"></datalist>
+                    <label for="donator_email">אימייל של התורם</label>
+                    <input list="userEmailsList" type="email" id="donator_email" placeholder="הקלד או בחר מהרשימה" required>
+                    <datalist id="userEmailsList"></datalist>
+
                     <label class="checkbox-wrapper">
-                        <input type="checkbox" id="orgCheckbox" onchange="toggleOrg()">
+                        <input type="checkbox" id="orgCheckbox" onchange="toggleOrgEmail()">
                         עמותת לב קטן
                     </label>
                 </div>
+
                 <div style="display:flex; gap:10px; margin-top:20px;">
-                    <button type="submit" class="btn-primary" style="flex:1">➕ הוספת המוצר</button>
+                    <button type="submit" class="btn-primary" style="flex:1">➕ הוסף מוצר</button>
                     <button type="button" onclick="document.getElementById('addProductModal').style.display='none'" class="btn-cancel">ביטול</button>
                 </div>
             </form>
         </div>
     </div>
+
     <div id="editModal" class="modal">
         <div class="modal-content">
             <h3 style="margin-top:0;">ערוך פרטי מוצר <span id="editProductId" style="font-size:16px; opacity:0.6;"></span></h3>
@@ -344,19 +329,14 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="edit_donator_username">אימייל של התורם</label>
-                    <input type="username" id="edit_donator_username" required>
+                    <label for="edit_donator_email">אימייל של התורם</label>
+                    <input type="email" id="edit_donator_email" required>
                 </div>
 
                 <div class="form-group">
                     <label for="edit_status">סטטוס (לקריאה בלבד)</label>
                     <input type="text" id="edit_status" readonly 
-                           style="background-color: #f0f0f0; 
-                                  border: 1px solid #ccc; 
-                                  color: #666; 
-                                  cursor: not-allowed; 
-                                  font-weight: bold; 
-                                  text-align: center;">
+                           style="background-color: #f0f0f0; border: 1px solid #ccc; color: #666; cursor: not-allowed; font-weight: bold; text-align: center;">
                 </div>
 
                 <div style="display:flex; gap:10px; margin-top:20px;">
@@ -391,8 +371,8 @@
                     <textarea id="don_description" rows="3" required></textarea>
                 </div>
                 <div class="form-group">
-                    <label>שם המשתמש של התורם</label>
-                    <input type="username" id="don_username" required>
+                    <label>אימייל התורם</label>
+                    <input type="email" id="don_email" required>
                 </div>
                 <div style="display:flex; gap:10px; margin-top:20px;">
                     <button type="submit" class="btn-approve" style="flex:1">שמור ואשר תרומה ✅</button>
@@ -402,7 +382,6 @@
         </div>
     </div>
 
-    
     <script>
         const API_URL = "https://levkatan-api-dxh8azfdfua6e9gn.israelcentral-01.azurewebsites.net/api";
         const token = localStorage.getItem('userToken');
@@ -439,30 +418,30 @@
             if(tabId === 'extensions') loadExtensionRequests();
         }
 
-        // --- ADD MODAL & LOGIC ---
+        // --- NEW FEATURES: ADD MODAL & EMAIL LOGIC ---
 
         function openAddModal() {
             document.getElementById('addProductModal').style.display = 'block';
-            loadUsernamesForDropdown(); // Fetch usernames when modal opens
+            loadUserEmailsForDropdown(); // Fetch emails when modal opens
         }
 
-        function toggleOrgDonation() {
+        function toggleOrgEmail() {
             const checkbox = document.getElementById('orgCheckbox');
-            const usernameInput = document.getElementById('donator_username');
-            const ORG_STR = "עמותת לב קטן"; // Default Org donation string
+            const emailInput = document.getElementById('donator_email');
+            const ORG_EMAIL = "office@levkatan.org.il"; // Default Org Email
 
             if (checkbox.checked) {
-                usernameInput.value = ORG_STR;
-                usernameInput.readOnly = true;
-                usernameInput.style.backgroundColor = "#f0f0f0";
+                emailInput.value = ORG_EMAIL;
+                emailInput.readOnly = true;
+                emailInput.style.backgroundColor = "#f0f0f0";
             } else {
-                usernameInput.value = "";
-                usernameInput.readOnly = false;
-                usernameInput.style.backgroundColor = "var(--bg-color)";
+                emailInput.value = "";
+                emailInput.readOnly = false;
+                emailInput.style.backgroundColor = "var(--bg-color)";
             }
         }
 
-        async function loadUsernamesForDropdown() {
+        async function loadUserEmailsForDropdown() {
             // Note: In current app.py, only admins can access /api/admin/users. 
             // If the current user is an employee, this might return 403. 
             // We catch the error silently so the rest of the form still works.
@@ -474,8 +453,8 @@
                 });
                 if(res.ok) {
                     const users = await res.json();
-                    const dataList = document.getElementById('usernamesList');
-                    dataList.innerHTML = users.map(u => `<option value="${u.username}">`).join('');
+                    const dataList = document.getElementById('userEmailsList');
+                    dataList.innerHTML = users.map(u => `<option value="${u.email}">`).join('');
                 }
             } catch (e) {
                 console.log("Could not load user list (requires admin)");
@@ -535,7 +514,7 @@
                 product_name: document.getElementById('product_name').value,
                 category: document.getElementById('category').value,
                 description: document.getElementById('description').value,
-                donator_username: document.getElementById('donator_username').value,
+                donator_email: document.getElementById('donator_email').value,
             };
 
             const res = await fetch(`${API_URL}/employee/products`, {
@@ -548,7 +527,7 @@
                 alert("מוצר נוסף בהצלחה!");
                 document.getElementById('productForm').reset();
                 document.getElementById('addProductModal').style.display = 'none'; // Close modal
-                toggleOrgDonation(); // Reset styles
+                toggleOrgEmail(); // Reset styles
                 loadProducts();
             } else {
                 alert("שגיאה בהוספה");
@@ -579,7 +558,7 @@
             document.getElementById('edit_product_name').value = product.product_name;
             document.getElementById('edit_category').value = product.category;
             document.getElementById('edit_description').value = product.description;
-            document.getElementById('edit_donator_username').value = product.donator_username;
+            document.getElementById('edit_donator_email').value = product.donator_email;
 
             const statusTranslations = {
                 'available': 'זמין',
@@ -599,7 +578,7 @@
                 product_name: document.getElementById('edit_product_name').value,
                 category: document.getElementById('edit_category').value,
                 description: document.getElementById('edit_description').value,
-                donator_username: document.getElementById('edit_donator_username').value,
+                donator_email: document.getElementById('edit_donator_email').value,
             };
 
             const res = await fetch(`${API_URL}/employee/products/${id}`, {
@@ -653,7 +632,7 @@
                 <tr>
                     <td>${d.created_at.split(' ')[0]}</td>
                     <td>${d.product_name}</td>
-                    <td>${d.donator_username}</td>
+                    <td>${d.donator_email}</td>
                     <td>
                         <button class="btn-edit" onclick="openApproveDonation(${JSON.stringify(d).replace(/"/g, '&quot;')})">ערוך ואשר ✏️</button>
                         <button class="btn-reject" onclick="rejectDonation(${d.id})">דחה ❌</button>
@@ -667,7 +646,7 @@
             document.getElementById('don_name').value = don.product_name;
             document.getElementById('don_category').value = don.category;
             document.getElementById('don_description').value = don.description;
-            document.getElementById('don_username').value = don.donator_username;
+            document.getElementById('don_email').value = don.donator_email;
             document.getElementById('donationModal').style.display = 'block';
         }
 
@@ -678,7 +657,7 @@
                 product_name: document.getElementById('don_name').value,
                 category: document.getElementById('don_category').value,
                 description: document.getElementById('don_description').value,
-                donator_username: document.getElementById('don_username').value
+                donator_email: document.getElementById('don_email').value
             };
             const res = await fetch(`${API_URL}/employee/donations/${id}/approve`, {
                 method: 'POST',
