@@ -210,22 +210,22 @@ def get_products():
     conn = get_db_connection()
     cur = conn.cursor()
     try:
-        # UPDATED: Fetching description and donator_email as well
-        cur.execute("SELECT id, product_name, category, status, description, donator_email FROM products WHERE status = 'available';")
+        # UPDATED: Select donator_username
+        cur.execute("SELECT id, product_name, category, status, description, donator_username FROM products WHERE status = 'available';")
         products = [{
             'id': r[0], 
             'name': r[1], 
             'category': r[2], 
             'status': r[3],
             'description': r[4], 
-            'owner_email': r[5] # Mapping donator_email to owner_email for frontend compatibility
+            'donator_username': r[5] # Updated key
         } for r in cur.fetchall()]
     except Exception as e:
         print(f"Error fetching products: {e}")
         conn.rollback()
         # Fallback query if columns are missing
         cur.execute("SELECT id, product_name, category, status FROM products WHERE status = 'available';")
-        products = [{'id': r[0], 'name': r[1], 'category': r[2], 'status': r[3], 'description': '', 'owner_email': ''} for r in cur.fetchall()]
+        products = [{'id': r[0], 'name': r[1], 'category': r[2], 'status': r[3], 'description': '', 'donator_username': ''} for r in cur.fetchall()]
 
     conn.close()
     return jsonify(products), 200
@@ -308,7 +308,7 @@ def get_my_requests():
     conn.close()
     return jsonify(requests), 200
 
-#---DONQTION REQUEST---
+#---DONATION REQUEST---
 @app.route('/api/donate', methods=['POST'])
 @token_required
 def request_donation():
@@ -316,15 +316,15 @@ def request_donation():
     p_name = data.get('product_name')
     cat = data.get('category')
     desc = data.get('description')
-    email = data.get('donator_email')
+    username = data.get('donator_username') # Changed from donator_email
 
     conn = get_db_connection()
     cur = conn.cursor()
     try:
         cur.execute("""
-            INSERT INTO donation_requests (product_name, category, description, donator_email)
+            INSERT INTO donation_requests (product_name, category, description, donator_username)
             VALUES (%s, %s, %s, %s)
-        """, (p_name, cat, desc, email))
+        """, (p_name, cat, desc, username))
         conn.commit()
         return jsonify({"message": "Donation request submitted"}), 201
     except Exception as e:
@@ -344,7 +344,7 @@ def create_product():
     product_name = data.get('product_name')
     category = data.get('category')
     description = data.get('description')
-    donator_email = data.get('donator_email')
+    donator_username = data.get('donator_username') # Changed
 
     conn = get_db_connection()
     if not conn:
@@ -355,11 +355,11 @@ def create_product():
     try:
         sql = """
             INSERT INTO products 
-            (product_name, category, description, donator_email)
+            (product_name, category, description, donator_username)
             VALUES (%s, %s, %s, %s) 
             RETURNING id;
         """
-        cur.execute(sql, (product_name, category, description, donator_email))
+        cur.execute(sql, (product_name, category, description, donator_username))
         product_id = cur.fetchone()[0]
         conn.commit()
 
@@ -384,7 +384,7 @@ def get_single_product(product_id):
 
     try:
         sql = """
-            SELECT id, product_name, category, description, donator_email, status 
+            SELECT id, product_name, category, description, donator_username, status 
             FROM products 
             WHERE id = %s;
         """
@@ -392,7 +392,7 @@ def get_single_product(product_id):
         product = cur.fetchone()
 
         if product:
-            columns = ['id', 'product_name', 'category', 'description', 'donator_email', 'status']
+            columns = ['id', 'product_name', 'category', 'description', 'donator_username', 'status']
             result = dict(zip(columns, product))
             return jsonify(result), 200
         else:
@@ -417,7 +417,7 @@ def get_all_products():
     try:
         sql = """
             SELECT 
-                p.id, p.product_name, p.category, p.status, p.donator_email, p.publish_date,
+                p.id, p.product_name, p.category, p.status, p.donator_username, p.publish_date,
                 u.username as borrower_name
             FROM products p
             LEFT JOIN borrow_requests br ON p.id = br.product_id AND br.status = 'approved'
@@ -426,7 +426,7 @@ def get_all_products():
         """
         cur.execute(sql)
         
-        columns = ['id', 'product_name', 'category', 'status', 'donator_email', 'publish_date', 'borrower_name']
+        columns = ['id', 'product_name', 'category', 'status', 'donator_username', 'publish_date', 'borrower_name']
         products = [dict(zip(columns, r)) for r in cur.fetchall()]
         
         for p in products:
@@ -449,7 +449,7 @@ def update_product(product_id):
     product_name = data.get('product_name')
     category = data.get('category')
     description = data.get('description')
-    donator_email = data.get('donator_email')
+    donator_username = data.get('donator_username') # Changed
     status = data.get('status')
 
     conn = get_db_connection()
@@ -464,12 +464,12 @@ def update_product(product_id):
             SET product_name = %s, 
                 category = %s, 
                 description = %s, 
-                donator_email = %s, 
+                donator_username = %s, 
                 status = %s
             WHERE id = %s 
             RETURNING id;
         """
-        cur.execute(sql, (product_name, category, description, donator_email, status, product_id ))
+        cur.execute(sql, (product_name, category, description, donator_username, status, product_id ))
 
         updated_id = cur.fetchone()
 
@@ -591,8 +591,8 @@ def update_request_status(req_id):
 def get_donations():
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute("SELECT id, product_name, category, description, donator_email, created_at FROM donation_requests WHERE status = 'donation_pending' ORDER BY created_at DESC")
-    dons = [{'id':r[0], 'product_name':r[1], 'category':r[2], 'description':r[3], 'donator_email':r[4], 'created_at':str(r[5])} for r in cur.fetchall()]
+    cur.execute("SELECT id, product_name, category, description, donator_username, created_at FROM donation_requests WHERE status = 'donation_pending' ORDER BY created_at DESC")
+    dons = [{'id':r[0], 'product_name':r[1], 'category':r[2], 'description':r[3], 'donator_username':r[4], 'created_at':str(r[5])} for r in cur.fetchall()]
     conn.close()
     return jsonify(dons), 200
 
@@ -614,9 +614,9 @@ def approve_donation(don_id):
     cur = conn.cursor()
     try:
         cur.execute("""
-            INSERT INTO products (product_name, category, description, donator_email, status)
+            INSERT INTO products (product_name, category, description, donator_username, status)
             VALUES (%s, %s, %s, %s, 'available')
-        """, (data['product_name'], data['category'], data['description'], data['donator_email']))
+        """, (data['product_name'], data['category'], data['description'], data['donator_username']))
         
         cur.execute("UPDATE donation_requests SET status = 'approved' WHERE id = %s", (don_id,))
         
