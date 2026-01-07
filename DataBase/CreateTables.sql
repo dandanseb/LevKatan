@@ -46,7 +46,7 @@ CREATE TABLE donation_requests (
     product_name VARCHAR(100) NOT NULL,
     category VARCHAR(50) NOT NULL,
     description VARCHAR(200),
-    donator_email VARCHAR(100) NOT NULL,
+    donator_username VARCHAR(100) NOT NULL,
     status VARCHAR(20) DEFAULT 'donation_pending', -- 'donation_pending', 'donation_approved', 'donation_rejected'
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
