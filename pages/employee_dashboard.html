@@ -96,7 +96,7 @@
         .btn-primary {
             background: var(--brand-pink); color: white; border: none; padding: 10px 20px;
             border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s;
-            display: inline-flex; align-items: center; justify-content: center; /* Added for centering */
+            display: inline-flex; align-items: center; justify-content: center;
             gap: 8px; width: auto;
         }
         .btn-primary:hover { background: var(--brand-pink-hover); transform: translateY(-2px); box-shadow: 0 4px 10px rgba(255, 105, 180, 0.3); }
@@ -227,7 +227,7 @@
                     <tr>
                         <th>תאריך הבקשה</th>
                         <th>שם המוצר</th>
-                        <th>אימייל התורם</th>
+                        <th>שם התורם</th>
                         <th>פעולות</th>
                     </tr>
                 </thead>
@@ -287,7 +287,7 @@
 
                     <label class="checkbox-wrapper">
                         <input type="checkbox" id="orgCheckbox" onchange="toggleOrgUser()">
-                        נתרם על ידי עמותת לב קטן
+                        עמותת לב קטן
                     </label>
                 </div>
 
@@ -369,8 +369,8 @@
                     <textarea id="don_description" rows="3" required></textarea>
                 </div>
                 <div class="form-group">
-                    <label>אימייל התורם</label>
-                    <input type="email" id="don_email" required>
+                    <label>שם משתמש של התורם</label>
+                    <input type="text" id="don_username" required>
                 </div>
                 <div style="display:flex; gap:10px; margin-top:20px;">
                     <button type="submit" class="btn-approve" style="flex:1">שמור ואשר תרומה ✅</button>
@@ -442,7 +442,7 @@
         function toggleOrgUser() {
             const checkbox = document.getElementById('orgCheckbox');
             const userInput = document.getElementById('donator_username');
-            const ORG_USERNAME = "עמותת לב קטן"; 
+            const ORG_USERNAME = "lev_katan_org"; 
 
             if (checkbox.checked) {
                 userInput.value = ORG_USERNAME;
@@ -520,14 +520,14 @@
             if(products.length === 0) tbody.innerHTML = "<tr><td colspan='6' style='text-align:center; padding:20px;'>אין מוצרים תואמים לפילטר 🔍</td></tr>";
         }
 
-        // ADD PRODUCT - FIX: Sending donator_email key with username value
+        // ADD PRODUCT - Using donator_username key
         document.getElementById('productForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const newProduct = {
                 product_name: document.getElementById('product_name').value,
                 category: document.getElementById('category').value,
                 description: document.getElementById('description').value,
-                donator_email: document.getElementById('donator_username').value, // Use donator_email key per DB schema
+                donator_username: document.getElementById('donator_username').value,
             };
 
             const res = await fetch(`${API_URL}/employee/products`, {
@@ -571,17 +571,16 @@
             document.getElementById('edit_category').value = product.category;
             document.getElementById('edit_description').value = product.description;
             
-            // Populating the username input with the data stored in donator_email
-            document.getElementById('edit_donator_username').value = product.donator_email;
+            // Populating username from product.donator_username
+            document.getElementById('edit_donator_username').value = product.donator_username || '';
 
             document.getElementById('edit_status').value = statusMap[product.status] || product.status;
             
-            // Ensure usernames are loaded so the edit dropdown works
             loadUserUsernamesForDropdown();
             document.getElementById('editModal').style.display = 'block';
         }
 
-        // EDIT PRODUCT - FIX: Sending donator_email key with username value
+        // EDIT PRODUCT - Using donator_username key
         document.getElementById('editProductForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const id = document.getElementById('edit_id').value;
@@ -589,7 +588,7 @@
                 product_name: document.getElementById('edit_product_name').value,
                 category: document.getElementById('edit_category').value,
                 description: document.getElementById('edit_description').value,
-                donator_email: document.getElementById('edit_donator_username').value, // Use donator_email key per DB schema
+                donator_username: document.getElementById('edit_donator_username').value,
             };
 
             const res = await fetch(`${API_URL}/employee/products/${id}`, {
@@ -643,7 +642,7 @@
                 <tr>
                     <td>${d.created_at.split(' ')[0]}</td>
                     <td>${d.product_name}</td>
-                    <td>${d.donator_email}</td>
+                    <td>${d.donator_username || d.donator_email}</td>
                     <td>
                         <button class="btn-edit" onclick="openApproveDonation(${JSON.stringify(d).replace(/"/g, '&quot;')})">ערוך ואשר ✏️</button>
                         <button class="btn-reject" onclick="rejectDonation(${d.id})">דחה ❌</button>
@@ -657,10 +656,12 @@
             document.getElementById('don_name').value = don.product_name;
             document.getElementById('don_category').value = don.category;
             document.getElementById('don_description').value = don.description;
-            document.getElementById('don_email').value = don.donator_email;
+            // Trying to use username, falling back to email if needed, or empty
+            document.getElementById('don_username').value = don.donator_username || don.donator_email || '';
             document.getElementById('donationModal').style.display = 'block';
         }
 
+        // APPROVE DONATION - Sending donator_username
         document.getElementById('approveDonationForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const id = document.getElementById('don_id').value;
@@ -668,7 +669,7 @@
                 product_name: document.getElementById('don_name').value,
                 category: document.getElementById('don_category').value,
                 description: document.getElementById('don_description').value,
-                donator_email: document.getElementById('don_email').value
+                donator_username: document.getElementById('don_username').value
             };
             const res = await fetch(`${API_URL}/employee/donations/${id}/approve`, {
                 method: 'POST',
