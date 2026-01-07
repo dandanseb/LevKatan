@@ -188,18 +188,15 @@
             margin-bottom: 5px;
         }
 
-        /* UPDATED: Compact Centered Category Pill */
+        /* Compact Centered Category Pill */
         .cat-tag {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            /* Ensures text is centered */
             gap: 6px;
-            /* Reduced gap */
             background: var(--brand-pink);
             color: white;
             padding: 4px 10px;
-            /* Reduced padding (smaller pill) */
             border-radius: 20px;
             font-size: 12px;
             font-weight: bold;
@@ -208,13 +205,11 @@
 
         .cat-img {
             width: 18px;
-            /* Reduced icon size */
             height: 18px;
             object-fit: contain;
             border-radius: 50%;
             padding: 1px;
             background: rgba(255, 255, 255, 0.2);
-            /* Slight contrast for icon */
         }
 
         body.dark-mode .cat-tag {
@@ -301,7 +296,7 @@
             min-width: 150px;
         }
 
-        /* FORM STYLES (Profile) */
+        /* FORM STYLES */
         .form-group {
             margin-bottom: 15px;
         }
@@ -413,7 +408,6 @@
             gap: 10px;
         }
 
-        /* UPDATED: Modal Specific Styling */
         #modalTagContainer {
             display: flex;
             flex-direction: column;
@@ -433,7 +427,6 @@
             border: 1px solid var(--border-color);
         }
 
-        /* Missing style added for the text below the icon */
         .modal-cat-badge {
             background: var(--brand-pink);
             color: white;
@@ -443,7 +436,7 @@
             font-weight: bold;
         }
 
-        /* Bouton de don flottant */
+        /* Floating Button */
         .btn-donate-float {
             position: fixed;
             bottom: 20px;
@@ -469,7 +462,6 @@
             background: var(--brand-pink-hover);
         }
 
-        /* Tooltip au survol */
         .btn-donate-float::after {
             content: "תרמו מוצר";
             position: absolute;
@@ -628,10 +620,12 @@
                     <label>תיאור המוצר</label>
                     <textarea id="don_description" class="form-control" rows="3" maxlength="200" required></textarea>
                 </div>
-                <div class="form-group">
-                    <label>אימייל של התורם</label>
-                    <input type="email" id="don_email" class="form-control" required>
+
+                <div class="form-group" style="display:flex; align-items:center; gap:10px;">
+                    <input type="checkbox" id="don_anonymous" style="width:auto; margin:0; transform:scale(1.2); cursor:pointer;">
+                    <label for="don_anonymous" style="margin:0; cursor:pointer;">תרומה בעילום שם (אנונימי)</label>
                 </div>
+
                 <button type="submit" class="btn-borrow">שלח בקשת תרומה 💝</button>
             </form>
         </div>
@@ -646,7 +640,6 @@
         // Global variable to store fetched products
         let allProducts = [];
         let currentModalProductId = null;
-        // Global var to store current limits for the session
         let currentLimits = { max_days: 14, remaining: 0 };
 
         // --- Theme Logic ---
@@ -743,28 +736,22 @@
 
         // --- POPUP LOGIC ---
         async function openPopup(id) {
-            console.log("Opening popup for ID:", id);
             const p = allProducts.find(prod => prod.id === id);
             if (!p) return;
 
             currentModalProductId = id;
 
-            // Populate Modal Data
             document.getElementById('modalTitle').innerText = p.name;
-
-            // This line caused the error before because 'modalCat' didn't exist in HTML
             const modalCatEl = document.getElementById('modalCat');
             if (modalCatEl) modalCatEl.innerText = translateCategory(p.category);
 
-            // Modal Image Path
             document.getElementById('modalImg').src = `../images/${p.category}.png`;
             document.getElementById('modalImg').style.display = 'block';
 
             document.getElementById('modalDesc').innerText = p.description ? p.description : 'אין תיאור זמין עבור מוצר זה.';
 
-            // Extract Donor Name from Email
-            const donorName = p.owner_email ? p.owner_email.split('@')[0] : 'אנונימי';
-            document.getElementById('modalDonor').innerText = donorName;
+            // UPDATED: Show Username directly
+            document.getElementById('modalDonor').innerText = p.donator_username || 'אנונימי';
 
             // Fetch and Display Borrow Status
             const limitBox = document.getElementById('borrowLimitInfo');
@@ -782,7 +769,7 @@
                 if (status.remaining_slots > 0) {
                     limitBox.style.display = 'block';
                     limitBox.innerHTML = `✅ ניתן להשאיל עוד <b>${status.remaining_slots}</b> מוצרים (עד ${status.max_items} במקביל).<br>⏱️ זמן השאלה מקסימלי: <b>${status.max_days}</b> ימים.`;
-                    limitBox.style.background = '#E3F2FD'; // Blue
+                    limitBox.style.background = '#E3F2FD';
                     limitBox.style.color = '#0D47A1';
                     borrowBtn.disabled = false;
                     borrowBtn.style.opacity = "1";
@@ -790,7 +777,7 @@
                 } else {
                     limitBox.style.display = 'block';
                     limitBox.innerHTML = `⚠️ הגעת למכסת ההשאלות שלך! ניתן להשאיל עד ${status.max_items} מוצרים במקביל.<br>יש להחזיר מוצרים מושאלים לפני בקשת השאלה חדשה.`;
-                    limitBox.style.background = '#FFEBEE'; // Red
+                    limitBox.style.background = '#FFEBEE';
                     limitBox.style.color = '#C62828';
                     borrowBtn.disabled = true;
                     borrowBtn.style.opacity = "0.5";
@@ -800,13 +787,11 @@
                 console.error("Error fetching limits", e);
             }
 
-            // Setup Buttons
             borrowBtn.onclick = () => borrow(id);
 
             const similarBtn = document.getElementById('modalSimilarBtn');
             similarBtn.onclick = () => discoverSimilar(p.category);
 
-            // Show Modal
             document.getElementById('itemModal').style.display = 'flex';
         }
 
@@ -842,7 +827,6 @@
 
         // --- ACTION LOGIC ---
         async function borrow(id) {
-            // Calculate max date string (YYYY-MM-DD)
             const today = new Date();
             const maxDateObj = new Date();
             maxDateObj.setDate(today.getDate() + currentLimits.max_days);
@@ -851,7 +835,6 @@
             const returnDate = prompt(`עד מתי ברצונך להשאיל? (תאריך מקסימלי: ${maxDateStr})\nהכנס תאריך בפורמט YYYY-MM-DD:`, maxDateStr);
             if (!returnDate) return;
 
-            // Basic Frontend Validation
             if (new Date(returnDate) > maxDateObj) {
                 alert(`תאריך זה חורג מהמותר! ניתן להשאיל עד ${currentLimits.max_days} ימים.`);
                 return;
@@ -875,7 +858,7 @@
         }
 
         // --- HISTORY LOGIC ---
-        let allMyRequests = []; // Variable globale pour le stockage
+        let allMyRequests = [];
 
         async function loadHistory() {
             try {
@@ -883,7 +866,7 @@
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 allMyRequests = await res.json();
-                filterAndRenderHistory(); // On lance le premier affichage
+                filterAndRenderHistory();
             } catch (e) {
                 console.error("Erreur chargement historique", e);
             }
@@ -892,13 +875,11 @@
         function filterAndRenderHistory() {
             const filter = document.getElementById('requestStatusFilter').value;
             const container = document.getElementById('historyGrid');
-            // Allow 'returned' items to show when 'all' is selected
             const filtered = allMyRequests.filter(r => filter === 'all' || r.status === filter);
 
             container.innerHTML = filtered.map(r => {
                 let buttonsHtml = "";
 
-                // Only show actions for active loans
                 if (r.status === 'approved') {
                     buttonsHtml += `
                         <button class="btn-borrow" style="background-color: var(--brand-pink); border-radius:20px; margin-top:10px;" onclick="requestExtension(${r.id})">בקשת הארכת השאלה ⏳</button>
@@ -932,8 +913,8 @@
 
                 if (res.ok) {
                     alert("המוצר הוחזר בהצלחה! ↩️");
-                    loadHistory(); // Updates list to show 'Returned' status
-                    loadProducts(); // Updates catalog availability
+                    loadHistory();
+                    loadProducts();
                 } else {
                     alert("שגיאה: " + (data.message || "לא ניתן להחזיר"));
                 }
@@ -943,7 +924,6 @@
         }
 
         async function requestExtension(borrowId) {
-            // 1. Ensure we have the latest limits (Max days)
             if (currentLimits.max_days === 14 && currentLimits.remaining === 0) {
                 try {
                     const res = await fetch(`${API_URL}/borrow-status`, {
@@ -958,18 +938,14 @@
                 }
             }
 
-            // 2. Calculate Max Date (Today + Max Days allowed)
             const today = new Date();
             const maxDateObj = new Date();
             maxDateObj.setDate(today.getDate() + currentLimits.max_days);
             const maxDateStr = maxDateObj.toISOString().split('T')[0];
 
-            // 3. Prompt User
             const newDate = prompt(`עד מתי ברצונך להאריך? (תאריך מקסימלי: ${maxDateStr})\nהכנס תאריך בפורמט YYYY-MM-DD:`, maxDateStr);
+            if (!newDate) return;
 
-            if (!newDate) return; // User cancelled
-
-            // 4. Validate Input
             const selectedDate = new Date(newDate);
             if (isNaN(selectedDate.getTime())) {
                 alert("תאריך לא תקין.");
@@ -981,7 +957,6 @@
                 return;
             }
 
-            // 5. Send Request
             try {
                 const res = await fetch(`${API_URL}/extensions`, {
                     method: 'POST',
@@ -990,10 +965,9 @@
                 });
 
                 const data = await res.json();
-
                 if (res.ok) {
                     alert("בקשת ההארכה נשלחה בהצלחה! ⏳");
-                    loadHistory(); // Refresh the list
+                    loadHistory();
                 } else {
                     alert("שגיאה: " + (data.message || "לא ניתן לבצע הארכה"));
                 }
@@ -1001,7 +975,6 @@
                 alert("שגיאה בתקשורת עם השרת");
             }
         }
-
 
         function translateStatus(s, returnedDate) {
             if (s === 'returned') return 'הוחזר';
@@ -1013,25 +986,17 @@
                 if (!returnedDate || returnedDate === 'null' || returnedDate === 'לא צוין') {
                     return 'אושר - תאריך החזרה לא ידוע';
                 }
-
-                // today's date
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
-
-                //return date
                 const returnD = new Date(returnedDate);
                 returnD.setHours(0, 0, 0, 0);
 
                 const diffInTime = returnD.getTime() - today.getTime();
                 const diffInDays = Math.ceil(diffInTime / (1000 * 3600 * 24));
 
-                if (diffInDays < 0) {
-                    return `אושר - איחור של ${Math.abs(diffInDays)} ימים! ⚠️`;
-                } else if (diffInDays === 0) {
-                    return `אושר - להחזיר היום! 🔔`;
-                } else {
-                    return `אושר - נותרו עוד ${diffInDays} ימים להחזרה`;
-                }
+                if (diffInDays < 0) return `אושר - איחור של ${Math.abs(diffInDays)} ימים! ⚠️`;
+                else if (diffInDays === 0) return `אושר - להחזיר היום! 🔔`;
+                else return `אושר - נותרו עוד ${diffInDays} ימים להחזרה`;
             }
             return s;
         }
@@ -1095,14 +1060,19 @@
             document.getElementById('donateModal').style.display = 'none';
         }
 
+        // --- UPDATED: Donation Submission Logic ---
         async function submitDonation(event) {
             event.preventDefault();
+
+            // Check if anonymous
+            const isAnonymous = document.getElementById('don_anonymous').checked;
 
             const donationData = {
                 product_name: document.getElementById('don_name').value,
                 category: document.getElementById('don_category').value,
                 description: document.getElementById('don_description').value,
-                donator_email: document.getElementById('don_email').value
+                // Send username or 'Anonymous' based on checkbox
+                donator_username: isAnonymous ? 'אנונימי' : username
             };
 
             try {
@@ -1127,6 +1097,7 @@
                 alert("שגיאה בחיבור לשרת");
             }
         }
+
         function logout() { localStorage.clear(); window.location.href = 'login_page.html'; }
 
         // Init
