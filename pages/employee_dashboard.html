@@ -298,7 +298,7 @@
 
                     <label class="checkbox-wrapper">
                         <input type="checkbox" id="orgCheckbox" onchange="toggleOrgUser()">
-                        עמותת לב קטן
+                        נתרם ע"י עמותת לב קטן
                     </label>
                 </div>
 
@@ -453,7 +453,7 @@
         function toggleOrgUser() {
             const checkbox = document.getElementById('orgCheckbox');
             const userInput = document.getElementById('donator_username');
-            const ORG_USERNAME = "lev_katan_org"; // Default Org Username
+            const ORG_USERNAME = "עמותת לב קטן"; // Default Org Username
 
             if (checkbox.checked) {
                 userInput.value = ORG_USERNAME;
