@@ -18,7 +18,7 @@ CREATE TABLE products (
     category VARCHAR(50) NOT NULL,
     publish_date DATE DEFAULT CURRENT_DATE,
     status VARCHAR(20) CHECK (status IN ('available', 'borrowed', 'unavailable', 'confirmation_pending')) DEFAULT 'available',
-    donator_email VARCHAR(100),
+    donator_username VARCHAR(100),
     description VARCHAR(200)
 
 );
