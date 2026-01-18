@@ -339,7 +339,7 @@
             font-weight: bold;
         }
 
-        /* MODAL POPUP */
+        /* Unified Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -351,19 +351,35 @@
             background-color: rgba(0, 0, 0, 0.5);
             align-items: center;
             justify-content: center;
-            backdrop-filter: blur(2px);
+            backdrop-filter: blur(4px);
+            padding: 20px;
         }
 
         .modal-content {
             background-color: var(--card-bg);
             padding: 30px;
             border-radius: 16px;
-            width: 90%;
-            max-width: 500px;
+            width: 100%;
+            max-width: 600px;
+            max-height: 85vh;
+            overflow-y: auto;
             position: relative;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
             text-align: center;
             border: 1px solid var(--border-color);
+            animation: fadeInScale 0.3s ease-out;
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
 
         .close-btn {
