@@ -271,7 +271,7 @@ def borrow_product():
             return jsonify({"message": f"תקופת ההשאלה חורגת מהמותר ({max_days} ימים)."}), 400
 
         # 4. Check Availability & Create Request (Existing Logic)
-        cur.execute("SELECT status FROM product WHERE id = %s", (product_id,))
+        cur.execute("SELECT status FROM products WHERE id = %s", (product_id,))
         status = cur.fetchone()
         if not status or status[0] != 'available':
             return jsonify({"message": "Product not available"}), 400
@@ -852,5 +852,6 @@ def get_borrow_status():
 if __name__ == '__main__':
     # Reads the string "True" or "False" from .env and converts to boolean
     debug_mode = os.getenv("FLASK_DEBUG", "False").lower() in ('true', '1', 't')
+
 
     app.run(debug=debug_mode, port=5230, host='0.0.0.0')
