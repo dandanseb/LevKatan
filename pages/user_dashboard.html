@@ -491,7 +491,8 @@
         </div>
 
         <div id="roleNav" class="nav-links">
-            <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
+            <button class="theme-toggle" onclick="toggleTheme()" title="מצב מוחשך">🌓</button>
+            <button class="help-toggle" onclick="openHelpModal()" title="עזרה">❓</button>
         </div>
 
         <div class="user-area">
@@ -622,12 +623,23 @@
                 </div>
 
                 <div class="form-group" style="display:flex; align-items:center; gap:10px;">
-                    <input type="checkbox" id="don_anonymous" style="width:auto; margin:0; transform:scale(1.2); cursor:pointer;">
+                    <input type="checkbox" id="don_anonymous"
+                        style="width:auto; margin:0; transform:scale(1.2); cursor:pointer;">
                     <label for="don_anonymous" style="margin:0; cursor:pointer;">תרומה בעילום שם (אנונימי)</label>
                 </div>
 
                 <button type="submit" class="btn-borrow">שלח בקשת תרומה 💝</button>
             </form>
+        </div>
+    </div>
+
+    <div id="helpModal" class="modal" onclick="closeHelpOnOutside(event)">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeHelpModal()">&times;</span>
+            <h2 style="margin-bottom:10px; color:var(--text-color);">מדריך למשתמש</h2>
+            <div id="helpContent" style="text-align: right;">
+                <p>טוען מידע...</p>
+            </div>
         </div>
     </div>
 
@@ -1097,6 +1109,24 @@
                 alert("שגיאה בחיבור לשרת");
             }
         }
+
+        // --- HELP MODAL LOGIC ---
+        async function openHelpModal() {
+            document.getElementById('helpModal').style.display = 'flex';
+            const contentDiv = document.getElementById('helpContent');
+            if (contentDiv.innerHTML.includes('טוען מידע')) {
+                try {
+                    // NOTE: Different file for user dashboard
+                    const response = await fetch('help/user_help.html');
+                    if (response.ok) {
+                        const html = await response.text();
+                        contentDiv.innerHTML = html;
+                    } else { contentDiv.innerHTML = "שגיאה בטעינה"; }
+                } catch (e) { contentDiv.innerHTML = "שגיאה בטעינה"; }
+            }
+        }
+        function closeHelpModal() { document.getElementById('helpModal').style.display = 'none'; }
+        function closeHelpOnOutside(e) { if (e.target === document.getElementById('helpModal')) closeHelpModal(); }
 
         function logout() { localStorage.clear(); window.location.href = 'login_page.html'; }
 
