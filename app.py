@@ -277,7 +277,7 @@ def borrow_product():
             return jsonify({"message": "Product not available"}), 400
             
         cur.execute("INSERT INTO borrow_requests (user_id, product_id, returned_date) VALUES (%s, %s, %s)", (user_id, product_id, returned_date_str))
-        cur.execute("UPDATE product SET status = 'unavailable' WHERE id = %s", (product_id,))
+        cur.execute("UPDATE products SET status = 'unavailable' WHERE id = %s", (product_id,))
         
         conn.commit()
         return jsonify({"message": "בקשתך נשלחה בהצלחה!"}), 200
@@ -855,3 +855,4 @@ if __name__ == '__main__':
 
 
     app.run(debug=debug_mode, port=5230, host='0.0.0.0')
+
