@@ -362,7 +362,7 @@
             overflow-y: auto;
             position: relative;
             box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
-            text-align: center;
+            text-align: right;
             border: 1px solid var(--border-color);
             animation: fadeInScale 0.3s ease-out;
         }
@@ -716,7 +716,7 @@
         // --- ADD & EDIT MODAL LOGIC ---
 
         function openAddModal() {
-            document.getElementById('addProductModal').style.display = 'block';
+            document.getElementById('addProductModal').style.display = 'flex';
             loadUserUsernamesForDropdown();
         }
 
@@ -939,7 +939,7 @@
             document.getElementById('don_description').value = don.description;
             // Trying to use username, falling back to email if needed, or empty
             document.getElementById('don_username').value = don.donator_username || don.donator_email || '';
-            document.getElementById('donationModal').style.display = 'block';
+            document.getElementById('donationModal').style.display = 'flex';
         }
 
         // APPROVE DONATION - Sending donator_username
