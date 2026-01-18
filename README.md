@@ -73,6 +73,10 @@ The system allows users to borrow useful items for their children free of charge
   - `id` (Serial), `user_id` (FK), `product_id` (FK), `request_date`, `returned_date` (Date), `status` (pending/approved/rejected).
 - **Table: `donation_requests`**
   - `id` (Serial), `product_name`, `category`, `description`, `donator_email`, `status` (pending/approved/rejected), `created_at`.
+- **Table: `extension_requests`**
+  - `id` (Serial), `borrow_id` (FK to borrow_requests), `new_returned_date` , `status` (extension_pending, extension_approved, extension_rejected), `request_date`.
+- **Table: `system_settings`**
+  - `setting_key` (PK), `setting_value`. 
 ---
 
 ## 🚀 Project Status
@@ -81,7 +85,6 @@ The system allows users to borrow useful items for their children free of charge
 - [x] User Catalog with Search and Category filters.
 - [x] Dynamic Loan Request System.
 - [x] Real-time countdown for return dates on User Dashboard.
-- [ ] Email notifications for return reminders (Coming Soon).
 
 ---
 
