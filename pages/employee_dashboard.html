@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <title>לב קטן - ניהול המערכת</title>
@@ -20,6 +21,7 @@
             --brand-pink-hover: #E05297;
             --input-disabled-bg: #e9e9e9;
         }
+
         body.dark-mode {
             --bg-color: #121212;
             --header-bg: #1E1E1E;
@@ -33,53 +35,183 @@
             --input-disabled-bg: #3a3a3a;
         }
 
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg-color); color: var(--text-color); margin: 0; transition: background 0.3s; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            transition: background 0.3s;
+        }
 
         /* HEADER STYLES */
         .top-bar {
-            background: var(--header-bg); padding: 10px 20px;
-            display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 2px;
+            background: var(--header-bg);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2px;
         }
-        .brand-area { display: flex; align-items: center; gap: 10px; }
-        .brand-logo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
 
-        .nav-actions { display: flex; align-items: center; gap: 10px; }
+        .brand-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
         .nav-item {
-            text-decoration: none; color: var(--nav-btn-text); font-size: 14px; font-weight: 600;
-            padding: 8px 16px; border-radius: 20px; background: var(--nav-btn-bg);
-            transition: all 0.2s; display: inline-flex; align-items: center; gap: 5px;
+            text-decoration: none;
+            color: var(--nav-btn-text);
+            font-size: 14px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: var(--nav-btn-bg);
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
         }
-        .nav-item:hover { background: var(--nav-btn-hover); color: var(--text-color); }
 
-        .theme-toggle { background: none; border: none; font-size: 20px; cursor: pointer; padding: 5px; border-radius: 50%; margin-left: 10px; }
-        .logout-btn { background: #FF4444; color: white; border: none; padding: 6px 15px; border-radius: 20px; font-weight: bold; cursor: pointer; }
-        .logout-btn:hover { background: #D32F2F; }
+        .nav-item:hover {
+            background: var(--nav-btn-hover);
+            color: var(--text-color);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            margin-left: 10px;
+        }
+
+        .logout-btn {
+            background: #FF4444;
+            color: white;
+            border: none;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .logout-btn:hover {
+            background: #D32F2F;
+        }
 
         /* TABS STYLE */
-        .tabs { display: flex; background: var(--header-bg); justify-content: center; box-shadow: 0 4px 6px -4px rgba(0,0,0,0.1); margin-bottom: 30px; }
-        .tab { padding: 15px 40px; cursor: pointer; font-weight: 600; color: #888; border-bottom: 3px solid transparent; font-size: 16px; transition: all 0.3s; }
-        .tab:hover { background: rgba(0,0,0,0.05); color: var(--brand-pink); }
-        .tab.active { color: var(--brand-pink); border-bottom-color: var(--brand-pink); }
+        .tabs {
+            display: flex;
+            background: var(--header-bg);
+            justify-content: center;
+            box-shadow: 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .tab {
+            padding: 15px 40px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #888;
+            border-bottom: 3px solid transparent;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            background: rgba(0, 0, 0, 0.05);
+            color: var(--brand-pink);
+        }
+
+        .tab.active {
+            color: var(--brand-pink);
+            border-bottom-color: var(--brand-pink);
+        }
 
         /* CONTAINER & CARDS */
-        .container { max-width: 1000px; margin: 0 auto; padding: 0 20px; padding-bottom: 80px; }
-        .card { background: var(--card-bg); padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); margin-bottom: 30px; }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+            padding-bottom: 80px;
+        }
 
-        h3 { margin-top: 0; color: var(--text-color); border-bottom: 2px solid var(--brand-pink); padding-bottom: 10px; display: inline-block; }
-        h4 { margin-bottom: 15px; color: var(--text-color); opacity: 0.9; }
+        .card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        h3 {
+            margin-top: 0;
+            color: var(--text-color);
+            border-bottom: 2px solid var(--brand-pink);
+            padding-bottom: 10px;
+            display: inline-block;
+        }
+
+        h4 {
+            margin-bottom: 15px;
+            color: var(--text-color);
+            opacity: 0.9;
+        }
 
         /* FORM STYLES */
-        .form-row { display: flex; gap: 15px; flex-wrap: wrap; }
-        .form-group { flex: 1; min-width: 200px; margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
-        .form-control, select, textarea, input {
-            width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px;
-            background: var(--bg-color); color: var(--text-color); box-sizing: border-box; font-family: inherit;
+        .form-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-control,
+        select,
+        textarea,
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            box-sizing: border-box;
+            font-family: inherit;
         }
 
         /* Read-only / Disabled Input Style */
-        input:read-only, input:disabled {
+        input:read-only,
+        input:disabled {
             background-color: var(--input-disabled-bg) !important;
             color: var(--text-color);
             opacity: 0.8;
@@ -87,56 +219,178 @@
         }
 
         /* TABLE STYLES */
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { padding: 15px; text-align: right; border-bottom: 1px solid var(--border-color); color: var(--text-color); }
-        th { background-color: var(--table-head-bg); color: #555; font-weight: bold; font-size: 14px; }
-        body.dark-mode th { color: #ccc; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th,
+        td {
+            padding: 15px;
+            text-align: right;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-color);
+        }
+
+        th {
+            background-color: var(--table-head-bg);
+            color: #555;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        body.dark-mode th {
+            color: #ccc;
+        }
 
         /* BUTTONS */
         .btn-primary {
-            background: var(--brand-pink); color: white; border: none; padding: 10px 20px;
-            border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s;
-            display: inline-flex; align-items: center; justify-content: center;
-            gap: 8px; width: auto;
+            background: var(--brand-pink);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: auto;
         }
-        .btn-primary:hover { background: var(--brand-pink-hover); transform: translateY(-2px); box-shadow: 0 4px 10px rgba(255, 105, 180, 0.3); }
 
-        .btn-edit { background: #E3F2FD; color: #1565C0; border: 1px solid #BBDEFB; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; margin-left: 5px; }
-        .btn-delete, .btn-reject { background: #FFEBEE; color: #D32F2F; border: 1px solid #FFCDD2; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; }
-        .btn-approve { background: #E8F5E9; color: #2E7D32; border: 1px solid #A5D6A7; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; margin-left: 5px; }
-        .btn-cancel { background: #f5f5f5; color: #333; border: 1px solid #ccc; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn-primary:hover {
+            background: var(--brand-pink-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(255, 105, 180, 0.3);
+        }
+
+        .btn-edit {
+            background: #E3F2FD;
+            color: #1565C0;
+            border: 1px solid #BBDEFB;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-left: 5px;
+        }
+
+        .btn-delete,
+        .btn-reject {
+            background: #FFEBEE;
+            color: #D32F2F;
+            border: 1px solid #FFCDD2;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-approve {
+            background: #E8F5E9;
+            color: #2E7D32;
+            border: 1px solid #A5D6A7;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-left: 5px;
+        }
+
+        .btn-cancel {
+            background: #f5f5f5;
+            color: #333;
+            border: 1px solid #ccc;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
 
         /* Floating Action Button (FAB) */
         .fab-btn {
-            position: fixed; bottom: 30px; left: 30px; width: 60px; height: 60px;
-            background-color: var(--brand-pink); color: white; border-radius: 50%; border: none;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3); font-size: 30px; display: flex;
-            align-items: center; justify-content: center; cursor: pointer;
-            transition: transform 0.2s, background-color 0.2s; z-index: 90;
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            width: 60px;
+            height: 60px;
+            background-color: var(--brand-pink);
+            color: white;
+            border-radius: 50%;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            font-size: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+            z-index: 90;
         }
-        .fab-btn:hover { background-color: var(--brand-pink-hover); transform: scale(1.1); }
+
+        .fab-btn:hover {
+            background-color: var(--brand-pink-hover);
+            transform: scale(1.1);
+        }
 
         /* Modal Styles */
         .modal {
-            display:none; position:fixed; z-index:100; left:0; top:0; width:100%; height:100%;
-            overflow:auto; background-color:rgba(0,0,0,0.4); animation: fadeIn 0.3s;
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            animation: fadeIn 0.3s;
         }
+
         .modal-content {
-            background-color:var(--card-bg); margin:5% auto; padding:30px; border-radius:15px;
-            border:1px solid var(--border-color); width:90%; max-width:550px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            background-color: var(--card-bg);
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+            width: 90%;
+            max-width: 550px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
 
         /* Checkbox styling */
         .checkbox-wrapper {
-            display: flex; align-items: center; gap: 8px; margin-top: 5px;
-            font-size: 14px; font-weight: normal; color: var(--text-color); cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 5px;
+            font-size: 14px;
+            font-weight: normal;
+            color: var(--text-color);
+            cursor: pointer;
         }
-        .checkbox-wrapper input[type="checkbox"] { width: auto; transform: scale(1.2); cursor: pointer; }
 
+        .checkbox-wrapper input[type="checkbox"] {
+            width: auto;
+            transform: scale(1.2);
+            cursor: pointer;
+        }
     </style>
 </head>
+
 <body>
     <div class="top-bar">
         <div class="brand-area">
@@ -146,8 +400,11 @@
         <div class="nav-actions">
             <span id="dynamicNav"></span>
             <a href="user_dashboard.html" class="nav-item">🪑 קטלוג</a>
-            <span id="userGreeting" style="margin: 0 5px; font-weight:600; color:var(--text-color); opacity:0.7;"></span>
-            <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
+            <span id="userGreeting"
+                style="margin: 0 5px; font-weight:600; color:var(--text-color); opacity:0.7;"></span>
+
+            <button class="theme-toggle" onclick="toggleTheme()" title="מצב מוחשך">🌓</button>
+            <button class="help-toggle" onclick="openHelpModal()" title="עזרה">❓</button>
             <button class="logout-btn" onclick="logout()">יציאה</button>
         </div>
     </div>
@@ -163,7 +420,8 @@
 
         <div id="inventory-view">
             <div class="card">
-                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
                     <h3>רשימת מוצרים</h3>
 
                     <div style="display: flex; gap: 10px;">
@@ -200,7 +458,7 @@
                     <tbody id="productsTableBody"></tbody>
                 </table>
             </div>
-            
+
             <button class="fab-btn" onclick="openAddModal()">+</button>
         </div>
 
@@ -219,7 +477,7 @@
                 <tbody id="requestsTableBody"></tbody>
             </table>
         </div>
-        
+
         <div id="donations-view" class="card" style="display:none;">
             <h3>בקשות תרומה</h3>
             <table id="donationsTable">
@@ -234,7 +492,7 @@
                 <tbody id="donationsTableBody"></tbody>
             </table>
         </div>
-        
+
         <div id="extensions-view" class="card" style="display:none;">
             <h3>בקשות להארכת השאלה</h3>
             <table id="extensionsTable">
@@ -250,7 +508,7 @@
                 <tbody id="extensionsTableBody"></tbody>
             </table>
         </div>
-        
+
     </div>
 
     <div id="addProductModal" class="modal">
@@ -283,7 +541,8 @@
 
                 <div class="form-group">
                     <label for="donator_username">שם משתמש של התורם</label>
-                    <input list="userUsernamesList" type="text" id="donator_username" placeholder="הקלד או בחר מהרשימה" required>
+                    <input list="userUsernamesList" type="text" id="donator_username" placeholder="הקלד או בחר מהרשימה"
+                        required>
 
                     <label class="checkbox-wrapper">
                         <input type="checkbox" id="orgCheckbox" onchange="toggleOrgUser()">
@@ -293,7 +552,8 @@
 
                 <div style="display:flex; gap:10px; margin-top:20px;">
                     <button type="submit" class="btn-primary" style="flex:1">➕ הוסף מוצר</button>
-                    <button type="button" onclick="document.getElementById('addProductModal').style.display='none'" class="btn-cancel">ביטול</button>
+                    <button type="button" onclick="document.getElementById('addProductModal').style.display='none'"
+                        class="btn-cancel">ביטול</button>
                 </div>
             </form>
         </div>
@@ -301,7 +561,8 @@
 
     <div id="editModal" class="modal">
         <div class="modal-content">
-            <h3 style="margin-top:0;">ערוך פרטי מוצר <span id="editProductId" style="font-size:16px; opacity:0.6;"></span></h3>
+            <h3 style="margin-top:0;">ערוך פרטי מוצר <span id="editProductId"
+                    style="font-size:16px; opacity:0.6;"></span></h3>
 
             <form id="editProductForm">
                 <input type="hidden" id="edit_id">
@@ -339,7 +600,8 @@
 
                 <div style="display:flex; gap:10px; margin-top:20px;">
                     <button type="submit" class="btn-primary" style="flex:1">💾 שמור</button>
-                    <button type="button" onclick="document.getElementById('editModal').style.display='none'" class="btn-cancel">ביטול</button>
+                    <button type="button" onclick="document.getElementById('editModal').style.display='none'"
+                        class="btn-cancel">ביטול</button>
                 </div>
             </form>
         </div>
@@ -374,9 +636,20 @@
                 </div>
                 <div style="display:flex; gap:10px; margin-top:20px;">
                     <button type="submit" class="btn-approve" style="flex:1">שמור ואשר תרומה ✅</button>
-                    <button type="button" onclick="document.getElementById('donationModal').style.display='none'" class="btn-cancel">ביטול</button>
+                    <button type="button" onclick="document.getElementById('donationModal').style.display='none'"
+                        class="btn-cancel">ביטול</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <div id="helpModal" class="modal" onclick="closeHelpOnOutside(event)">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeHelpModal()">&times;</span>
+            <h2 style="margin-bottom:10px; color:var(--text-color);">מדריך לעובד</h2>
+            <div id="helpContent">
+                <p>טוען מידע...</p>
+            </div>
         </div>
     </div>
 
@@ -411,38 +684,38 @@
         }
         if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
 
-        if(!token) window.location.href = 'login_page.html';
+        if (!token) window.location.href = 'login_page.html';
         document.getElementById('userGreeting').innerText = username;
-        if(role === 'admin') document.getElementById('dynamicNav').innerHTML = `<a href="admin_dashboard.html" class="nav-item">🔒 ניהול אדמין</a>`;
+        if (role === 'admin') document.getElementById('dynamicNav').innerHTML = `<a href="admin_dashboard.html" class="nav-item">🔒 ניהול אדמין</a>`;
 
         function logout() { localStorage.clear(); window.location.href = 'login_page.html'; }
-        
+
         function switchTab(tabId) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            if(event) event.target.classList.add('active');
-        
+            if (event) event.target.classList.add('active');
+
             document.getElementById('inventory-view').style.display = tabId === 'inventory' ? 'block' : 'none';
             document.getElementById('requests-view').style.display = tabId === 'requests' ? 'block' : 'none';
             document.getElementById('donations-view').style.display = tabId === 'donations' ? 'block' : 'none';
             document.getElementById('extensions-view').style.display = tabId === 'extensions' ? 'block' : 'none';
-            
-            if(tabId === 'inventory') loadProducts();
-            if(tabId === 'requests') loadRequests();
-            if(tabId === 'donations') loadDonations();
-            if(tabId === 'extensions') loadExtensionRequests();
+
+            if (tabId === 'inventory') loadProducts();
+            if (tabId === 'requests') loadRequests();
+            if (tabId === 'donations') loadDonations();
+            if (tabId === 'extensions') loadExtensionRequests();
         }
 
         // --- ADD & EDIT MODAL LOGIC ---
 
         function openAddModal() {
             document.getElementById('addProductModal').style.display = 'block';
-            loadUserUsernamesForDropdown(); 
+            loadUserUsernamesForDropdown();
         }
 
         function toggleOrgUser() {
             const checkbox = document.getElementById('orgCheckbox');
             const userInput = document.getElementById('donator_username');
-            const ORG_USERNAME = "עמותת לב קטן"; 
+            const ORG_USERNAME = "עמותת לב קטן";
 
             if (checkbox.checked) {
                 userInput.value = ORG_USERNAME;
@@ -454,13 +727,13 @@
         }
 
         async function loadUserUsernamesForDropdown() {
-            if(role !== 'admin') return; 
+            if (role !== 'admin') return;
 
             try {
                 const res = await fetch(`${API_URL}/admin/users`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
-                if(res.ok) {
+                if (res.ok) {
                     const users = await res.json();
                     const dataList = document.getElementById('userUsernamesList');
                     dataList.innerHTML = users.map(u => `<option value="${u.username}">`).join('');
@@ -495,13 +768,13 @@
         function renderInventory(products) {
             const tbody = document.getElementById('productsTableBody');
             tbody.innerHTML = products.map(p => {
-                const borrowerInfo = p.status === 'borrowed' && p.borrower_name 
-                    ? `<span style="color: #E05297; font-weight: bold;"> ${p.borrower_name}</span>` 
+                const borrowerInfo = p.status === 'borrowed' && p.borrower_name
+                    ? `<span style="color: #E05297; font-weight: bold;"> ${p.borrower_name}</span>`
                     : "-";
-                
+
                 const displayCategory = categoryMap[p.category] || p.category;
                 const displayStatus = statusMap[p.status] || p.status;
-        
+
                 return `
                     <tr>
                         <td>${p.id}</td>
@@ -516,12 +789,12 @@
                     </tr>
                 `;
             }).join('');
-            
-            if(products.length === 0) tbody.innerHTML = "<tr><td colspan='6' style='text-align:center; padding:20px;'>אין מוצרים תואמים לפילטר 🔍</td></tr>";
+
+            if (products.length === 0) tbody.innerHTML = "<tr><td colspan='6' style='text-align:center; padding:20px;'>אין מוצרים תואמים לפילטר 🔍</td></tr>";
         }
 
         // ADD PRODUCT - Using donator_username key
-        document.getElementById('productForm').addEventListener('submit', async function(e) {
+        document.getElementById('productForm').addEventListener('submit', async function (e) {
             e.preventDefault();
             const newProduct = {
                 product_name: document.getElementById('product_name').value,
@@ -539,8 +812,8 @@
             if (res.status === 201) {
                 alert("מוצר נוסף בהצלחה!");
                 document.getElementById('productForm').reset();
-                document.getElementById('addProductModal').style.display = 'none'; 
-                toggleOrgUser(); 
+                document.getElementById('addProductModal').style.display = 'none';
+                toggleOrgUser();
                 loadProducts();
             } else {
                 alert("שגיאה בהוספה");
@@ -562,7 +835,7 @@
             const res = await fetch(`${API_URL}/employee/products/${id}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            if(!res.ok) return alert("שגיאה בטעינת המוצר");
+            if (!res.ok) return alert("שגיאה בטעינת המוצר");
 
             const product = await res.json();
             document.getElementById('edit_id').value = product.id;
@@ -570,18 +843,18 @@
             document.getElementById('edit_product_name').value = product.product_name;
             document.getElementById('edit_category').value = product.category;
             document.getElementById('edit_description').value = product.description;
-            
+
             // Populating username from product.donator_username
             document.getElementById('edit_donator_username').value = product.donator_username || '';
 
             document.getElementById('edit_status').value = statusMap[product.status] || product.status;
-            
+
             loadUserUsernamesForDropdown();
             document.getElementById('editModal').style.display = 'block';
         }
 
         // EDIT PRODUCT - Using donator_username key
-        document.getElementById('editProductForm').addEventListener('submit', async function(e) {
+        document.getElementById('editProductForm').addEventListener('submit', async function (e) {
             e.preventDefault();
             const id = document.getElementById('edit_id').value;
             const updatedProduct = {
@@ -607,8 +880,8 @@
 
         // --- REQUESTS, DONATIONS, EXTENSIONS ---
         async function loadRequests() {
-            const res = await fetch(`${API_URL}/employee/requests`, { headers: { 'Authorization': `Bearer ${token}` }});
-            if(res.status === 403) return;
+            const res = await fetch(`${API_URL}/employee/requests`, { headers: { 'Authorization': `Bearer ${token}` } });
+            if (res.status === 403) return;
             const reqs = await res.json();
             const tbody = document.getElementById('requestsTableBody');
             tbody.innerHTML = reqs.map(r => `
@@ -623,7 +896,7 @@
                     </td>
                 </tr>
             `).join('');
-            if(reqs.length === 0) tbody.innerHTML = "<tr><td colspan='5' style='text-align:center; padding:20px;'>אין בקשות ממתינות</td></tr>";
+            if (reqs.length === 0) tbody.innerHTML = "<tr><td colspan='5' style='text-align:center; padding:20px;'>אין בקשות ממתינות</td></tr>";
         }
 
         async function updateStatus(id, status) {
@@ -636,7 +909,7 @@
         }
 
         async function loadDonations() {
-            const res = await fetch(`${API_URL}/employee/donations`, { headers: { 'Authorization': `Bearer ${token}` }});
+            const res = await fetch(`${API_URL}/employee/donations`, { headers: { 'Authorization': `Bearer ${token}` } });
             const dons = await res.json();
             document.getElementById('donationsTableBody').innerHTML = dons.map(d => `
                 <tr>
@@ -676,7 +949,7 @@
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify(data)
             });
-            if(res.ok) {
+            if (res.ok) {
                 alert("התרומה אושרה והתווספה למלאי!");
                 document.getElementById('donationModal').style.display = 'none';
                 loadDonations();
@@ -684,13 +957,13 @@
         });
 
         async function rejectDonation(id) {
-            if(!confirm("האם למחוק בקשת תרומה זו?")) return;
-            await fetch(`${API_URL}/employee/donations/${id}/reject`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` }});
+            if (!confirm("האם למחוק בקשת תרומה זו?")) return;
+            await fetch(`${API_URL}/employee/donations/${id}/reject`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
             loadDonations();
         }
 
         async function loadExtensionRequests() {
-            const res = await fetch(`${API_URL}/employee/extensions`, { headers: { 'Authorization': `Bearer ${token}` }});
+            const res = await fetch(`${API_URL}/employee/extensions`, { headers: { 'Authorization': `Bearer ${token}` } });
             const data = await res.json();
             const tbody = document.getElementById('extensionsTableBody');
             if (data.length === 0) { tbody.innerHTML = "<tr><td colspan='5' style='text-align:center;'>אין בקשות הארכה ממתינות</td></tr>"; return; }
@@ -707,24 +980,42 @@
                 </tr>
             `).join('');
         }
-        
+
         async function handleExtension(extId, status) {
             const res = await fetch(`${API_URL}/employee/extensions/${extId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ status: status })
             });
-            if(res.ok) {
+            if (res.ok) {
                 alert(status === 'approved' ? "התאריך עודכן בהצלחה" : "הבקשה נדחתה");
                 loadExtensionRequests();
             }
         }
 
-        window.onclick = function(event) {
+        window.onclick = function (event) {
             if (event.target.className === 'modal') {
                 event.target.style.display = "none";
             }
         }
+
+        // --- HELP MODAL LOGIC ---
+        async function openHelpModal() {
+            document.getElementById('helpModal').style.display = 'flex';
+            const contentDiv = document.getElementById('helpContent');
+            if (contentDiv.innerHTML.includes('טוען מידע')) {
+                try {
+                    // NOTE: Different file for employee dashboard
+                    const response = await fetch('help/employee_help.html');
+                    if (response.ok) {
+                        const html = await response.text();
+                        contentDiv.innerHTML = html;
+                    } else { contentDiv.innerHTML = "שגיאה בטעינה"; }
+                } catch (e) { contentDiv.innerHTML = "שגיאה בטעינה"; }
+            }
+        }
+        function closeHelpModal() { document.getElementById('helpModal').style.display = 'none'; }
+        function closeHelpOnOutside(e) { if (e.target === document.getElementById('helpModal')) closeHelpModal(); }
 
         // Init
         loadProducts();
@@ -732,4 +1023,5 @@
         loadDonations();
     </script>
 </body>
+
 </html>
